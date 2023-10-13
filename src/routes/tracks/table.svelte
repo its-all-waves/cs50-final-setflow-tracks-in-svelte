@@ -1,10 +1,7 @@
 <script>
+	import { display } from '../../lib/util/util'
 	// expose as attrs
 	export let data
-
-	function display(name) {
-		return name.replace('_', ' ')
-	}
 </script>
 
 <table data-main-table>
@@ -29,11 +26,13 @@
 
 				<!-- a cell (col) per scene -->
 				{#each data.table.scenes as scene}
-					<td
-						data-track-name={track.name}
-						data-scene-name={scene.name}
-						data-drop-zone="scene"
-					/>
+					<td>
+						<div
+							data-track-name={track.name}
+							data-scene-name={scene.name}
+							data-drop-zone
+						/>
+					</td>
 				{/each}
 			</tr>
 		{/each}
@@ -41,15 +40,13 @@
 </table>
 
 <style>
-	/* DROP ZONES */
-	[data-drop-zone='scene'] {
-		border: 3px solid #885df1;
-		border-radius: 80px;
-		z-index: 3;
-	}
-
-	thead th:not(:first-child) {
-		border-bottom: 3px solid #885df1;
+	table,
+	thead,
+	th,
+	tr,
+	td {
+		margin: 0;
+		padding: 0;
 	}
 
 	thead th,
@@ -58,7 +55,39 @@
 	}
 
 	/* keep track/row headers narrow */
-	tbody th {
+	tbody tr th {
+		position: sticky;
+		left: 0;
 		width: 12ch;
+		min-width: 9ch;
+		background: rgb(17, 25, 31);
+		background: linear-gradient(90deg, rgba(17, 25, 31, 1) 75%, rgba(17, 25, 31, 0) 100%);
 	}
+
+	thead th {
+		position: sticky;
+		top: -0.6rem;
+		height: 3rem;
+		background: rgb(17, 25, 31);
+		background: linear-gradient(0deg, rgba(17, 25, 31, 1) 75%, rgba(17, 25, 31, 0) 100%);
+	}
+
+	td {
+		height: 3rem;
+		padding: 1.5rem;
+		margin: 0;
+		padding: 0;
+	}
+
+	/* DROP ZONES */
+	[data-drop-zone] {
+		border: 1px solid #885df1;
+		border-radius: 30px;
+		height: 100%;
+		min-width: 12ch;
+	}
+
+	/* thead th:not(:first-child) {
+		border-bottom: 3px solid #885df1;
+	} */
 </style>

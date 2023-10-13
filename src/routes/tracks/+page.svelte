@@ -1,16 +1,16 @@
 <script>
 	import { newTrack } from '../../lib/TableObjects/Track'
 	import { newScene } from '../../lib/TableObjects/Scene'
+	import { newCharacter } from '../../lib/TableObjects/Character'
 
 	import Table from './table.svelte'
+	import CharacterPool from './characterPool.svelte'
 
 	/** @type {import('./$types').PageData} */
 	export let data
 
 	let trackCount = 4
 	let trackPrefix = 'track'
-	/** true triggers rendering of table */
-	let tracksWereSubmitted = false
 
 	/** Add tracks to the global table object */
 	function submitTracks(event) {
@@ -40,9 +40,6 @@
 		// clear input fields
 		trackPrefix = null
 		trackCount = null
-
-		tracksWereSubmitted = true
-		console.log('TRACKS SUBMITTED')
 	}
 
 	function submitScene(event) {
@@ -64,54 +61,90 @@
 		inputField.value = null
 	}
 
+	function submitCharacter(event) {
+		if (event.key !== 'Enter') return
+
+		let inputField = event.target
+		const name = inputField.value.replace(' ', '_')
+
+		// TODO: sanitize input
+		if (!name) return
+
+		// create a character, push it to characters[]
+		const character = newCharacter(name)
+		data.table.characters.push(character)
+
+		// force svelte to update ui
+		data.table.characters = [...data.table.characters]
+
+		inputField.value = null
+	}
+
 	$: console.log(data)
 </script>
 
-<h3>Tracks</h3>
+<div class="container">
+	<h3>Tracks</h3>
 
-{#if tracksWereSubmitted}
-	<Table {data} />
-{/if}
+	{#if data.table.tracks.length > 0}
+		<!-- <div class="h-scroll"> -->
+		<!-- <div class="v-scroll"> -->
+		<article>
+			<div class="table">
+				<Table {data} />
+			</div>
+		</article>
+		<!-- </div> -->
+		<!-- </div> -->
+	{/if}
 
-<form>
-	<div class="track-input">
-		<input
-			autofocus
-			name="track-prefix"
-			type="text"
-			class=""
-			value={trackPrefix}
-			on:keyup={submitTracks}
-		/>
-		<span> X </span>
-		<input
-			name="track-count"
-			type="text"
-			class=""
-			value={trackCount}
-			on:keyup={submitTracks}
-		/>
-	</div>
+	{#if data.table.characters.length > 0}
+		<div class="character-pool">
+			<CharacterPool {data} />
+		</div>
+	{/if}
 
-	<div class="scene-input">
-		<input
-			name="scene-name"
-			type="text"
-			class=""
-			placeholder="add a scene"
-			on:keyup={submitScene}
-		/>
-	</div>
+	<form>
+		<div class="track-input">
+			<input
+				autofocus
+				name="track-prefix"
+				type="text"
+				class=""
+				value={trackPrefix}
+				on:keypress={submitTracks}
+			/>
+			<span> X </span>
+			<input
+				name="track-count"
+				type="text"
+				class=""
+				value={trackCount}
+				on:keypress={submitTracks}
+			/>
+		</div>
 
-	<div class="actor-input">
-		<input
-			name="actor-name"
-			type="text"
-			class=""
-			placeholder="add a character"
-		/>
-	</div>
-</form>
+		<div class="scene-input">
+			<input
+				name="scene-name"
+				type="text"
+				class=""
+				placeholder="add a scene"
+				on:keypress={submitScene}
+			/>
+		</div>
+
+		<div class="actor-input">
+			<input
+				name="actor-name"
+				type="text"
+				class=""
+				placeholder="add a character"
+				on:keypress={submitCharacter}
+			/>
+		</div>
+	</form>
+</div>
 
 <style>
 	/* should be end selector ($=, not *=), but would not work */
@@ -123,5 +156,35 @@
 
 	.track-input span {
 		text-align: center;
+	}
+
+	.h-scroll {
+		overflow-x: auto;
+	}
+
+	.v-scroll {
+		/* counter-intuitively, overflow must be unchanged to allow sticky thead */
+		/* overflow-y: auto; */
+	}
+
+	article {
+		overflow-y: auto;
+	}
+
+	.table {
+		max-height: 80%;
+		overflow: auto;
+	}
+
+	form {
+		margin: 3rem;
+	}
+
+	.character-pool {
+		display: flex;
+		margin: 1.5rem;
+		border: 1px solid rgb(0, 255, 255);
+		border-radius: 1.5rem;
+		min-height: 3rem;
 	}
 </style>

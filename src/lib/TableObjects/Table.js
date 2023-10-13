@@ -18,28 +18,23 @@ const DEFAULT_TRACK_COUNT = 4
  * @returns {{ tracks: Track[], scenes: Scene[], elem: HTMLElement, bodyElem: HTMLElement, headerElem: HTMLElement }}
  * */
 export function newTableObj(trackPrefix = 'track', trackCount = DEFAULT_TRACK_COUNT) {
-	// queried elements should already exist in the skeleton
-	// const elem = document.querySelector('[data-main-table]')
-	// const bodyElem = elem.querySelector('tbody')
-	// const headerElem = elem.querySelector('thead')
-
 	let elem = null
 	let bodyElem = null
 	let headerElem = null
+
+	/** @type {import('../../lib/TableObjects/Track').newTrack} */
 	const tracks = []
+
+	/** @type {import('../../lib/TableObjects/Scene').newScene} */
 	const scenes = []
 
-	// // create table rows and add to the main table body
-	// for (let i = 0; i < trackCount; i++) {
-	// 	const trackName = `${trackPrefix}_${i + 1}`
-	// 	const row = newRow(trackName)
-
-	// 	bodyElem.append(row)
-	// }
+	/** @type {import('../../lib/TableObjects/Character').newCharacter} */
+	const characters = []
 
 	return {
 		tracks,
 		scenes,
+		characters,
 		elem,
 		bodyElem,
 		headerElem
