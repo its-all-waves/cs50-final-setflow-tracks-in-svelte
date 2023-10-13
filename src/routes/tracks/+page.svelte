@@ -1,17 +1,15 @@
 <script>
 	import { newTrack } from '../../lib/TableObjects/Track'
+	import { newScene } from '../../lib/TableObjects/Scene'
 
 	import Table from './table.svelte'
 
 	/** @type {import('./$types').PageData} */
 	export let data
 
-	// const TRACK_NAME_PLACEHOLDER = 'track'
-	// const TRACK_COUNT_PLACEHOLDER = 4
-
 	let trackCount = 4
 	let trackPrefix = 'track'
-	/** true triggers rendering of table + ??? */
+	/** true triggers rendering of table */
 	let tracksWereSubmitted = false
 
 	/** Add tracks to the global table object */
@@ -28,12 +26,12 @@
 		trackPrefix = trackPrefixVal
 		trackCount = trackCountVal
 
-		// TODO: eval goal: svelte will bind ui to table obj
 		// CREATE THE DATA STRUCTURES
 		// push new tracks to table.tracks
 		for (let i = 0; i < trackCount; i++) {
 			const track = newTrack(`${trackPrefix}_${i + 1}`)
 			data.table.tracks.push(track)
+			// TODO: track.rowElem ???
 		}
 
 		// trigger a svelte update by making a copy
@@ -50,15 +48,20 @@
 	function submitScene(event) {
 		if (event.key !== 'Enter') return
 
-		const sceneNameVal = event.target.value
+		const inputField = event.target
+		const name = inputField.value.replace(' ', '_')
 
-		// TODO: sanitize inputs
-		if (!sceneNameVal) return
+		// TODO: sanitize input
+		if (!name) return
 
-		// create a scene, then push it to scenes[]
-		const scene = newScene()
-
+		// create a scene, push it to scenes[]
+		const scene = newScene(name)
 		data.table.scenes.push(scene)
+		// force a svelte rerender to update ui
+		data.table.scenes = [...data.table.scenes]
+
+		// clear the input field
+		inputField.value = null
 	}
 
 	$: console.log(data)
@@ -70,43 +73,45 @@
 	<Table {data} />
 {/if}
 
-<div class="track-input">
-	<input
-		autofocus
-		name="track-prefix"
-		type="text"
-		class=""
-		value={trackPrefix}
-		on:keyup={submitTracks}
-	/>
-	<span> X </span>
-	<input
-		name="track-count"
-		type="text"
-		class=""
-		value={trackCount}
-		on:keyup={submitTracks}
-	/>
-</div>
+<form>
+	<div class="track-input">
+		<input
+			autofocus
+			name="track-prefix"
+			type="text"
+			class=""
+			value={trackPrefix}
+			on:keyup={submitTracks}
+		/>
+		<span> X </span>
+		<input
+			name="track-count"
+			type="text"
+			class=""
+			value={trackCount}
+			on:keyup={submitTracks}
+		/>
+	</div>
 
-<div class="scene-input">
-	<input
-		name="scene-name"
-		type="text"
-		class=""
-		placeholder="add a scene"
-		on:keyup={submitScene}
-	/>
-</div>
+	<div class="scene-input">
+		<input
+			name="scene-name"
+			type="text"
+			class=""
+			placeholder="add a scene"
+			on:keyup={submitScene}
+		/>
+	</div>
 
-<div class="actor-input">
-	<input
-		name="actor-name"
-		type="text"
-		class=""
-		placeholder="add a character"
-	/>
-</div>
+	<div class="actor-input">
+		<input
+			name="actor-name"
+			type="text"
+			class=""
+			placeholder="add a character"
+		/>
+	</div>
+</form>
 
 <style>
 	/* should be end selector ($=, not *=), but would not work */

@@ -4,9 +4,7 @@
 // 	rowElem: null
 // }
 
-import { nanoid } from 'nanoid'
-
-const NANO_ID_LENGTH = 6
+import { nanoid, NANO_ID_LENGTH } from '../util/util'
 
 /**
  * @param {string} name
