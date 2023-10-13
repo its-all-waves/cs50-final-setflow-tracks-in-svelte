@@ -42,7 +42,7 @@
 							data-scene-name={scene.name}
 							data-drop-zone
 							bind:this={self}
-							class:selected={self === selectedDropZones}
+							class:selected={self in selectedDropZones}
 							on:pointerup={pushToSelectedDropZone}
 						/>
 					</td>

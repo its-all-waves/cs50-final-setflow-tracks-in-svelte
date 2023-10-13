@@ -89,7 +89,9 @@
 <div class="container">
 	<h3>Tracks</h3>
 
-	{#if data.table.tracks.length > 0}
+	<!-- {#if data.table.tracks.length > 0} -->
+	<!-- a poor-man's OR op? -->
+	{#if data.table.tracks.length + data.table.scenes.length > 0}
 		<article>
 			<div class="table">
 				<Table
