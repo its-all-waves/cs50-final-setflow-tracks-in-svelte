@@ -1,4 +1,6 @@
 <script>
+	import { newTrack } from '../../lib/TableObjects/Track'
+
 	import Table from './table.svelte'
 
 	/** @type {import('./$types').PageData} */
@@ -16,46 +18,72 @@
 	function submitTracks(event) {
 		if (event.key !== 'Enter') return
 
-		const trackPrefixVal = document.querySelector("input[name='track-prefix']").value
-		const trackCountVal = document.querySelector("input[name='track-count']").value
+		let trackPrefixVal = document.querySelector("input[name='track-prefix']").value
+		let trackCountVal = document.querySelector("input[name='track-count']").value
 
 		// TODO: sanitize inputs
-
 		// must have 2 valid track inputs to proceed
 		if (!trackPrefixVal || !trackCountVal) return
 
-		// set the props
 		trackPrefix = trackPrefixVal
 		trackCount = trackCountVal
+
+		// TODO: eval goal: svelte will bind ui to table obj
+		// CREATE THE DATA STRUCTURES
+		// push new tracks to table.tracks
+		for (let i = 0; i < trackCount; i++) {
+			const track = newTrack(`${trackPrefix}_${i + 1}`)
+			data.table.tracks.push(track)
+		}
+
+		// trigger a svelte update by making a copy
+		data.table.tracks = [...data.table.tracks]
+
+		// clear input fields
+		trackPrefix = null
+		trackCount = null
+
 		tracksWereSubmitted = true
 		console.log('TRACKS SUBMITTED')
 	}
+
+	function submitScene(event) {
+		if (event.key !== 'Enter') return
+
+		const sceneNameVal = event.target.value
+
+		// TODO: sanitize inputs
+		if (!sceneNameVal) return
+
+		// create a scene, then push it to scenes[]
+		const scene = newScene()
+
+		data.table.scenes.push(scene)
+	}
+
+	$: console.log(data)
 </script>
 
 <h3>Tracks</h3>
 
 {#if tracksWereSubmitted}
-	<Table
-		{trackPrefix}
-		{trackCount}
-	/>
+	<Table {data} />
 {/if}
 
 <div class="track-input">
 	<input
+		autofocus
 		name="track-prefix"
 		type="text"
 		class=""
-		placeholder={trackPrefix}
 		value={trackPrefix}
 		on:keyup={submitTracks}
 	/>
 	<span> X </span>
 	<input
 		name="track-count"
-		type="number"
+		type="text"
 		class=""
-		placeholder={trackCount}
 		value={trackCount}
 		on:keyup={submitTracks}
 	/>
@@ -67,6 +95,7 @@
 		type="text"
 		class=""
 		placeholder="add a scene"
+		on:keyup={submitScene}
 	/>
 </div>
 
@@ -84,6 +113,7 @@
 	.track-input {
 		display: grid;
 		grid-template-columns: 2fr 0.2fr 2fr;
+		align-items: center;
 	}
 
 	.track-input span {

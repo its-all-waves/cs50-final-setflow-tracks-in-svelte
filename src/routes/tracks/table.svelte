@@ -1,10 +1,8 @@
 <script>
-	// TODO: HOW DO I GET THIS?
-	let tracks
-
 	// expose as attrs
-	export let trackPrefix
-	export let trackCount
+	export let data
+	// export let trackPrefix
+	// export let trackCount
 </script>
 
 <table data-main-table>
@@ -16,9 +14,9 @@
 	</thead>
 
 	<tbody>
-		{#each { length: trackCount } as _, i}
+		{#each data.table.tracks as track, i}
 			<tr>
-				<th>{trackPrefix} {i + 1}</th>
+				<th>{track.name.replace('_', ' ')}</th>
 			</tr>
 		{/each}
 	</tbody>

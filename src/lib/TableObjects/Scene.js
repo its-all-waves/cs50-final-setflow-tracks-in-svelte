@@ -1,6 +1,6 @@
-const Scene = {
-	id: null,
-	name: null,
-	actors: [],
-	columnElem: null
-}
+// const Scene = {
+// 	id: null,
+// 	name: null,
+// 	actors: [],
+// 	columnElem: null
+// }
