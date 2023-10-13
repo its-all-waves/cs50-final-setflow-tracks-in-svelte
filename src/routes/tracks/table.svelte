@@ -32,7 +32,7 @@
 					<td
 						data-track-name={track.name}
 						data-scene-name={scene.name}
-						data-receiver
+						data-drop-zone="scene"
 					/>
 				{/each}
 			</tr>
@@ -41,8 +41,24 @@
 </table>
 
 <style>
-	td {
-		border: 1px solid blue;
-		border-radius: 30%;
+	/* DROP ZONES */
+	[data-drop-zone='scene'] {
+		border: 3px solid #885df1;
+		border-radius: 80px;
+		z-index: 3;
+	}
+
+	thead th:not(:first-child) {
+		border-bottom: 3px solid #885df1;
+	}
+
+	thead th,
+	tbody th {
+		text-align: center;
+	}
+
+	/* keep track/row headers narrow */
+	tbody th {
+		width: 12ch;
 	}
 </style>
