@@ -2,6 +2,16 @@
 	import { display } from '../../lib/util/util'
 	// expose as attrs
 	export let data
+	/** @type {HTMLElement[]} */
+	export let selectedDropZones = []
+
+	let self
+
+	function pushToSelectedDropZone() {
+		console.log('PUSHED: ')
+		console.log(selectedDropZones)
+		selectedDropZones.push(self)
+	}
 </script>
 
 <table data-main-table>
@@ -31,6 +41,9 @@
 							data-track-name={track.name}
 							data-scene-name={scene.name}
 							data-drop-zone
+							bind:this={self}
+							class:selected={self === selectedDropZones}
+							on:pointerup={pushToSelectedDropZone}
 						/>
 					</td>
 				{/each}
@@ -90,4 +103,8 @@
 	/* thead th:not(:first-child) {
 		border-bottom: 3px solid #885df1;
 	} */
+
+	.selected {
+		border: 2px solid green;
+	}
 </style>

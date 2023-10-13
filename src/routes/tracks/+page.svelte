@@ -4,10 +4,15 @@
 	import { newCharacter } from '../../lib/TableObjects/Character'
 
 	import Table from './table.svelte'
-	import CharacterPool from './characterPool.svelte'
+	import Character from './character.svelte'
 
 	/** @type {import('./$types').PageData} */
 	export let data
+
+	/** @type {HTMLElement} */
+	let characterInHand = null
+	/** @type {HTMLElement[]} */
+	let selectedDropZones = []
 
 	let trackCount = 4
 	let trackPrefix = 'track'
@@ -79,28 +84,32 @@
 
 		inputField.value = null
 	}
-
-	$: console.log(data)
 </script>
 
 <div class="container">
 	<h3>Tracks</h3>
 
 	{#if data.table.tracks.length > 0}
-		<!-- <div class="h-scroll"> -->
-		<!-- <div class="v-scroll"> -->
 		<article>
 			<div class="table">
-				<Table {data} />
+				<Table
+					{data}
+					bind:selectedDropZones
+					bind:characterInHand
+				/>
 			</div>
 		</article>
-		<!-- </div> -->
-		<!-- </div> -->
 	{/if}
 
 	{#if data.table.characters.length > 0}
 		<div class="character-pool">
-			<CharacterPool {data} />
+			{#each data.table.characters as character}
+				<!-- bind:characterInHand allows Character to update the var and re-render this element -- 2-way binding, as opposed to normal passing from parent into child -->
+				<Character
+					{character}
+					bind:characterInHand
+				/>
+			{/each}
 		</div>
 	{/if}
 
