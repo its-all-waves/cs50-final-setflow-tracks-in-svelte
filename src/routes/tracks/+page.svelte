@@ -1,17 +1,21 @@
 <script>
 	import { newTrack } from '../../lib/TableObjects/Track'
-	import { newScene } from '../../lib/TableObjects/Scene'
+	import { newScene, newTrackListItem } from '../../lib/TableObjects/Scene'
 	import { newCharacter } from '../../lib/TableObjects/Character'
 
 	import Table from './table.svelte'
 	import Character from './character.svelte'
 
-	/** @type {import('./$types').PageData} */
+	/**
+	 * 	@type {import('./$types').PageData} */
 	export let data
 
-	/** @type {HTMLElement} */
+	/**
+	 * @type {string}
+	 * the character's name */
 	let characterInHand = null
-	/** @type {HTMLElement[]} */
+	/**
+	 * @type {{ scene: string, track: string }[]} */
 	let selectedDropZones = []
 
 	let trackCount = 4
@@ -47,6 +51,7 @@
 		trackCount = null
 	}
 
+	/** Add a scene to the global table object */
 	function submitScene(event) {
 		if (event.key !== 'Enter') return
 
@@ -66,6 +71,7 @@
 		inputField.value = null
 	}
 
+	/** Add a character to the global table object */
 	function submitCharacter(event) {
 		if (event.key !== 'Enter') return
 
@@ -83,6 +89,58 @@
 		data.table.characters = [...data.table.characters]
 
 		inputField.value = null
+	}
+
+	function commitDropZones(event) {
+		// function is executed only by Enter key (+focus) or pointerup
+		if (event.type !== 'pointerup' && event.key !== 'Enter') {
+			return
+		}
+
+		addCharacterNameToScenes()
+
+		// reset the 'pick up n drop' flags (as opposed to drag n drop)
+		selectedDropZones = []
+		characterInHand = null
+	}
+
+	/** Helper for commitDropZones() \
+	 * put the CHARACTER on this TRACK, in this SCENE */
+	function addCharacterNameToScenes() {
+		if (!characterInHand) {
+			throw new Error('No idea how we got here (populateDropZone())...')
+		}
+
+		for (let i = 0; i < selectedDropZones.length; i++) {
+			// get the scene and track names
+			const { sceneName, trackName } = selectedDropZones[i]
+
+			const tracks = data.table.tracks
+			const scenes = data.table.scenes
+			const scene = scenes.find((scene) => scene.name === sceneName)
+
+			// TODO: handle errors - scene or track undefined
+
+			// find the obj in trackList where obj.trackName === trackName
+			const CharacterNameDestination = scene.trackList.find(
+				(obj) => obj.trackName === trackName
+			)
+
+			// avoid multiple entries with same track name
+			// if the destination exists, add to it
+			if (CharacterNameDestination) {
+				// TODO: PROBLEM? copy to force ui to update?
+				CharacterNameDestination.characterNames.push()
+			} else {
+				scene.trackList.push(newTrackListItem(trackName, characterInHand))
+			}
+			// debugger
+		}
+
+		data.table.scenes = [...data.table.scenes]
+
+		// data.table.scenes.characterNames = [...data.table.scenes.characterNames]
+		console.log(data.table.scenes)
 	}
 </script>
 
@@ -103,17 +161,22 @@
 		</article>
 	{/if}
 
-	{#if data.table.characters.length > 0}
-		<div class="character-pool">
-			{#each data.table.characters as character}
-				<!-- bind:characterInHand allows Character to update the var and re-render this element -- 2-way binding, as opposed to normal passing from parent into child -->
-				<Character
-					{character}
-					bind:characterInHand
-				/>
-			{/each}
-		</div>
-	{/if}
+	<div class="character-pool">
+		{#each data.table.characters as character}
+			<!-- bind:characterInHand allows Character to update the var and re-render this element -- 2-way binding, as opposed to normal passing from parent into child -->
+			<Character
+				{character}
+				bind:characterInHand
+			/>
+		{/each}
+		<button
+			class:hidden={!characterInHand}
+			on:pointerup={commitDropZones}
+			on:keypress={commitDropZones}
+		>
+			✔
+		</button>
+	</div>
 
 	<form>
 		<div class="track-input">
@@ -193,9 +256,23 @@
 
 	.character-pool {
 		display: flex;
+		align-items: center;
 		margin: 1.5rem;
 		border: 1px solid rgb(0, 255, 255);
 		border-radius: 1.5rem;
 		min-height: 3rem;
+	}
+
+	.character-pool button {
+		width: 3ch;
+		padding: 0;
+		margin: 0;
+		margin-left: 1rem;
+		align-self: center;
+		font-size: 1.5rem;
+	}
+
+	.hidden {
+		display: none;
 	}
 </style>

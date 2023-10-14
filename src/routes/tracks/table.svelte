@@ -2,15 +2,19 @@
 	import { display } from '../../lib/util/util'
 	// expose as attrs
 	export let data
-	/** @type {HTMLElement[]} */
+	/**
+	 * @type {{ scene: string, track: string }[]} */
 	export let selectedDropZones = []
 
-	let self
+	/**
+	 * @param {string} sceneName
+	 * @param {string} trackName */
+	function addToSelectedDropZones(sceneName, trackName) {
+		const thisDropZone = { sceneName, trackName }
+		selectedDropZones.push(thisDropZone)
 
-	function pushToSelectedDropZone() {
 		console.log('PUSHED: ')
 		console.log(selectedDropZones)
-		selectedDropZones.push(self)
 	}
 </script>
 
@@ -38,13 +42,35 @@
 				{#each data.table.scenes as scene}
 					<td>
 						<div
-							data-track-name={track.name}
-							data-scene-name={scene.name}
 							data-drop-zone
-							bind:this={self}
-							class:selected={self in selectedDropZones}
-							on:pointerup={pushToSelectedDropZone}
-						/>
+							data-scene-name={scene.name}
+							data-track-name={track.name}
+							class:selected={false}
+							on:pointerup={() => addToSelectedDropZones(scene.name, track.name)}
+						>
+							{#each scene.trackList as trackEntry}
+								{#if trackEntry.trackName === track.name}
+									{#each trackEntry.characterNames as characterName}
+										<div data-draggable>{characterName}</div>
+									{/each}
+								{/if}
+							{/each}
+
+							<!-- a [draggable] character per player in scene -->
+							<!-- {#each scene.trackList as entry}
+								<pre>{JSON.stringify(entry)}</pre>
+
+								{#each entry.characterNames as characterName}
+									<div
+										data-draggable
+										data-character-name={characterName}
+									>
+										<pre>{JSON.stringify(entry)}</pre>
+										{characterName}
+									</div>
+								{/each}
+							{/each} -->
+						</div>
 					</td>
 				{/each}
 			</tr>
@@ -106,5 +132,15 @@
 
 	.selected {
 		border: 2px solid green;
+	}
+
+	[data-draggable] {
+		margin: 0.5rem 0.3rem;
+		padding: 0.2rem 1rem;
+		border: 2px solid rgb(0, 183, 255);
+		border-radius: 1.5rem;
+		line-height: 2rem;
+		max-width: 16ch;
+		text-overflow: clip;
 	}
 </style>

@@ -10,21 +10,8 @@
 	let self
 
 	function grab(event) {
-		characterInHand = event.target
-		console.log('IN HAND:')
-		console.log(characterInHand)
-
-		const oldParent = characterInHand.parentElement
-		console.log('OLD PARENT: ')
-		console.log(oldParent)
-
-		// get the new parent somehow...
-		// if (characterInHand) if (oldParent === newParent) return
-
-		// if (newParent.dataset.dropZone) {
-		// 	console.log('made it')
-		// 	newParent.append(characterInHand)
-		// }
+		characterInHand = event.target.dataset.characterName
+		console.log(`IN HAND: ${characterInHand}`)
 	}
 </script>
 
@@ -32,6 +19,7 @@
 	on:pointerdown={grab}
 	bind:this={self}
 	class:in-hand={self === characterInHand}
+	data-character-name={character.name}
 	data-draggable
 >
 	{display(character.name)}
