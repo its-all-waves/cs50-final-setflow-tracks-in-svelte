@@ -16,7 +16,6 @@
 </script>
 
 <div
-	bind:this={self}
 	class:in-hand={characterName === characterInHand}
 	data-draggable
 	data-character-name={characterName}
@@ -35,6 +34,7 @@
 		max-width: 16ch;
 		text-overflow: clip;
 		font-size: 1.25rem;
+		user-select: none;
 	}
 
 	.in-hand {

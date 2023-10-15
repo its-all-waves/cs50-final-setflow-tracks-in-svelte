@@ -13,12 +13,7 @@
 	 * @param {string} trackName */
 	function addToSelectedDropZones(sceneName, trackName) {
 		if (!characterInHand) return
-
-		const dropZoneInfo = { sceneName, trackName }
-		selectedDropZones.push(dropZoneInfo)
-
-		console.log('PUSHED: ')
-		console.log(selectedDropZones)
+		selectedDropZones.push({ sceneName, trackName })
 	}
 </script>
 
@@ -46,16 +41,15 @@
 				{#each data.table.scenes as scene}
 					<td>
 						<div
+							class:selected={false}
 							data-drop-zone
 							data-scene-name={scene.name}
 							data-track-name={track.name}
-							class:selected={false}
 							on:pointerup={() => addToSelectedDropZones(scene.name, track.name)}
 						>
 							{#each scene.trackList as trackEntry}
 								{#if trackEntry.trackName === track.name}
 									{#each trackEntry.characterNames as characterName}
-										<!-- <div data-draggable>{characterName}</div> -->
 										<Character
 											{characterName}
 											bind:characterInHand
