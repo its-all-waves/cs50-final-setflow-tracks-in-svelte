@@ -1,17 +1,21 @@
 <script>
 	import { display } from '../../lib/util/util'
+	import Character from './character.svelte'
 	// expose as attrs
 	export let data
 	/**
 	 * @type {{ scene: string, track: string }[]} */
 	export let selectedDropZones = []
+	export let characterInHand
 
 	/**
 	 * @param {string} sceneName
 	 * @param {string} trackName */
 	function addToSelectedDropZones(sceneName, trackName) {
-		const thisDropZone = { sceneName, trackName }
-		selectedDropZones.push(thisDropZone)
+		if (!characterInHand) return
+
+		const dropZoneInfo = { sceneName, trackName }
+		selectedDropZones.push(dropZoneInfo)
 
 		console.log('PUSHED: ')
 		console.log(selectedDropZones)
@@ -51,25 +55,14 @@
 							{#each scene.trackList as trackEntry}
 								{#if trackEntry.trackName === track.name}
 									{#each trackEntry.characterNames as characterName}
-										<div data-draggable>{characterName}</div>
+										<!-- <div data-draggable>{characterName}</div> -->
+										<Character
+											{characterName}
+											bind:characterInHand
+										/>
 									{/each}
 								{/if}
 							{/each}
-
-							<!-- a [draggable] character per player in scene -->
-							<!-- {#each scene.trackList as entry}
-								<pre>{JSON.stringify(entry)}</pre>
-
-								{#each entry.characterNames as characterName}
-									<div
-										data-draggable
-										data-character-name={characterName}
-									>
-										<pre>{JSON.stringify(entry)}</pre>
-										{characterName}
-									</div>
-								{/each}
-							{/each} -->
 						</div>
 					</td>
 				{/each}
@@ -112,8 +105,8 @@
 	}
 
 	td {
-		height: 3rem;
-		padding: 1.5rem;
+		height: 4rem;
+		padding: 0;
 		margin: 0;
 		padding: 0;
 	}
@@ -132,15 +125,5 @@
 
 	.selected {
 		border: 2px solid green;
-	}
-
-	[data-draggable] {
-		margin: 0.5rem 0.3rem;
-		padding: 0.2rem 1rem;
-		border: 2px solid rgb(0, 183, 255);
-		border-radius: 1.5rem;
-		line-height: 2rem;
-		max-width: 16ch;
-		text-overflow: clip;
 	}
 </style>

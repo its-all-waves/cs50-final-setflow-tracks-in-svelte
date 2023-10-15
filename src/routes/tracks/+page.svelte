@@ -165,7 +165,7 @@
 		{#each data.table.characters as character}
 			<!-- bind:characterInHand allows Character to update the var and re-render this element -- 2-way binding, as opposed to normal passing from parent into child -->
 			<Character
-				{character}
+				characterName={character.name}
 				bind:characterInHand
 			/>
 		{/each}

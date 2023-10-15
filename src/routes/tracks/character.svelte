@@ -3,26 +3,26 @@
 
 	// exposed to parent as attr
 	/** @type {Character} */
-	export let character
+	export let characterName
 	export let characterInHand
 
 	/** a reference to THIS element (search bind:this) */
 	let self
 
-	function grab(event) {
+	function setCharacterInHand(event) {
 		characterInHand = event.target.dataset.characterName
 		console.log(`IN HAND: ${characterInHand}`)
 	}
 </script>
 
 <div
-	on:pointerdown={grab}
 	bind:this={self}
-	class:in-hand={self === characterInHand}
-	data-character-name={character.name}
+	class:in-hand={characterName === characterInHand}
 	data-draggable
+	data-character-name={characterName}
+	on:pointerdown={setCharacterInHand}
 >
-	{display(character.name)}
+	{display(characterName)}
 </div>
 
 <style>
@@ -34,6 +34,7 @@
 		line-height: 2rem;
 		max-width: 16ch;
 		text-overflow: clip;
+		font-size: 1.25rem;
 	}
 
 	.in-hand {
