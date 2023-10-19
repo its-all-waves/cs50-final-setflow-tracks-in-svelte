@@ -10,8 +10,8 @@
 	 * @type {DropZoneInfo[]} */
 	export let selectedDropZones = []
 	export let characterInHand
-
-	let selectedDropZone
+	/** the selected drop zone */
+	export let selectedDZ
 
 	/**
 	 * @param {string} sceneName
@@ -30,11 +30,13 @@
 
 		selectedDropZones.push(newDropZoneInfo(sceneName, trackName))
 
-		// find the thing with this scene and track name
-		selectedDropZone = document.querySelector(
+		// set the reference to the selected drop zone
+		selectedDZ = document.querySelector(
 			`[data-scene-name=${sceneName}][data-track-name=${trackName}]`
 		)
 		// if (!selectedDropZone) return
+
+		// CURRENT TODO: clear all selections -- drop zones and sc/tr headers
 	}
 </script>
 
@@ -47,7 +49,7 @@
 			{#each data.table.scenes as scene}
 				<th
 					data-scene-col={scene.name}
-					class:selected={selectedDropZone?.dataset?.sceneName === scene.name}
+					class:selected={selectedDZ?.dataset?.sceneName === scene.name}
 				>
 					{display(scene.name)}
 				</th>
@@ -59,7 +61,7 @@
 		<!-- a row + header per track -->
 		{#each data.table.tracks as track}
 			<tr data-track-row={track.name}>
-				<th class:selected={selectedDropZone?.dataset?.trackName === track.name}
+				<th class:selected={selectedDZ?.dataset?.trackName === track.name}
 					>{display(track.name)}</th
 				>
 
@@ -71,8 +73,8 @@
 							data-scene-name={scene.name}
 							data-track-name={track.name}
 							on:pointerup={() => addToSelectedDropZones(scene.name, track.name)}
-							class:selected={selectedDropZone?.dataset?.sceneName === scene.name &&
-								selectedDropZone?.dataset?.trackName === track.name}
+							class:selected={selectedDZ?.dataset?.sceneName === scene.name &&
+								selectedDZ?.dataset?.trackName === track.name}
 						>
 							{#each scene.trackList as trackEntry}
 								{#if trackEntry.trackName === track.name}

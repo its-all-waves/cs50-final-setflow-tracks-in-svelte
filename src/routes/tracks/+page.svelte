@@ -17,6 +17,7 @@
 	/**
 	 * @type {{ scene: string, track: string }[]} */
 	let selectedDropZones = []
+	let selectedDZ = null
 
 	let trackCount = 4
 	let trackPrefix = 'track'
@@ -92,16 +93,23 @@
 	}
 
 	function commitDropZones(event) {
-		// function is executed only by Enter key (+focus) or pointerup
+		// committing is executed only by Enter key (+focus) or button click
 		if (event.type !== 'pointerup' && event.key !== 'Enter') {
 			return
 		}
 
 		addCharacterNameToScenes()
 
-		// reset the 'pick up n drop' flags (as opposed to drag n drop)
-		selectedDropZones = []
+		resetUiSelectionFlags()
+	}
+
+	/** Helper for commitDropZones() \
+	 * Forget what's currently selected */
+	function resetUiSelectionFlags() {
 		characterInHand = null
+
+		selectedDZ = null
+		selectedDropZones = []
 	}
 
 	/** Helper for commitDropZones() \
@@ -147,13 +155,13 @@
 <div class="container">
 	<h3>Tracks</h3>
 
-	<!-- {#if data.table.tracks.length > 0} -->
 	<!-- a poor-man's OR op? -->
 	{#if data.table.tracks.length + data.table.scenes.length > 0}
 		<article>
 			<div class="table">
 				<Table
 					{data}
+					bind:selectedDZ
 					bind:selectedDropZones
 					bind:characterInHand
 				/>
