@@ -45,7 +45,10 @@
 
 			<!-- a column header per scene -->
 			{#each data.table.scenes as scene}
-				<th data-scene-col={scene.name}>
+				<th
+					data-scene-col={scene.name}
+					class:selected={selectedDropZone?.dataset?.sceneName === scene.name}
+				>
 					{display(scene.name)}
 				</th>
 			{/each}
@@ -56,7 +59,9 @@
 		<!-- a row + header per track -->
 		{#each data.table.tracks as track}
 			<tr data-track-row={track.name}>
-				<th>{display(track.name)}</th>
+				<th class:selected={selectedDropZone?.dataset?.trackName === track.name}
+					>{display(track.name)}</th
+				>
 
 				<!-- a cell (col) per scene -->
 				{#each data.table.scenes as scene, i}
@@ -135,11 +140,14 @@
 		min-width: 12ch;
 	}
 
-	/* thead th:not(:first-child) {
-		border-bottom: 3px solid #885df1;
-	} */
-
-	.selected {
+	.selected[data-drop-zone] {
 		border: 2px solid green;
+	}
+
+	th.selected {
+		text-shadow: 0px 0px 6px black, 0 0 6px rgba(255, 255, 255, 0.75),
+			0 0 12px rgba(255, 242, 0, 0.75), 0 0 18px rgba(255, 255, 255, 0.75);
+		transition: text-shadow 0.1s 0s, font-size 0.075s 0s;
+		font-size: 1.25rem;
 	}
 </style>
