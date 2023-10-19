@@ -1,12 +1,15 @@
-/* 
-const Table = {
-	tracks: [],
-	scenes: [],
-	elem: null,
-	headerElem: null,
-	bodyElem: null
-} 
-*/
+/**
+ * @typedef {object} Table
+ * @property {Track[]} tracks
+ * @property {Scene[]} scenes
+ * @property {Character[]} characters
+ */
+
+/**
+ * @typedef {object} DropZoneInfo
+ * @property {string} scene
+ * @property {string} track
+ */
 
 const DEFAULT_TRACK_COUNT = 4
 
@@ -15,51 +18,24 @@ const DEFAULT_TRACK_COUNT = 4
 /** TODO: how to handle track options?
  * @param {string?} trackPrefix
  * @param {number?} trackCount
- * @returns {{ tracks: Track[], scenes: Scene[], elem: HTMLElement, bodyElem: HTMLElement, headerElem: HTMLElement }}
+ * @returns {Table}
  * */
 export function newTableObj(trackPrefix = 'track', trackCount = DEFAULT_TRACK_COUNT) {
-	let elem = null
-	let bodyElem = null
-	let headerElem = null
-
-	/** @type {import('../../lib/TableObjects/Track').newTrack} */
 	const tracks = []
-
-	/** @type {import('../../lib/TableObjects/Scene').newScene} */
 	const scenes = []
-
-	/** @type {import('../../lib/TableObjects/Character').newCharacter} */
 	const characters = []
 
 	return {
 		tracks,
 		scenes,
-		characters,
-		elem,
-		bodyElem,
-		headerElem
+		characters
 	}
 }
 
-function newRow(trackName) {
-	// structure
-	const row = document.createElement(HTMLElem.tr)
-	const header = newRowHeader(trackName)
-	// visuals
-	row.classList.add(CssClass.track)
-	row.append(header)
-	return row
-}
-
-/** Helper for newRow() */
-function newRowHeader(trackName) {
-	const header = document.createElement(HTMLElem.th)
-	row.dataset.trackName = trackName
-	return header
-}
-
-function DEBUG_newCell() {
-	const cell = document.createElement(HTMLElem.td)
-	cell.textContent = 'HOT DANG'
-	return cell
+/**
+ * @returns {DropZoneInfo}
+ * @param {string} sceneName
+ * @param {string} trackName*/
+export function newDropZoneInfo(sceneName, trackName) {
+	return { sceneName, trackName }
 }

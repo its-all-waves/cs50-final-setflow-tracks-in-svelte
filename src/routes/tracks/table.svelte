@@ -1,19 +1,40 @@
 <script>
 	import { display } from '../../lib/util/util'
+	import { newDropZoneInfo } from '../../lib/TableObjects/Table'
+
 	import Character from './character.svelte'
+
 	// expose as attrs
 	export let data
 	/**
-	 * @type {{ scene: string, track: string }[]} */
+	 * @type {DropZoneInfo[]} */
 	export let selectedDropZones = []
 	export let characterInHand
+
+	let selectedDropZone
 
 	/**
 	 * @param {string} sceneName
 	 * @param {string} trackName */
 	function addToSelectedDropZones(sceneName, trackName) {
 		if (!characterInHand) return
-		selectedDropZones.push({ sceneName, trackName })
+
+		// return if character already in scene
+		const selectedScene = data.table.scenes.find((scene) => scene.name === sceneName)
+		if (
+			selectedScene.trackList.find((entry) => entry.characterNames.includes(characterInHand))
+		) {
+			console.log(`"${characterInHand}" is already in scene "${sceneName}"`)
+			return
+		}
+
+		selectedDropZones.push(newDropZoneInfo(sceneName, trackName))
+
+		// find the thing with this scene and track name
+		selectedDropZone = document.querySelector(
+			`[data-scene-name=${sceneName}][data-track-name=${trackName}]`
+		)
+		// if (!selectedDropZone) return
 	}
 </script>
 
@@ -38,14 +59,15 @@
 				<th>{display(track.name)}</th>
 
 				<!-- a cell (col) per scene -->
-				{#each data.table.scenes as scene}
+				{#each data.table.scenes as scene, i}
 					<td>
 						<div
-							class:selected={false}
 							data-drop-zone
 							data-scene-name={scene.name}
 							data-track-name={track.name}
 							on:pointerup={() => addToSelectedDropZones(scene.name, track.name)}
+							class:selected={selectedDropZone?.dataset?.sceneName === scene.name &&
+								selectedDropZone?.dataset?.trackName === track.name}
 						>
 							{#each scene.trackList as trackEntry}
 								{#if trackEntry.trackName === track.name}
