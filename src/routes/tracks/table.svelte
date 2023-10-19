@@ -21,22 +21,28 @@
 
 		// return if character already in scene
 		const selectedScene = data.table.scenes.find((scene) => scene.name === sceneName)
-		if (
-			selectedScene.trackList.find((entry) => entry.characterNames.includes(characterInHand))
-		) {
+		const selectedSceneContainsCharacterInHand = selectedScene.trackList.find((entry) =>
+			entry.characterNames.includes(characterInHand)
+		)
+		if (selectedSceneContainsCharacterInHand) {
 			console.log(`"${characterInHand}" is already in scene "${sceneName}"`)
 			return
 		}
 
-		selectedDropZones.push(newDropZoneInfo(sceneName, trackName))
-
-		// set the reference to the selected drop zone
+		// TODO: make this an array, or somehow use the existing selectedDropZones array
+		// so far so good; set the ref to the selected drop zone so the ui knows what to highlight
 		selectedDZ = document.querySelector(
 			`[data-scene-name=${sceneName}][data-track-name=${trackName}]`
 		)
-		// if (!selectedDropZone) return
 
-		// CURRENT TODO: clear all selections -- drop zones and sc/tr headers
+		// selected drop zones can't contain more than one DropZoneInfo obj with the same scene
+		// if the same scene is being added now, delete the old one
+		const index = selectedDropZones.findIndex((_) => _.sceneName === sceneName)
+		if (index > -1) selectedDropZones.splice(index, 1)
+
+		selectedDropZones.push(newDropZoneInfo(sceneName, trackName))
+		console.log('SELECTED DROP ZONES')
+		console.log(selectedDropZones)
 	}
 </script>
 

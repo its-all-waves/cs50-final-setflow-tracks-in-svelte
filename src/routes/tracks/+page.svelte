@@ -148,7 +148,7 @@
 		data.table.scenes = [...data.table.scenes]
 
 		// data.table.scenes.characterNames = [...data.table.scenes.characterNames]
-		console.log(data.table.scenes)
+		// console.log(data.table.scenes)
 	}
 </script>
 

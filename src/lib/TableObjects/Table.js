@@ -7,8 +7,8 @@
 
 /**
  * @typedef {object} DropZoneInfo
- * @property {string} scene
- * @property {string} track
+ * @property {string} sceneName
+ * @property {string} trackName
  */
 
 const DEFAULT_TRACK_COUNT = 4
@@ -35,7 +35,7 @@ export function newTableObj(trackPrefix = 'track', trackCount = DEFAULT_TRACK_CO
 /**
  * @returns {DropZoneInfo}
  * @param {string} sceneName
- * @param {string} trackName*/
+ * @param {string} trackName */
 export function newDropZoneInfo(sceneName, trackName) {
 	return { sceneName, trackName }
 }
