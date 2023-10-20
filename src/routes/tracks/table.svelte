@@ -140,7 +140,7 @@
 	/* DROP ZONES */
 	[data-drop-zone] {
 		border: 1px solid #885df1;
-		border-radius: 30px;
+		border-radius: 12px;
 		height: 100%;
 		min-width: 12ch;
 	}
