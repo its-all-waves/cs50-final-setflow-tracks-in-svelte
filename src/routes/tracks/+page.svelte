@@ -5,6 +5,7 @@
 
 	import Table from './table.svelte'
 	import Character from './character.svelte'
+	import { onMount } from 'svelte'
 
 	/**
 	 * 	@type {import('./$types').PageData} */
@@ -15,7 +16,7 @@
 	 * the character's name */
 	let characterInHand = null
 	/**
-	 * @type {{ scene: string, track: string }[]} */
+	 * @type {DropZoneInfo[]} */
 	let selectedDropZones = []
 	let selectedDZ = null
 
@@ -149,6 +150,24 @@
 
 		// data.table.scenes.characterNames = [...data.table.scenes.characterNames]
 		// console.log(data.table.scenes)
+	}
+
+	onMount(DEV_populate_table)
+
+	function DEV_populate_table() {
+		// add X tracks
+		const NUM_TRACKS = 4
+		for (let i = 0; i < NUM_TRACKS; i++) {
+			data.table.tracks[i] = newTrack('Track_' + (i + 1))
+		}
+
+		// add 2 scenes
+		data.table.scenes[0] = newScene('33A')
+		data.table.scenes[1] = newScene('66B')
+
+		// add 3 characters
+		data.table.characters[0] = newCharacter('Alex')
+		data.table.characters[1] = newCharacter('Zina')
 	}
 </script>
 

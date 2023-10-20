@@ -32,7 +32,7 @@
 		// TODO: make this an array, or somehow use the existing selectedDropZones array
 		// so far so good; set the ref to the selected drop zone so the ui knows what to highlight
 		selectedDZ = document.querySelector(
-			`[data-scene-name=${sceneName}][data-track-name=${trackName}]`
+			`[data-scene-name="${sceneName}"][data-track-name="${trackName}"]`
 		)
 
 		// selected drop zones can't contain more than one DropZoneInfo obj with the same scene
@@ -41,8 +41,8 @@
 		if (index > -1) selectedDropZones.splice(index, 1)
 
 		selectedDropZones.push(newDropZoneInfo(sceneName, trackName))
-		console.log('SELECTED DROP ZONES')
-		console.log(selectedDropZones)
+		console.log('👇🏽 SELECTED DROP ZONES')
+		console.dir(selectedDropZones)
 	}
 </script>
 
@@ -67,12 +67,12 @@
 		<!-- a row + header per track -->
 		{#each data.table.tracks as track}
 			<tr data-track-row={track.name}>
-				<th class:selected={selectedDZ?.dataset?.trackName === track.name}
-					>{display(track.name)}</th
-				>
+				<th class:selected={selectedDZ?.dataset?.trackName === track.name}>
+					{display(track.name)}
+				</th>
 
 				<!-- a cell (col) per scene -->
-				{#each data.table.scenes as scene, i}
+				{#each data.table.scenes as scene}
 					<td>
 						<div
 							data-drop-zone
