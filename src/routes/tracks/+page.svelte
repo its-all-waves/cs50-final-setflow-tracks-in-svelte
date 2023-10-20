@@ -99,7 +99,7 @@
 			return
 		}
 
-		addCharacterNameToScenes()
+		addCharacterToSelectedScenes()
 
 		resetUiSelectionFlags()
 	}
@@ -108,48 +108,26 @@
 	 * Forget what's currently selected */
 	function resetUiSelectionFlags() {
 		characterInHand = null
-
 		selectedDZ = null
 		selectedDropZones = []
 	}
 
 	/** Helper for commitDropZones() \
 	 * put the CHARACTER on this TRACK, in this SCENE */
-	function addCharacterNameToScenes() {
+	function addCharacterToSelectedScenes() {
 		if (!characterInHand) {
 			throw new Error('No idea how we got here (populateDropZone())...')
 		}
 
 		for (let i = 0; i < selectedDropZones.length; i++) {
-			// get the scene and track names
 			const { sceneName, trackName } = selectedDropZones[i]
 
-			const tracks = data.table.tracks
-			const scenes = data.table.scenes
-			const scene = scenes.find((scene) => scene.name === sceneName)
+			const scene = data.table.scenes.find((_) => _.name === sceneName)
 
-			// TODO: handle errors - scene or track undefined
+			// TODO: handle error - scene undefined
 
-			// find the obj in trackList where obj.trackName === trackName
-			const CharacterNameDestination = scene.trackList.find(
-				(obj) => obj.trackName === trackName
-			)
-
-			// avoid multiple entries with same track name
-			// if the destination exists, add to it
-			if (CharacterNameDestination) {
-				// TODO: PROBLEM? copy to force ui to update?
-				CharacterNameDestination.characterNames.push()
-			} else {
-				scene.trackList.push(newTrackListItem(trackName, characterInHand))
-			}
-			// debugger
+			scene.trackList.push(newTrackListItem(trackName, characterInHand))
 		}
-
-		data.table.scenes = [...data.table.scenes]
-
-		// data.table.scenes.characterNames = [...data.table.scenes.characterNames]
-		// console.log(data.table.scenes)
 	}
 
 	onMount(DEV_populate_table)
