@@ -139,6 +139,7 @@
 
 	/* DROP ZONES */
 	[data-drop-zone] {
+		display: flex;
 		border: 1px solid #885df1;
 		border-radius: 12px;
 		height: 100%;
@@ -146,7 +147,7 @@
 	}
 
 	.selected[data-drop-zone] {
-		border: 2px solid green;
+		border: 2px solid rgb(255, 255, 255);
 	}
 
 	th.selected {
@@ -154,5 +155,10 @@
 			0 0 12px rgba(255, 242, 0, 0.75), 0 0 18px rgba(255, 255, 255, 0.75);
 		transition: text-shadow 0.1s 0s, font-size 0.075s 0s;
 		font-size: 1.25rem;
+	}
+
+	/* .in-hand comes from character.svelte */
+	tbody :global(.in-hand) {
+		scale: 1;
 	}
 </style>

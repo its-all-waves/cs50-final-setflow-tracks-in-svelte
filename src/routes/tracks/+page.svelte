@@ -179,7 +179,7 @@
 			on:pointerup={commitDropZones}
 			on:keypress={commitDropZones}
 		>
-			✔
+			&#x2713
 		</button>
 	</div>
 
@@ -260,24 +260,40 @@
 	}
 
 	.character-pool {
+		position: relative;
 		display: flex;
 		align-items: center;
 		margin: 1.5rem;
-		border: 1px solid rgb(0, 255, 255);
+		border: 1px solid rgb(0, 157, 255);
 		border-radius: 1.5rem;
 		min-height: 3rem;
 	}
 
 	.character-pool button {
-		width: 3ch;
+		position: absolute;
+		right: 0;
+		border-radius: 0 1.5rem 1.5rem 0;
+		height: 100%;
+
+		display: flex;
+		align-items: center;
+		justify-content: center;
 		padding: 0;
 		margin: 0;
 		margin-left: 1rem;
-		align-self: center;
-		font-size: 1.5rem;
+		font-size: 2.4rem;
+		text-shadow: 0 0.2rem 0 black;
+		width: 3ch;
+		background-color: rgba(0, 157, 255, 0.265);
+		border: 2px solid rgb(0, 157, 255);
+		color: white;
 	}
 
 	.hidden {
-		display: none;
+		display: none !important;
+	}
+
+	.character-pool button {
+		/* background-color: rgb(0, 157, 255); */
 	}
 </style>

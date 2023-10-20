@@ -26,10 +26,11 @@
 
 <style>
 	[data-draggable] {
-		margin: 0.5rem 0.3rem;
+		margin: 0.5rem 0.5rem;
 		padding: 0.2rem 1rem;
-		border: 2px solid rgb(0, 183, 255);
+		border: 1px solid goldenrod;
 		border-radius: 1.5rem;
+		background-color: #11191f;
 		line-height: 2rem;
 		max-width: 16ch;
 		text-overflow: clip;
@@ -38,6 +39,12 @@
 	}
 
 	.in-hand {
-		border: 3px solid red;
+		/* border-color: goldenrod; */
+		border-width: 1;
+		scale: 1.25;
+		transform: translateY(-0.3rem);
+		box-shadow: 0 10px 1.5px rgba(0, 0, 0, 0.588), 0 0 30px rgb(255, 193, 37),
+			inset 0 1px 1px goldenrod, inset 0 -2px 3px rgba(0, 0, 0, 0.681);
+		transition: border 0.1s, scale 0.1s, box-shadow 0.1s;
 	}
 </style>
