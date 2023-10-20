@@ -135,9 +135,6 @@
 
 	td {
 		height: 4rem;
-		padding: 0;
-		margin: 0;
-		padding: 0;
 	}
 
 	/* DROP ZONES */

@@ -130,9 +130,9 @@
 		}
 	}
 
-	onMount(DEV_populate_table)
+	onMount(async () => await DEV_populate_table())
 
-	function DEV_populate_table() {
+	async function DEV_populate_table() {
 		// add X tracks
 		const NUM_TRACKS = 4
 		for (let i = 0; i < NUM_TRACKS; i++) {
