@@ -1,18 +1,18 @@
 <script>
-	import { onMount } from 'svelte'
 	import { newDropZoneInfo } from '../../lib/TableObjects/Table'
 	import Character from './character.svelte'
 
-	export let allDropZones
-	export let selectedDropZones
 	export let characterInHand
 	export let data
 	export let scene
+	export let selectedDropZones
 	export let trackName
 
 	/**
+	 * @returns {void}
 	 * @param {string} sceneName
-	 * @param {string} trackName */
+	 * @param {string} trackName
+	 * */
 	function addToSelectedDropZones(sceneName, trackName) {
 		if (!characterInHand) return
 
@@ -36,20 +36,11 @@
 		// console.dir(selectedDropZones)
 	}
 
-	function addToAllDropZones(sceneName, trackName) {
-		console.log(`ADDING ${{ sceneName, trackName }} TO ALL DROP ZONES ARRAY`)
-	}
-
 	/** whether to apply .selected class
 	 * @type {boolean} */
 	$: selected = selectedDropZones.some(
 		(_) => _.sceneName === scene.name && _.trackName === trackName
 	)
-
-	onMount(() => {
-		console.log('MEOW?')
-		allDropZones = allDropZones.concat(newDropZoneInfo(scene.name, trackName))
-	})
 </script>
 
 <div
