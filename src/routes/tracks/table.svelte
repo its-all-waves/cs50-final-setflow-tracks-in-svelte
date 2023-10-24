@@ -1,9 +1,9 @@
 <script>
-	import { onMount } from 'svelte'
 	import { display } from '../../lib/util/util'
 
 	import Dropzone from './dropzone.svelte'
 	import { newTrackListItem } from '../../lib/TableObjects/Scene'
+	import { newDropZoneInfo } from '../../lib/TableObjects/Table'
 
 	// expose as attrs
 	export let data
@@ -17,26 +17,29 @@
 	function addCharacterInHandToAllScenesOn(trackName) {
 		if (!characterInHand) return
 
+		/* STOPPING HERE FOR THE DAY:
+		
+		this fn needs to be reworked to take account of
+		+page.svelte>commitDropZones() 
+
+		this fn should only add to selected drop zones, instead of whatever tf
+		its currently doing
+
+		commitDropZones() (executed on press of big blue done button) should
+		then take care of what's needed to update the ui and such
+		
+		*/
+
+		for (let scene of data.table.scenes) {
+			selectedDropZones.push(newDropZoneInfo(scene.name, trackName))
+		}
+		// force the UI update
+		selectedDropZones = [...selectedDropZones]
+
 		/* TODO: How to handle a scene already occupied?
 		eg: track 1 -> ___ ___ ___ pam ___ ___
 		FOR NOW: disallow the whole operation and tell user why
 		*/
-
-		for (let scene of data.table.scenes) {
-			/* TODO: Why does this smell bad?
-			I feel like scene.trackList should already be initialized / ready to
-			add to an existing trackListItem, at least in some cases. Why is it
-			certainly undefined at this point? Where should it be initialized?
-			*/
-
-			// throw an error
-			if (scene.trackList.characterNames !== undefined) {
-				// (if characterNames is DEFINED...)
-				throw new Error('How the ELF did we get here?!')
-			}
-			// characterNames is UNDEFINED
-			scene.trackList = scene.trackList.concat(newTrackListItem(trackName, characterInHand))
-		}
 
 		/* TODO: BIG BUG: when adding character to all scenes on a track...
 		if a different character is clicked just after selecting the track, the
@@ -48,6 +51,16 @@
 		/* TODO: BIG BUG: can duplicate characters in a scene when adding to all
 		scenes on a track
 		 */
+
+		/* TODO: BIG BUG: when adding character to a scene, if i select a
+		dropZone, then choose a track, the character is applied to all scenes on
+		that track, but also again on the selected dropZone
+			
+		a quick n dirty fix:
+
+			disallow more than one copy of a character in a scene.trackList.characterList
+
+		*/
 	}
 </script>
 
