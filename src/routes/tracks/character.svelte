@@ -6,9 +6,9 @@
 	export let characterName
 	export let characterInHand
 
-	function setCharacterInHand(event) {
-		characterInHand = event.target.dataset.characterName
-		console.log(`IN HAND: ${characterInHand}`)
+	function setCharacterInHand(charName) {
+		characterInHand = charName
+		// console.log(`IN HAND: ${characterInHand}`)
 	}
 </script>
 
@@ -16,7 +16,7 @@
 	class:in-hand={characterName === characterInHand}
 	data-draggable
 	data-character-name={characterName}
-	on:pointerdown={setCharacterInHand}
+	on:pointerdown={() => setCharacterInHand(characterName)}
 >
 	{display(characterName)}
 </div>
