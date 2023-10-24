@@ -8,7 +8,8 @@
 	export let selectedDropZones
 	export let trackName
 
-	/**
+	/** Should be identical to table.svelte > addToSelectedDropZones()...
+	 * Until I find a better place to put this and import it from there
 	 * @returns {void}
 	 * @param {string} sceneName
 	 * @param {string} trackName

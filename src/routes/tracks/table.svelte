@@ -31,7 +31,8 @@
 		*/
 
 		for (let scene of data.table.scenes) {
-			selectedDropZones.push(newDropZoneInfo(scene.name, trackName))
+			// selectedDropZones.push(newDropZoneInfo(scene.name, trackName))
+			addToSelectedDropZones(scene.name, trackName)
 		}
 		// force the UI update
 		selectedDropZones = [...selectedDropZones]
@@ -40,27 +41,35 @@
 		eg: track 1 -> ___ ___ ___ pam ___ ___
 		FOR NOW: disallow the whole operation and tell user why
 		*/
+	}
 
-		/* TODO: BIG BUG: when adding character to all scenes on a track...
-		if a different character is clicked just after selecting the track, the
-		first character chosen is added to the track. 
-		this is the opposite behavior of when a character is being added to a
-		single scene, where you last character selected is the one that is
-		applied to that track in that scene. */
+	/**
+	 *
+	 * @returns {void}
+	 * @param {string} sceneName
+	 * @param {string} trackName
+	 * */
+	function addToSelectedDropZones(sceneName, trackName) {
+		if (!characterInHand) return
 
-		/* TODO: BIG BUG: can duplicate characters in a scene when adding to all
-		scenes on a track
-		 */
+		// return if character already in scene
+		const selectedScene = data.table.scenes.find((_) => _.name === sceneName)
+		const selectedSceneContainsCharacterInHand = selectedScene.trackList.find((_) =>
+			_.characterNames.includes(characterInHand)
+		)
+		if (selectedSceneContainsCharacterInHand) {
+			console.log(`"${characterInHand}" is already in scene "${sceneName}"`)
+			return
+		}
 
-		/* TODO: BIG BUG: when adding character to a scene, if i select a
-		dropZone, then choose a track, the character is applied to all scenes on
-		that track, but also again on the selected dropZone
-			
-		a quick n dirty fix:
+		// selected drop zones can't contain more than one DropZoneInfo obj with the same scene
+		// if the same scene is being added now, delete the old one
+		const index = selectedDropZones.findIndex((_) => _.sceneName === sceneName)
+		if (index > -1) selectedDropZones.splice(index, 1)
 
-			disallow more than one copy of a character in a scene.trackList.characterList
-
-		*/
+		selectedDropZones = selectedDropZones.concat(newDropZoneInfo(sceneName, trackName))
+		// console.log('👇🏽 SELECTED DROP ZONES')
+		// console.dir(selectedDropZones)
 	}
 </script>
 
