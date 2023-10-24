@@ -1,0 +1,38 @@
+SCHEMA FOR MAIN DATA STRUCTURE
+
+{
+    table: {
+        tracks: [
+            {
+                id,
+                name,
+                rowElem
+            },
+            ...
+        ],
+        scenes: [
+        {
+            id,
+            name,
+            trackList: TrackListItem[] [
+            {
+                trackName,
+                characterNames: [
+                    name,
+                    ...
+                ]
+            }
+            ]
+        },
+		...
+        ],
+        characters: [
+        {
+            name,
+            elem,
+            defaultTrackName
+        },
+        ...
+		]
+    }
+}
