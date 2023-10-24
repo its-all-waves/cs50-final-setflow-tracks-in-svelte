@@ -41,12 +41,8 @@
 		// push new tracks to table.tracks
 		for (let i = 0; i < trackCount; i++) {
 			const track = newTrack(`${trackPrefix}_${i + 1}`)
-			data.table.tracks.push(track)
-			// TODO: track.rowElem ???
+			data.table.tracks = data.table.tracks.concat(track)
 		}
-
-		// trigger a svelte update by making a copy
-		data.table.tracks = [...data.table.tracks]
 
 		// clear input fields
 		trackPrefix = null
@@ -64,10 +60,7 @@
 		if (!name) return
 
 		// create a scene, push it to scenes[]
-		const scene = newScene(name)
-		data.table.scenes.push(scene)
-		// force a svelte rerender to update ui
-		data.table.scenes = [...data.table.scenes]
+		data.table.scenes = data.table.scenes.concat(newScene(name))
 
 		// clear the input field
 		inputField.value = null
@@ -84,11 +77,7 @@
 		if (!name) return
 
 		// create a character, push it to characters[]
-		const character = newCharacter(name)
-		data.table.characters.push(character)
-
-		// force svelte to update ui
-		data.table.characters = [...data.table.characters]
+		data.table.characters = data.table.characters.concat(newCharacter(name))
 
 		inputField.value = null
 	}
@@ -126,7 +115,7 @@
 
 			// TODO: handle error - scene undefined
 
-			scene.trackList.push(newTrackListItem(trackName, characterInHand))
+			scene.trackList = scene.trackList.concat(newTrackListItem(trackName, characterInHand))
 		}
 	}
 

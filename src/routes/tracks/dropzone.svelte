@@ -34,11 +34,11 @@
 		// console.dir(selectedDropZones)
 	}
 
+	/** whether to apply selected class
+	 * @type {boolean} */
 	$: selected = isSelected(selectedDropZones)
 
 	function isSelected(selected) {
-		if (selected.length === 0) return
-
 		for (let i = 0; i < selected.length; i++) {
 			if (selected[i].sceneName === scene.name && selected[i].trackName === trackName) {
 				return true
@@ -66,11 +66,6 @@
 		{/if}
 	{/each}
 </div>
-
-<!-- 
-    class:selected={selectedDZ?.dataset?.sceneName === scene.name &&
-		selectedDZ?.dataset?.trackName === trackName}i
- -->
 
 <style>
 	/* DROP ZONES */
