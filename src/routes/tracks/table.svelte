@@ -68,7 +68,7 @@
 		text-align: center;
 	}
 
-	/* keep track/row headers narrow */
+	/* row headers - keep narrow */
 	tbody tr th {
 		position: sticky;
 		left: 0;
@@ -78,14 +78,16 @@
 		background: linear-gradient(90deg, rgba(17, 25, 31, 1) 75%, rgba(17, 25, 31, 0) 100%);
 	}
 
+	/* column headers */
 	thead th {
-		position: sticky;
+		position: sticky; /* currently does nothing... */
 		top: -0.6rem;
 		height: 3rem;
 		background: rgb(17, 25, 31);
-		background: linear-gradient(0deg, rgba(17, 25, 31, 1) 75%, rgba(17, 25, 31, 0) 100%);
+		background: linear-gradient(180deg, rgba(17, 25, 31, 1) 75%, rgba(17, 25, 31, 0) 100%);
 	}
 
+	/* limit cell (and dropZone) height */
 	td {
 		height: 4rem;
 	}

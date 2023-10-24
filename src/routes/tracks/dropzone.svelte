@@ -34,7 +34,7 @@
 		// console.dir(selectedDropZones)
 	}
 
-	/** whether to apply selected class
+	/** whether to apply .selected class
 	 * @type {boolean} */
 	$: selected = isSelected(selectedDropZones)
 
