@@ -29,7 +29,7 @@
 			certainly undefined at this point? Where should it be initialized?
 			*/
 
-			// throw an error (aim: help in dev to figure how we // get here)
+			// throw an error
 			if (scene.trackList.characterNames !== undefined) {
 				// (if characterNames is DEFINED...)
 				throw new Error('How the ELF did we get here?!')
@@ -37,6 +37,17 @@
 			// characterNames is UNDEFINED
 			scene.trackList = scene.trackList.concat(newTrackListItem(trackName, characterInHand))
 		}
+
+		/* TODO: BIG BUG: when adding character to all scenes on a track...
+		if a different character is clicked just after selecting the track, the
+		first character chosen is added to the track. 
+		this is the opposite behavior of when a character is being added to a
+		single scene, where you last character selected is the one that is
+		applied to that track in that scene. */
+
+		/* TODO: BIG BUG: can duplicate characters in a scene when adding to all
+		scenes on a track
+		 */
 	}
 </script>
 
@@ -109,6 +120,11 @@
 		min-width: 9ch;
 		background: rgb(17, 25, 31);
 		background: linear-gradient(90deg, rgba(17, 25, 31, 1) 75%, rgba(17, 25, 31, 0) 100%);
+	}
+
+	tbody tr th:hover {
+		text-shadow: 0px 0px 6px black, 0 0 6px rgba(255, 255, 255, 0.75),
+			0 0 12px rgba(255, 242, 0, 0.75), 0 0 18px rgba(255, 255, 255, 0.75);
 	}
 
 	/* column headers */
