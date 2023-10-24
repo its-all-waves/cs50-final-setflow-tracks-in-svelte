@@ -18,7 +18,6 @@
 	/**
 	 * @type {DropZoneInfo[]} */
 	let selectedDropZones = []
-	let selectedDZ = null
 
 	let trackCount = 4
 	let trackPrefix = 'track'
@@ -97,7 +96,6 @@
 	 * Forget what's currently selected */
 	function resetUiSelectionFlags() {
 		characterInHand = null
-		selectedDZ = null
 		selectedDropZones = []
 	}
 
@@ -147,7 +145,6 @@
 			<div class="table">
 				<Table
 					{data}
-					bind:selectedDZ
 					bind:selectedDropZones
 					bind:characterInHand
 				/>
