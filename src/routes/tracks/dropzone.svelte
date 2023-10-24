@@ -36,16 +36,9 @@
 
 	/** whether to apply .selected class
 	 * @type {boolean} */
-	$: selected = isSelected(selectedDropZones)
-
-	function isSelected(selected) {
-		for (let i = 0; i < selected.length; i++) {
-			if (selected[i].sceneName === scene.name && selected[i].trackName === trackName) {
-				return true
-			}
-		}
-		return false
-	}
+	$: selected = selectedDropZones.some(
+		(_) => _.sceneName === scene.name && _.trackName === trackName
+	)
 </script>
 
 <div

@@ -6,9 +6,6 @@
 	export let characterName
 	export let characterInHand
 
-	/** a reference to THIS element (search bind:this) */
-	let self
-
 	function setCharacterInHand(event) {
 		characterInHand = event.target.dataset.characterName
 		console.log(`IN HAND: ${characterInHand}`)
