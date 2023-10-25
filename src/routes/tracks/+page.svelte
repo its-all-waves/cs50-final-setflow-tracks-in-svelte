@@ -19,8 +19,11 @@
 	 * @type {DropZoneInfo[]} */
 	let selectedDropZones = []
 
+	// form input defaults / placeholders
 	let trackCount = 4
 	let trackPrefix = 'track'
+
+	let canEdit = false
 
 	/** Add tracks to the global table object */
 	function submitTracks(event) {
@@ -117,9 +120,9 @@
 		}
 	}
 
-	onMount(async () => await DEV_populate_table())
+	onMount(DEV_populate_table)
 
-	async function DEV_populate_table() {
+	function DEV_populate_table() {
 		// add X tracks
 		const NUM_TRACKS = 4
 		for (let i = 0; i < NUM_TRACKS; i++) {
@@ -130,27 +133,56 @@
 		data.table.scenes[0] = newScene('33A')
 		data.table.scenes[1] = newScene('66B')
 
-		// add 3 characters
+		// add characters
 		data.table.characters[0] = newCharacter('Alex')
 		data.table.characters[1] = newCharacter('Zina')
+		data.table.characters[2] = newCharacter('Yuki')
+		data.table.characters[3] = newCharacter('Igor')
 	}
 </script>
 
 <div class="container">
-	<h3>Tracks</h3>
-
-	<!-- a poor-man's OR op? -->
-	{#if data.table.tracks.length + data.table.scenes.length > 0}
-		<article>
-			<div class="table">
+	<article>
+		<form class="tools">
+			<button
+				id="edit-table"
+				class:edit-mode={canEdit}
+				on:click={() => (canEdit = !canEdit)}
+			>
+				{#if canEdit}
+					<img
+						src="button-icons/checkmark.svg"
+						alt="Check mark"
+						title="Done editing"
+						width="30px"
+						height="30px"
+					/>
+				{:else}
+					<img
+						src="button-icons/pencil.svg"
+						alt="Pencil"
+						title="Edit the table"
+						width="30px"
+						height="30px"
+					/>
+				{/if}
+			</button>
+		</form>
+		<!-- a poor-man's OR op? -->
+		{#if data.table.tracks.length + data.table.scenes.length > 0}
+			<div
+				class="table"
+				class:glow={canEdit}
+			>
 				<Table
 					{data}
+					{canEdit}
 					bind:selectedDropZones
 					bind:characterInHand
 				/>
 			</div>
-		</article>
-	{/if}
+		{/if}
+	</article>
 
 	<div class="character-pool">
 		{#each data.table.characters as character}
@@ -169,7 +201,7 @@
 		</button>
 	</div>
 
-	<form>
+	<form class="inputs">
 		<div class="track-input">
 			<input
 				autofocus
@@ -234,6 +266,8 @@
 
 	article {
 		overflow-y: auto;
+		margin-top: 0;
+		padding-top: 0;
 	}
 
 	.table {
@@ -241,8 +275,25 @@
 		overflow: auto;
 	}
 
-	form {
-		margin: 3rem;
+	button {
+		margin: 1rem;
+		padding: 0.5rem;
+	}
+
+	form.tools {
+		display: flex;
+		justify-content: end;
+		margin: 0;
+		padding: 0;
+	}
+
+	form.tools button {
+		width: fit-content;
+	}
+
+	form.tools button#edit-table.edit-mode {
+		background-color: rgba(120, 54, 54, 0.579);
+		border-color: rgb(121, 21, 21);
 	}
 
 	.character-pool {
@@ -255,17 +306,10 @@
 		min-height: 3rem;
 	}
 
-	.character-pool button {
-		position: absolute;
-		right: 0;
-		border-radius: 0 1.5rem 1.5rem 0;
-		height: 100%;
-
+	button {
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		padding: 0;
-		margin: 0;
 		margin-left: 1rem;
 		font-size: 2.4rem;
 		text-shadow: 0 0.2rem 0 black;
@@ -275,11 +319,30 @@
 		color: white;
 	}
 
-	.hidden {
-		display: none !important;
+	.character-pool button {
+		position: absolute;
+		right: 0;
+		border-radius: 0 1.5rem 1.5rem 0;
+		height: 100%;
+
+		padding: 0;
+		margin: 0;
 	}
 
 	.character-pool button {
 		/* background-color: rgb(0, 157, 255); */
+	}
+
+	.hidden {
+		display: none !important;
+	}
+
+	form.inputs {
+		margin: 3rem;
+	}
+
+	/* applies to table's container when canEdit */
+	.glow {
+		box-shadow: 0 0 36px #885df1;
 	}
 </style>

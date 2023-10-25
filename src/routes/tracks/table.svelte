@@ -1,34 +1,18 @@
 <script>
+	import { newDropZoneInfo } from '../../lib/TableObjects/Table'
 	import { display } from '../../lib/util/util'
 
 	import Dropzone from './dropzone.svelte'
-	import { newTrackListItem } from '../../lib/TableObjects/Scene'
-	import { newDropZoneInfo } from '../../lib/TableObjects/Table'
 
-	// expose as attrs
 	export let data
 	/**
 	 * @type {DropZoneInfo[]} */
 	export let selectedDropZones
 	export let characterInHand
-
-	let allDropZones = []
+	export let canEdit
 
 	function addCharacterInHandToAllScenesOn(trackName) {
 		if (!characterInHand) return
-
-		/* STOPPING HERE FOR THE DAY:
-		
-		this fn needs to be reworked to take account of
-		+page.svelte>commitDropZones() 
-
-		this fn should only add to selected drop zones, instead of whatever tf
-		its currently doing
-
-		commitDropZones() (executed on press of big blue done button) should
-		then take care of what's needed to update the ui and such
-		
-		*/
 
 		for (let scene of data.table.scenes) {
 			// selectedDropZones.push(newDropZoneInfo(scene.name, trackName))
@@ -36,15 +20,9 @@
 		}
 		// force the UI update
 		selectedDropZones = [...selectedDropZones]
-
-		/* TODO: How to handle a scene already occupied?
-		eg: track 1 -> ___ ___ ___ pam ___ ___
-		FOR NOW: disallow the whole operation and tell user why
-		*/
 	}
 
 	/**
-	 *
 	 * @returns {void}
 	 * @param {string} sceneName
 	 * @param {string} trackName
@@ -68,12 +46,14 @@
 		if (index > -1) selectedDropZones.splice(index, 1)
 
 		selectedDropZones = selectedDropZones.concat(newDropZoneInfo(sceneName, trackName))
-		// console.log('👇🏽 SELECTED DROP ZONES')
-		// console.dir(selectedDropZones)
 	}
 </script>
 
-<table data-main-table>
+<table
+	class:canEdit
+	class:read-only={!canEdit}
+	data-main-table
+>
 	<thead>
 		<tr>
 			<th class="empty" />
@@ -107,7 +87,6 @@
 						<Dropzone
 							bind:characterInHand
 							bind:selectedDropZones
-							bind:allDropZones
 							{data}
 							{scene}
 							trackName={track.name}
@@ -127,6 +106,15 @@
 	td {
 		margin: 0;
 		padding: 0;
+	}
+
+	/* table switches to pointer-events: none when not editable */
+	thead,
+	tbody,
+	th,
+	td,
+	td div {
+		pointer-events: inherit;
 	}
 
 	thead th,
@@ -173,5 +161,13 @@
 	/* .in-hand comes from character.svelte */
 	tbody :global(.in-hand) {
 		scale: 1;
+	}
+
+	table.canEdit {
+		pointer-events: all;
+	}
+
+	table.read-only {
+		pointer-events: none;
 	}
 </style>
