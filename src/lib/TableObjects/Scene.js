@@ -3,7 +3,7 @@ import { nanoid, NANO_ID_LENGTH } from '../util/util'
 /**
  * @typedef {object} TrackListItem
  * @property {string} trackName
- * @property {string[]} characterName
+ * @property {string[]} characterNames
  */
 
 /**
