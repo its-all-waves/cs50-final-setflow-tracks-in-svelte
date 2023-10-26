@@ -15,11 +15,9 @@
 		if (!characterInHand) return
 
 		for (let scene of data.table.scenes) {
-			// selectedDropZones.push(newDropZoneInfo(scene.name, trackName))
 			addToSelectedDropZones(scene.name, trackName)
 		}
-		// force the UI update
-		selectedDropZones = [...selectedDropZones]
+		selectedDropZones = selectedDropZones // force ui update
 	}
 
 	/**
@@ -57,44 +55,47 @@
 	<thead>
 		<tr>
 			<th class="empty" />
-
-			<!-- a column header per scene -->
-			{#each data.table.scenes as scene}
-				<th
-					data-scene-col={scene.name}
-					class:selected={false}
-				>
-					{display(scene.name)}
-				</th>
-			{/each}
+			{#if data.table.scenes.length > 0}
+				<!-- a column header per scene -->
+				{#each data.table.scenes as scene}
+					<th
+						data-scene-col={scene.name}
+						class:selected={false}
+					>
+						{display(scene.name)}
+					</th>
+				{/each}
+			{/if}
 		</tr>
 	</thead>
 
 	<tbody>
-		<!-- a row + header per track -->
-		{#each data.table.tracks as track}
-			<tr data-track-row={track.name}>
-				<th
-					class:selected={false}
-					on:pointerup={() => addCharacterInHandToAllScenesOn(track.name)}
-				>
-					{display(track.name)}
-				</th>
+		{#if data.table.tracks.length > 0}
+			<!-- a row + header per track -->
+			{#each data.table.tracks as track}
+				<tr data-track-row={track.name}>
+					<th
+						class:selected={false}
+						on:pointerup={() => addCharacterInHandToAllScenesOn(track.name)}
+					>
+						{display(track.name)}
+					</th>
 
-				<!-- a cell (col) per scene -->
-				{#each data.table.scenes as scene}
-					<td>
-						<Dropzone
-							bind:characterInHand
-							bind:selectedDropZones
-							{data}
-							{scene}
-							trackName={track.name}
-						/>
-					</td>
-				{/each}
-			</tr>
-		{/each}
+					<!-- a cell (col) per scene -->
+					{#each data.table.scenes as scene}
+						<td>
+							<Dropzone
+								bind:characterInHand
+								bind:selectedDropZones
+								{data}
+								{scene}
+								trackName={track.name}
+							/>
+						</td>
+					{/each}
+				</tr>
+			{/each}
+		{/if}
 	</tbody>
 </table>
 

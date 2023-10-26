@@ -1,11 +1,13 @@
 <script>
+	import { onMount } from 'svelte'
+
 	import { newTrack } from '../../lib/TableObjects/Track'
 	import { newScene, newTrackListItem } from '../../lib/TableObjects/Scene'
 	import { newCharacter } from '../../lib/TableObjects/Character'
 
 	import Table from './table.svelte'
 	import Character from './character.svelte'
-	import { onMount } from 'svelte'
+	import Toolbar from './toolbar.svelte'
 
 	/**
 	 * 	@type {import('./$types').PageData} */
@@ -19,11 +21,11 @@
 	 * @type {DropZoneInfo[]} */
 	let selectedDropZones = []
 
+	let canEdit = true
+
 	// form input defaults / placeholders
 	let trackCount = 4
 	let trackPrefix = 'track'
-
-	let canEdit = false
 
 	/** Add tracks to the global table object */
 	function submitTracks(event) {
@@ -120,6 +122,7 @@
 		}
 	}
 
+	// DEBUG
 	onMount(DEV_populate_table)
 
 	function DEV_populate_table() {
@@ -143,31 +146,10 @@
 
 <div class="container">
 	<article>
-		<form class="tools">
-			<button
-				id="edit-table"
-				class:edit-mode={canEdit}
-				on:click={() => (canEdit = !canEdit)}
-			>
-				{#if canEdit}
-					<img
-						src="button-icons/checkmark.svg"
-						alt="Check mark"
-						title="Done editing"
-						width="30px"
-						height="30px"
-					/>
-				{:else}
-					<img
-						src="button-icons/pencil.svg"
-						alt="Pencil"
-						title="Edit the table"
-						width="30px"
-						height="30px"
-					/>
-				{/if}
-			</button>
-		</form>
+		<Toolbar
+			bind:canEdit
+			bind:scenes={data.table.scenes}
+		/>
 		<!-- a poor-man's OR op? -->
 		{#if data.table.tracks.length + data.table.scenes.length > 0}
 			<div
@@ -278,22 +260,6 @@
 	button {
 		margin: 1rem;
 		padding: 0.5rem;
-	}
-
-	form.tools {
-		display: flex;
-		justify-content: end;
-		margin: 0;
-		padding: 0;
-	}
-
-	form.tools button {
-		width: fit-content;
-	}
-
-	form.tools button#edit-table.edit-mode {
-		background-color: rgba(120, 54, 54, 0.579);
-		border-color: rgb(121, 21, 21);
 	}
 
 	.character-pool {
