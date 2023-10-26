@@ -144,6 +144,8 @@
 	}
 </script>
 
+<svelte:window on:keydown={commitDropZones} />
+
 <div class="container">
 	<article>
 		<Toolbar
@@ -175,9 +177,9 @@
 			/>
 		{/each}
 		<button
+			id="btn-commit"
 			class:hidden={!characterInHand}
 			on:pointerup={commitDropZones}
-			on:keypress={commitDropZones}
 		>
 			&#x2713
 		</button>
