@@ -82,7 +82,30 @@
 		// create a character, push it to characters[]
 		$table.characters = $table.characters.concat(newCharacter(name))
 
+		sortCharacters()
+
 		inputField.value = null
+	}
+
+	function sortCharacters() {
+		const characters = $table.characters
+		let swapCounter = -1
+		while (true) {
+			console.log('DEBUG')
+			if (swapCounter === 0) break
+			swapCounter = 0
+			for (let i = 0; i < characters.length - 1; i++) {
+				const name1 = characters[i].name
+				const name2 = characters[i + 1].name
+				const name1BelongsBeforeName2 = name1.localeCompare(name2) < 0
+				if (name1BelongsBeforeName2) continue
+				const temp = characters[i]
+				characters[i] = characters[i + 1]
+				characters[i + 1] = temp
+				swapCounter++
+			}
+		}
+		$table.characters = characters
 	}
 
 	function commitDropZones(event) {
