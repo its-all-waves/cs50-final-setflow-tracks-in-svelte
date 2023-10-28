@@ -263,6 +263,9 @@
 		border: 1px solid rgb(0, 157, 255);
 		border-radius: 1.5rem;
 		min-height: 3rem;
+
+		overflow-x: auto;
+		overflow-y: visible;
 	}
 
 	button {
@@ -273,7 +276,7 @@
 		font-size: 2.4rem;
 		text-shadow: 0 0.2rem 0 black;
 		width: 3ch;
-		background-color: rgba(0, 157, 255, 0.265);
+		background-color: #124266;
 		border: 2px solid rgb(0, 157, 255);
 		color: white;
 	}
@@ -286,6 +289,8 @@
 
 		padding: 0;
 		margin: 0;
+
+		position: sticky;
 	}
 
 	.character-pool button {
