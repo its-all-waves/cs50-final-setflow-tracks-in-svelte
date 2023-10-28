@@ -1,6 +1,9 @@
 <script>
 	export let scenes
 	export let canEdit
+	export let characterInHand
+
+	function clearDropZone() {}
 
 	function clearTable() {
 		console.log('CLEAR TABLE')

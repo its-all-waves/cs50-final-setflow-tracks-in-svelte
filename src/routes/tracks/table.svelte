@@ -9,6 +9,7 @@
 	 * @type {DropZoneInfo[]} */
 	export let selectedDropZones
 	export let characterInHand
+
 	export let canEdit
 
 	function addCharacterInHandToAllScenesOn(trackName) {
@@ -34,7 +35,7 @@
 			_.characterNames.includes(characterInHand)
 		)
 		if (selectedSceneContainsCharacterInHand) {
-			console.log(`"${characterInHand}" is already in scene "${sceneName}"`)
+			// console.log(`"${characterInHand}" is already in scene "${sceneName}"`)
 			return
 		}
 

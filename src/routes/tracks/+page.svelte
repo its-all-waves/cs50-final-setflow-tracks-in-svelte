@@ -148,8 +148,10 @@
 
 <div class="container">
 	<article>
+		<!-- does character in hand need to be a bind: ? -->
 		<Toolbar
 			bind:canEdit
+			bind:characterInHand
 			bind:scenes={data.table.scenes}
 		/>
 		<!-- a poor-man's OR op? -->

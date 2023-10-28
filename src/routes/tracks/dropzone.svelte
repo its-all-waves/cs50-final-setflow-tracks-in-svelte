@@ -15,6 +15,13 @@
 	 * @param {string} trackName
 	 * */
 	function addToSelectedDropZones(sceneName, trackName) {
+		/* TODO: split path for DELETE function and ADD FUNCTION
+        
+        everything that currently exists below is the ADD function
+            condition to branch to ADD function: if characterInHand
+        
+        */
+
 		if (!characterInHand) return
 
 		// return if character already in scene
@@ -23,7 +30,7 @@
 			_.characterNames.includes(characterInHand)
 		)
 		if (selectedSceneContainsCharacterInHand) {
-			console.log(`"${characterInHand}" is already in scene "${sceneName}"`)
+			// console.log(`"${characterInHand}" is already in scene "${sceneName}"`)
 			return
 		}
 
@@ -55,8 +62,10 @@
 		{#if trackListItem.trackName === trackName}
 			{#each trackListItem.characterNames as characterName}
 				<Character
-					{characterName}
 					bind:characterInHand
+					{characterName}
+					sceneName={scene.name}
+					{trackName}
 				/>
 			{/each}
 		{/if}
