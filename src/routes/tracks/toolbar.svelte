@@ -9,6 +9,8 @@
 
 	export let resetUiSelectionFlags // FUNCTION
 	function handleTrashButtonClick() {
+		// TODO: CLEAR A WHOLE TRACK
+
 		if (!$lastClickedCharacter.sceneName) {
 			// we haven't selected a particular character
 			clearTable()

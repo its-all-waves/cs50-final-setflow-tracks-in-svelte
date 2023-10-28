@@ -164,7 +164,6 @@
 
 	<div class="character-pool">
 		{#each $table.characters as character}
-			<!-- bind:characterInHand allows Character to update the var and re-render this element -- 2-way binding, as opposed to normal passing from parent into child -->
 			<Character name={character.name} />
 		{/each}
 		<button
@@ -264,8 +263,8 @@
 		border-radius: 1.5rem;
 		min-height: 3rem;
 
-		overflow-x: auto;
-		overflow-y: visible;
+		/* overflow-x: auto; */
+		/* overflow-y: visible; */
 	}
 
 	button {
@@ -290,7 +289,7 @@
 		padding: 0;
 		margin: 0;
 
-		position: sticky;
+		/* position: sticky; */
 	}
 
 	.character-pool button {

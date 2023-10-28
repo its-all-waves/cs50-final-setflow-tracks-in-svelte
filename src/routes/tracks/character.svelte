@@ -41,7 +41,7 @@
 	class:chosen
 	data-draggable
 	data-character-name={name}
-	on:pointerdown={setCharacterInHand}
+	on:pointerup={setCharacterInHand}
 >
 	{display(name)}
 </div>
