@@ -1,7 +1,11 @@
 <script>
-	export let scenes
-	export let canEdit
-	export let characterInHand
+	import {
+		table,
+		characterInHand,
+		selectedDropZones,
+		canEdit,
+		lastClickedCharacter
+	} from './store'
 
 	function clearDropZone() {}
 
@@ -9,12 +13,13 @@
 		console.log('CLEAR TABLE')
 		alert('SURE YOU WANT TO CLEAR THE TABLE CONTENTS?')
 
-		for (let scene of scenes) {
+		for (let scene of $table.scenes) {
 			for (let trackListItem of scene.trackList) {
 				trackListItem.characterNames = []
 			}
 		}
-		scenes = scenes // force ui update
+		// scenes = scenes // force ui update
+		$table.scenes = $table.scenes
 	}
 </script>
 
@@ -31,13 +36,13 @@
 	</button>
 	<button
 		id="edit-table"
-		class:edit-mode={canEdit}
-		on:click={() => (canEdit = !canEdit)}
+		class:edit-mode={$canEdit}
+		on:click={() => ($canEdit = !$canEdit)}
 	>
 		<img
-			src={canEdit ? 'button-icons/checkmark.svg' : 'button-icons/pencil.svg'}
-			alt={canEdit ? 'Check mark' : 'Pencil'}
-			title={canEdit ? 'Done editing' : 'Edit the table'}
+			src={$canEdit ? 'button-icons/checkmark.svg' : 'button-icons/pencil.svg'}
+			alt={$canEdit ? 'Check mark' : 'Pencil'}
+			title={$canEdit ? 'Done editing' : 'Edit the table'}
 		/>
 	</button>
 </menu>

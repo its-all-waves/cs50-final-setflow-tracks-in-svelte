@@ -1,11 +1,15 @@
 <script>
 	import { newDropZoneInfo } from '../../lib/TableObjects/Table'
 	import Character from './character.svelte'
+	import {
+		table,
+		characterInHand,
+		selectedDropZones,
+		canEdit,
+		lastClickedCharacter
+	} from './store'
 
-	export let characterInHand
-	export let data
 	export let scene
-	export let selectedDropZones
 	export let trackName
 
 	/** Should be identical to table.svelte > addToSelectedDropZones()...
@@ -22,12 +26,12 @@
         
         */
 
-		if (!characterInHand) return
+		if (!$characterInHand) return
 
 		// return if character already in scene
-		const selectedScene = data.table.scenes.find((_) => _.name === sceneName)
+		const selectedScene = $table.scenes.find((_) => _.name === sceneName)
 		const selectedSceneContainsCharacterInHand = selectedScene.trackList.find((_) =>
-			_.characterNames.includes(characterInHand)
+			_.characterNames.includes($characterInHand)
 		)
 		if (selectedSceneContainsCharacterInHand) {
 			// console.log(`"${characterInHand}" is already in scene "${sceneName}"`)
@@ -36,17 +40,17 @@
 
 		// selected drop zones can't contain more than one DropZoneInfo obj with the same scene
 		// if the same scene is being added now, delete the old one
-		const index = selectedDropZones.findIndex((_) => _.sceneName === sceneName)
-		if (index > -1) selectedDropZones.splice(index, 1)
+		const index = $selectedDropZones.findIndex((_) => _.sceneName === sceneName)
+		if (index > -1) $selectedDropZones.splice(index, 1)
 
-		selectedDropZones = selectedDropZones.concat(newDropZoneInfo(sceneName, trackName))
+		$selectedDropZones = $selectedDropZones.concat(newDropZoneInfo(sceneName, trackName))
 		// console.log('👇🏽 SELECTED DROP ZONES')
-		// console.dir(selectedDropZones)
+		// console.dir($selectedDropZones)
 	}
 
 	/** whether to apply .selected class
 	 * @type {boolean} */
-	$: selected = selectedDropZones.some(
+	$: selected = $selectedDropZones.some(
 		(_) => _.sceneName === scene.name && _.trackName === trackName
 	)
 </script>
@@ -62,7 +66,6 @@
 		{#if trackListItem.trackName === trackName}
 			{#each trackListItem.characterNames as characterName}
 				<Character
-					bind:characterInHand
 					{characterName}
 					sceneName={scene.name}
 					{trackName}

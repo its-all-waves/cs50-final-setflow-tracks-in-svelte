@@ -4,21 +4,21 @@
 
 	import Dropzone from './dropzone.svelte'
 
-	export let data
-	/**
-	 * @type {DropZoneInfo[]} */
-	export let selectedDropZones
-	export let characterInHand
-
-	export let canEdit
+	import {
+		table,
+		characterInHand,
+		selectedDropZones,
+		canEdit,
+		lastClickedCharacter
+	} from './store'
 
 	function addCharacterInHandToAllScenesOn(trackName) {
-		if (!characterInHand) return
+		if (!$characterInHand) return
 
-		for (let scene of data.table.scenes) {
+		for (let scene of $table.scenes) {
 			addToSelectedDropZones(scene.name, trackName)
 		}
-		selectedDropZones = selectedDropZones // force ui update
+		$selectedDropZones = $selectedDropZones // force ui update
 	}
 
 	/**
@@ -27,12 +27,12 @@
 	 * @param {string} trackName
 	 * */
 	function addToSelectedDropZones(sceneName, trackName) {
-		if (!characterInHand) return
+		if (!$characterInHand) return
 
 		// return if character already in scene
-		const selectedScene = data.table.scenes.find((_) => _.name === sceneName)
+		const selectedScene = $table.scenes.find((_) => _.name === sceneName)
 		const selectedSceneContainsCharacterInHand = selectedScene.trackList.find((_) =>
-			_.characterNames.includes(characterInHand)
+			_.characterNames.includes($characterInHand)
 		)
 		if (selectedSceneContainsCharacterInHand) {
 			// console.log(`"${characterInHand}" is already in scene "${sceneName}"`)
@@ -41,24 +41,24 @@
 
 		// selected drop zones can't contain more than one DropZoneInfo obj with the same scene
 		// if the same scene is being added now, delete the old one
-		const index = selectedDropZones.findIndex((_) => _.sceneName === sceneName)
-		if (index > -1) selectedDropZones.splice(index, 1)
+		const index = $selectedDropZones.findIndex((_) => _.sceneName === sceneName)
+		if (index > -1) $selectedDropZones.splice(index, 1)
 
-		selectedDropZones = selectedDropZones.concat(newDropZoneInfo(sceneName, trackName))
+		$selectedDropZones = $selectedDropZones.concat(newDropZoneInfo(sceneName, trackName))
 	}
 </script>
 
 <table
-	class:canEdit
-	class:read-only={!canEdit}
+	class:$canEdit
+	class:read-only={!$canEdit}
 	data-main-table
 >
 	<thead>
 		<tr>
 			<th class="empty" />
-			{#if data.table.scenes.length > 0}
+			{#if $table.scenes.length > 0}
 				<!-- a column header per scene -->
-				{#each data.table.scenes as scene}
+				{#each $table.scenes as scene}
 					<th
 						data-scene-col={scene.name}
 						class:selected={false}
@@ -71,9 +71,9 @@
 	</thead>
 
 	<tbody>
-		{#if data.table.tracks.length > 0}
+		{#if $table.tracks.length > 0}
 			<!-- a row + header per track -->
-			{#each data.table.tracks as track}
+			{#each $table.tracks as track}
 				<tr data-track-row={track.name}>
 					<th
 						class:selected={false}
@@ -83,12 +83,9 @@
 					</th>
 
 					<!-- a cell (col) per scene -->
-					{#each data.table.scenes as scene}
+					{#each $table.scenes as scene}
 						<td>
 							<Dropzone
-								bind:characterInHand
-								bind:selectedDropZones
-								{data}
 								{scene}
 								trackName={track.name}
 							/>

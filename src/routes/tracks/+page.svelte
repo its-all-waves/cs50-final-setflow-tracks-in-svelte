@@ -9,19 +9,18 @@
 	import Character from './character.svelte'
 	import Toolbar from './toolbar.svelte'
 
+	import {
+		table,
+		characterInHand,
+		selectedDropZones,
+		canEdit,
+		lastClickedCharacter
+	} from './store'
+
 	/**
 	 * 	@type {import('./$types').PageData} */
-	export let data
-
-	/**
-	 * @type {string}
-	 * the character's name */
-	let characterInHand = null
-	/**
-	 * @type {DropZoneInfo[]} */
-	let selectedDropZones = []
-
-	let canEdit = true
+	export let data // receive data obj from "server", then pass into the store
+	$table = data.table
 
 	// form input defaults / placeholders
 	let trackCount = 4
@@ -45,7 +44,7 @@
 		// push new tracks to table.tracks
 		for (let i = 0; i < trackCount; i++) {
 			const track = newTrack(`${trackPrefix}_${i + 1}`)
-			data.table.tracks = data.table.tracks.concat(track)
+			$table.tracks = $table.tracks.concat(track)
 		}
 
 		// clear input fields
@@ -64,7 +63,7 @@
 		if (!name) return
 
 		// create a scene, push it to scenes[]
-		data.table.scenes = data.table.scenes.concat(newScene(name))
+		$table.scenes = $table.scenes.concat(newScene(name))
 
 		// clear the input field
 		inputField.value = null
@@ -81,7 +80,7 @@
 		if (!name) return
 
 		// create a character, push it to characters[]
-		data.table.characters = data.table.characters.concat(newCharacter(name))
+		$table.characters = $table.characters.concat(newCharacter(name))
 
 		inputField.value = null
 	}
@@ -100,25 +99,26 @@
 	/** Helper for commitDropZones() \
 	 * Forget what's currently selected */
 	function resetUiSelectionFlags() {
-		characterInHand = null
-		selectedDropZones = []
+		$characterInHand = null
+		$selectedDropZones = []
 	}
 
 	/** Helper for commitDropZones() \
 	 * put the CHARACTER on this TRACK, in this SCENE */
 	function addCharacterToSelectedScenes() {
-		if (!characterInHand) {
+		if (!$characterInHand) {
 			throw new Error('No idea how we got here (populateDropZone())...')
 		}
 
-		for (let i = 0; i < selectedDropZones.length; i++) {
-			const { sceneName, trackName } = selectedDropZones[i]
+		for (let i = 0; i < $selectedDropZones.length; i++) {
+			const { sceneName, trackName } = $selectedDropZones[i]
 
-			const scene = data.table.scenes.find((_) => _.name === sceneName)
+			const scene = $table.scenes.find((_) => _.name === sceneName)
 
 			// TODO: handle error - scene undefined
 
-			scene.trackList = scene.trackList.concat(newTrackListItem(trackName, characterInHand))
+			scene.trackList = scene.trackList.concat(newTrackListItem(trackName, $characterInHand))
+			$table = $table
 		}
 	}
 
@@ -129,18 +129,18 @@
 		// add X tracks
 		const NUM_TRACKS = 4
 		for (let i = 0; i < NUM_TRACKS; i++) {
-			data.table.tracks[i] = newTrack('Track_' + (i + 1))
+			$table.tracks[i] = newTrack('Track_' + (i + 1))
 		}
 
 		// add 2 scenes
-		data.table.scenes[0] = newScene('33A')
-		data.table.scenes[1] = newScene('66B')
+		$table.scenes[0] = newScene('33A')
+		$table.scenes[1] = newScene('66B')
 
 		// add characters
-		data.table.characters[0] = newCharacter('Alex')
-		data.table.characters[1] = newCharacter('Zina')
-		data.table.characters[2] = newCharacter('Yuki')
-		data.table.characters[3] = newCharacter('Igor')
+		$table.characters[0] = newCharacter('Alex')
+		$table.characters[1] = newCharacter('Zina')
+		$table.characters[2] = newCharacter('Yuki')
+		$table.characters[3] = newCharacter('Igor')
 	}
 </script>
 
@@ -149,38 +149,26 @@
 <div class="container">
 	<article>
 		<!-- does character in hand need to be a bind: ? -->
-		<Toolbar
-			bind:canEdit
-			bind:characterInHand
-			bind:scenes={data.table.scenes}
-		/>
+		<Toolbar />
 		<!-- a poor-man's OR op? -->
-		{#if data.table.tracks.length + data.table.scenes.length > 0}
+		{#if $table.tracks.length + $table.scenes.length > 0}
 			<div
 				class="table"
-				class:glow={canEdit}
+				class:glow={$canEdit}
 			>
-				<Table
-					{data}
-					{canEdit}
-					bind:selectedDropZones
-					bind:characterInHand
-				/>
+				<Table />
 			</div>
 		{/if}
 	</article>
 
 	<div class="character-pool">
-		{#each data.table.characters as character}
+		{#each $table.characters as character}
 			<!-- bind:characterInHand allows Character to update the var and re-render this element -- 2-way binding, as opposed to normal passing from parent into child -->
-			<Character
-				characterName={character.name}
-				bind:characterInHand
-			/>
+			<Character characterName={character.name} />
 		{/each}
 		<button
 			id="btn-commit"
-			class:hidden={!characterInHand}
+			class:hidden={!$characterInHand}
 			on:pointerup={commitDropZones}
 		>
 			&#x2713

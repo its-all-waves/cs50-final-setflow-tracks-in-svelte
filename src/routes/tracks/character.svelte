@@ -1,20 +1,24 @@
 <script>
 	import { createEventDispatcher } from 'svelte'
 	import { display } from '../../lib/util/util'
-
-	const dispatch = createEventDispatcher()
+	import {
+		table,
+		characterInHand,
+		selectedDropZones,
+		canEdit,
+		lastClickedCharacter
+	} from './store'
 
 	// exposed to parent as attr
-	export let characterInHand
 	export let characterName
 
 	function setCharacterInHand(event) {
-		characterInHand = characterName
+		$characterInHand = characterName
 	}
 </script>
 
 <div
-	class:in-hand={characterName === characterInHand}
+	class:in-hand={characterName === $characterInHand}
 	data-draggable
 	data-character-name={characterName}
 	on:pointerdown={setCharacterInHand}
