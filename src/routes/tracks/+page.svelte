@@ -101,6 +101,7 @@
 	function resetUiSelectionFlags() {
 		$characterInHand = null
 		$selectedDropZones = []
+		$lastClickedCharacter = {}
 	}
 
 	/** Helper for commitDropZones() \
@@ -149,7 +150,7 @@
 <div class="container">
 	<article>
 		<!-- does character in hand need to be a bind: ? -->
-		<Toolbar />
+		<Toolbar {resetUiSelectionFlags} />
 		<!-- a poor-man's OR op? -->
 		{#if $table.tracks.length + $table.scenes.length > 0}
 			<div
@@ -164,7 +165,7 @@
 	<div class="character-pool">
 		{#each $table.characters as character}
 			<!-- bind:characterInHand allows Character to update the var and re-render this element -- 2-way binding, as opposed to normal passing from parent into child -->
-			<Character characterName={character.name} />
+			<Character name={character.name} />
 		{/each}
 		<button
 			id="btn-commit"

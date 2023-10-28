@@ -66,7 +66,7 @@
 		{#if trackListItem.trackName === trackName}
 			{#each trackListItem.characterNames as characterName}
 				<Character
-					{characterName}
+					name={characterName}
 					sceneName={scene.name}
 					{trackName}
 				/>

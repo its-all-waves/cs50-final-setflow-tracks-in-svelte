@@ -10,18 +10,18 @@
 	} from './store'
 
 	// exposed to parent as attr
-	export let characterName
+	export let name
 	export let sceneName
 	export let trackName
 
 	function setCharacterInHand(event) {
-		$characterInHand = characterName
+		$characterInHand = name
 
 		// proceed only if this character lives in the TABLE (not pool)
 		if (!sceneName) return
 
 		$lastClickedCharacter = {
-			characterName,
+			name,
 			sceneName
 		}
 	}
@@ -29,10 +29,7 @@
 	$: chosen = isLastClickedCharacter($lastClickedCharacter)
 
 	function isLastClickedCharacter(lastClickedChar) {
-		if (
-			lastClickedChar.characterName === characterName &&
-			lastClickedChar.sceneName === sceneName
-		) {
+		if (lastClickedChar.name === name && lastClickedChar.sceneName === sceneName) {
 			return true
 		}
 		return false
@@ -40,13 +37,13 @@
 </script>
 
 <div
-	class:in-hand={characterName === $characterInHand}
+	class:in-hand={name === $characterInHand}
 	class:chosen
 	data-draggable
-	data-character-name={characterName}
+	data-character-name={name}
 	on:pointerdown={setCharacterInHand}
 >
-	{display(characterName)}
+	{display(name)}
 </div>
 
 <style>

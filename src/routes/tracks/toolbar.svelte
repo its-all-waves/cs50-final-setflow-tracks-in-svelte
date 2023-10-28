@@ -7,7 +7,40 @@
 		lastClickedCharacter
 	} from './store'
 
-	function clearDropZone() {}
+	export let resetUiSelectionFlags // FUNCTION
+	function handleTrashButtonClick() {
+		if (!$lastClickedCharacter.sceneName) {
+			// we haven't selected a particular character
+			clearTable()
+		} else {
+			// we have selected a particular character in a particular scene
+			deleteCharacterFromScene()
+		}
+
+		resetUiSelectionFlags()
+	}
+
+	function deleteCharacterFromScene() {
+		// get the scene from $lastClickedCharacter
+		const sceneName = $lastClickedCharacter.sceneName
+		const sceneIndex = $table.scenes.findIndex((_) => _.name === sceneName)
+		const scene = $table.scenes[sceneIndex]
+
+		for (let trackListItem of scene.trackList) {
+			for (let characterName of trackListItem.characterNames) {
+				const characterIndex = trackListItem.characterNames.findIndex(
+					(_) => _ === $lastClickedCharacter.name
+				)
+
+				if (characterIndex > -1) {
+					trackListItem.characterNames.splice(characterIndex, 1)
+				}
+			}
+		}
+
+		// TODO: is there a more efficient way (is this even inefficient)? i only need to update a single cell in the <table>
+		$table.scenes = $table.scenes
+	}
 
 	function clearTable() {
 		console.log('CLEAR TABLE')
@@ -26,7 +59,7 @@
 <menu>
 	<button
 		id="clear-table"
-		on:click={() => clearTable()}
+		on:click={handleTrashButtonClick}
 	>
 		<img
 			src="button-icons/trash.fill.svg"
