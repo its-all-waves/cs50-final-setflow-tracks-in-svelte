@@ -8,4 +8,4 @@ export const selectedDropZones = writable(/** @type {DropZoneInfo[]} */ [])
 
 export const canEdit = writable(true)
 
-export const lastClickedCharacter = writable(null) // string?
+export const lastClickedCharacter = writable({}) // string?

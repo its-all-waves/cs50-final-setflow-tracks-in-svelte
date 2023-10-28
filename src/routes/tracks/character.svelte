@@ -11,14 +11,37 @@
 
 	// exposed to parent as attr
 	export let characterName
+	export let sceneName
+	export let trackName
 
 	function setCharacterInHand(event) {
 		$characterInHand = characterName
+
+		// proceed only if this character lives in the TABLE (not pool)
+		if (!sceneName) return
+
+		$lastClickedCharacter = {
+			characterName,
+			sceneName
+		}
+	}
+
+	$: chosen = isLastClickedCharacter($lastClickedCharacter)
+
+	function isLastClickedCharacter(lastClickedChar) {
+		if (
+			lastClickedChar.characterName === characterName &&
+			lastClickedChar.sceneName === sceneName
+		) {
+			return true
+		}
+		return false
 	}
 </script>
 
 <div
 	class:in-hand={characterName === $characterInHand}
+	class:chosen
 	data-draggable
 	data-character-name={characterName}
 	on:pointerdown={setCharacterInHand}
@@ -48,5 +71,11 @@
 		box-shadow: 0 10px 1.5px rgba(0, 0, 0, 0.588), 0 0 30px rgb(255, 193, 37),
 			inset 0 1px 1px goldenrod, inset 0 -2px 3px rgba(0, 0, 0, 0.681);
 		transition: border 0.1s, scale 0.1s, box-shadow 0.1s;
+	}
+
+	.chosen {
+		box-shadow: 0 10px 1.5px rgba(0, 0, 0, 0.588), 0 0 30px white, inset 0 1px 1px white,
+			inset 0 -2px 3px rgba(0, 0, 0, 0.681);
+		border-color: white;
 	}
 </style>
