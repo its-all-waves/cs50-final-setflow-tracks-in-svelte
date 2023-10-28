@@ -11,28 +11,30 @@
 
 	// exposed to parent as attr
 	export let name
-	export let sceneName
+	export let location
 	// export let trackName
 
-	function setCharacterInHand(event) {
+	function setCharacterInHand() {
 		$characterInHand = name
-
-		// proceed only if this character lives in the TABLE (not pool)
-		if (!sceneName) return
 
 		$lastClickedCharacter = {
 			name,
-			sceneName
+			location
 		}
 	}
 
 	$: chosen = isLastClickedCharacter($lastClickedCharacter)
 
+	/**
+	 * Only a character in the table (not in the pool) can be a lastClickedCharacter
+	 * TODO: fix this slightly off smell
+	 */
 	function isLastClickedCharacter(lastClickedChar) {
-		if (lastClickedChar.name === name && lastClickedChar.sceneName === sceneName) {
-			return true
-		}
-		return false
+		return (
+			lastClickedChar.location !== '__pool__' &&
+			lastClickedChar.location === location &&
+			lastClickedChar.name === name
+		)
 	}
 </script>
 

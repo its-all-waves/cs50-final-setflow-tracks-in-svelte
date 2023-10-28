@@ -75,10 +75,7 @@
 			<!-- a row + header per track -->
 			{#each $table.tracks as track}
 				<tr data-track-row={track.name}>
-					<th
-						class:selected={false}
-						on:pointerup={() => addCharacterInHandToAllScenesOn(track.name)}
-					>
+					<th on:pointerup={() => addCharacterInHandToAllScenesOn(track.name)}>
 						{display(track.name)}
 					</th>
 
@@ -135,6 +132,11 @@
 	tbody tr th:hover {
 		text-shadow: 0px 0px 6px black, 0 0 6px rgba(255, 255, 255, 0.75),
 			0 0 12px rgba(255, 242, 0, 0.75), 0 0 18px rgba(255, 255, 255, 0.75);
+	}
+
+	tbody tr th.chosen {
+		border-top: 2px solid white;
+		border-bottom: 2px solid white;
 	}
 
 	/* column headers */

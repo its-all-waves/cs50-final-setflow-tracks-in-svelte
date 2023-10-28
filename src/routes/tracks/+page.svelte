@@ -187,7 +187,10 @@
 
 	<div class="character-pool">
 		{#each $table.characters as character}
-			<Character name={character.name} />
+			<Character
+				name={character.name}
+				location="__pool__"
+			/>
 		{/each}
 		<button
 			id="btn-commit"

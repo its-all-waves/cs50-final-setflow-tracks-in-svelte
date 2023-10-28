@@ -33,8 +33,7 @@
 			{#each trackListItem.characterNames as characterName}
 				<Character
 					name={characterName}
-					sceneName={scene.name}
-					{trackName}
+					location={scene.name}
 				/>
 			{/each}
 		{/if}
