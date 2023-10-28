@@ -9,15 +9,15 @@
 
 	export let resetUiSelectionFlags // FUNCTION
 	function handleTrashButtonClick() {
+		// TODO: REWRITE THE BELOW TERNARY TO ACCOMMODATE THE TODOS BELOW
+
 		// TODO: CLEAR A WHOLE TRACK
 
-		if (!$lastClickedCharacter.sceneName) {
-			// we haven't selected a particular character
-			clearTable()
-		} else {
-			// we have selected a particular character in a particular scene
-			deleteCharacterFromScene()
-		}
+		// TODO: CLEAR A CHARACTER FROM WHOLE TABLE (every scene)
+
+		// if we chose a specific character from a specific scene, delete the character
+		// else clear all table contents
+		$lastClickedCharacter.sceneName ? deleteCharacterFromScene() : clearTable()
 
 		resetUiSelectionFlags()
 	}
@@ -29,15 +29,9 @@
 		const scene = $table.scenes[sceneIndex]
 
 		for (let trackListItem of scene.trackList) {
-			for (let characterName of trackListItem.characterNames) {
-				const characterIndex = trackListItem.characterNames.findIndex(
-					(_) => _ === $lastClickedCharacter.name
-				)
-
-				if (characterIndex > -1) {
-					trackListItem.characterNames.splice(characterIndex, 1)
-				}
-			}
+			const names = trackListItem.characterNames
+			const characterIndex = names.findIndex((_) => _ === $lastClickedCharacter.name)
+			if (characterIndex > -1) names.splice(characterIndex, 1)
 		}
 
 		// TODO: is there a more efficient way (is this even inefficient)? i only need to update a single cell in the <table>
