@@ -86,6 +86,7 @@
 					{#each $table.scenes as scene}
 						<td>
 							<Dropzone
+								{addToSelectedDropZones}
 								{scene}
 								trackName={track.name}
 							/>

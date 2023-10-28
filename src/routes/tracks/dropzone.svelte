@@ -12,41 +12,7 @@
 	export let scene
 	export let trackName
 
-	/** Should be identical to table.svelte > addToSelectedDropZones()...
-	 * Until I find a better place to put this and import it from there
-	 * @returns {void}
-	 * @param {string} sceneName
-	 * @param {string} trackName
-	 * */
-	function addToSelectedDropZones(sceneName, trackName) {
-		/* TODO: split path for DELETE function and ADD FUNCTION
-        
-        everything that currently exists below is the ADD function
-            condition to branch to ADD function: if characterInHand
-        
-        */
-
-		if (!$characterInHand) return
-
-		// return if character already in scene
-		const selectedScene = $table.scenes.find((_) => _.name === sceneName)
-		const selectedSceneContainsCharacterInHand = selectedScene.trackList.find((_) =>
-			_.characterNames.includes($characterInHand)
-		)
-		if (selectedSceneContainsCharacterInHand) {
-			// console.log(`"${characterInHand}" is already in scene "${sceneName}"`)
-			return
-		}
-
-		// selected drop zones can't contain more than one DropZoneInfo obj with the same scene
-		// if the same scene is being added now, delete the old one
-		const index = $selectedDropZones.findIndex((_) => _.sceneName === sceneName)
-		if (index > -1) $selectedDropZones.splice(index, 1)
-
-		$selectedDropZones = $selectedDropZones.concat(newDropZoneInfo(sceneName, trackName))
-		// console.log('👇🏽 SELECTED DROP ZONES')
-		// console.dir($selectedDropZones)
-	}
+	export let addToSelectedDropZones // FUNCTION
 
 	/** whether to apply .selected class
 	 * @type {boolean} */

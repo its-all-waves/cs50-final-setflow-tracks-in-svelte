@@ -12,7 +12,7 @@
 	// exposed to parent as attr
 	export let name
 	export let sceneName
-	export let trackName
+	// export let trackName
 
 	function setCharacterInHand(event) {
 		$characterInHand = name
