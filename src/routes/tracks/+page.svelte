@@ -5,17 +5,11 @@
 	import { newScene, newTrackListItem } from '../../lib/TableObjects/Scene'
 	import { newCharacter } from '../../lib/TableObjects/Character'
 
+	import { table, characterInHand, selectedDropZones, canEdit } from './store'
+
 	import Table from './table.svelte'
 	import Character from './character.svelte'
 	import Toolbar from './toolbar.svelte'
-
-	import {
-		table,
-		characterInHand,
-		selectedDropZones,
-		canEdit,
-		lastClickedCharacter
-	} from './store'
 
 	/**
 	 * 	@type {import('./$types').PageData} */
@@ -82,12 +76,12 @@
 		// create a character, push it to characters[]
 		$table.characters = $table.characters.concat(newCharacter(name))
 
-		sortCharacters()
+		sortCharactersAtoZ()
 
 		inputField.value = null
 	}
 
-	function sortCharacters() {
+	function sortCharactersAtoZ() {
 		const characters = $table.characters
 		let swapCounter = -1
 		while (true) {
@@ -122,16 +116,15 @@
 	/** Helper for commitDropZones() \
 	 * Forget what's currently selected */
 	function resetUiSelectionFlags() {
-		$characterInHand = null
+		$characterInHand = {}
 		$selectedDropZones = []
-		$lastClickedCharacter = {}
 	}
 
 	/** Helper for commitDropZones() \
 	 * put the CHARACTER on this TRACK, in this SCENE */
 	function addCharacterToSelectedScenes() {
-		if (!$characterInHand) {
-			throw new Error('No idea how we got here (populateDropZone())...')
+		if (!$characterInHand.name) {
+			throw new Error('No idea how we got here...')
 		}
 
 		for (let i = 0; i < $selectedDropZones.length; i++) {
@@ -141,7 +134,9 @@
 
 			// TODO: handle error - scene undefined
 
-			scene.trackList = scene.trackList.concat(newTrackListItem(trackName, $characterInHand))
+			scene.trackList = scene.trackList.concat(
+				newTrackListItem(trackName, $characterInHand.name)
+			)
 			$table = $table
 		}
 	}
@@ -168,7 +163,7 @@
 	}
 </script>
 
-<svelte:window on:keydown={commitDropZones} />
+<svelte:window on:keydown={$characterInHand.name && commitDropZones} />
 
 <div class="container">
 	<article>
@@ -194,7 +189,7 @@
 		{/each}
 		<button
 			id="btn-commit"
-			class:hidden={!$characterInHand}
+			class:hidden={!$characterInHand.name}
 			on:pointerup={commitDropZones}
 		>
 			&#x2713

@@ -1,13 +1,7 @@
 <script>
-	import { newDropZoneInfo } from '../../lib/TableObjects/Table'
+	import { table, characterInHand, selectedDropZones, canEdit } from './store'
+
 	import Character from './character.svelte'
-	import {
-		table,
-		characterInHand,
-		selectedDropZones,
-		canEdit,
-		lastClickedCharacter
-	} from './store'
 
 	export let scene
 	export let trackName

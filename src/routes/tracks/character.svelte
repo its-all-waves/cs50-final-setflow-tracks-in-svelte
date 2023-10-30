@@ -1,13 +1,6 @@
 <script>
-	import { createEventDispatcher } from 'svelte'
 	import { display } from '../../lib/util/util'
-	import {
-		table,
-		characterInHand,
-		selectedDropZones,
-		canEdit,
-		lastClickedCharacter
-	} from './store'
+	import { table, characterInHand, selectedDropZones, canEdit } from './store'
 
 	// exposed to parent as attr
 	export let name
@@ -15,31 +8,25 @@
 	// export let trackName
 
 	function setCharacterInHand() {
-		$characterInHand = name
-
-		$lastClickedCharacter = {
+		$characterInHand = {
 			name,
 			location
 		}
 	}
 
-	$: chosen = isLastClickedCharacter($lastClickedCharacter)
+	$: chosen = isLastClickedCharacterFromTable($characterInHand)
 
-	/**
-	 * Only a character in the table (not in the pool) can be a lastClickedCharacter
-	 * TODO: fix this slightly off smell
-	 */
-	function isLastClickedCharacter(lastClickedChar) {
+	function isLastClickedCharacterFromTable(charInHand) {
 		return (
-			lastClickedChar.location !== '__pool__' &&
-			lastClickedChar.location === location &&
-			lastClickedChar.name === name
+			charInHand.location !== '__pool__' &&
+			charInHand.location === location &&
+			charInHand.name === name
 		)
 	}
 </script>
 
 <div
-	class:in-hand={name === $characterInHand}
+	class:in-hand={name === $characterInHand.name}
 	class:chosen
 	data-draggable
 	data-character-name={name}

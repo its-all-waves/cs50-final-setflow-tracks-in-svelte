@@ -1,25 +1,43 @@
 <script>
-	import {
-		table,
-		characterInHand,
-		selectedDropZones,
-		canEdit,
-		lastClickedCharacter,
-		selectedHeader
-	} from './store'
+	import { table, characterInHand, selectedDropZones, canEdit, selectedHeader } from './store'
 
 	export let resetUiSelectionFlags // FUNCTION
+
 	function handleTrashButtonClick() {
+		/* 
+		GOALS FOR DELETE BUTTON
+
+		goal	
+			state...
+			...info
+		
+		delete char from specific scene
+			pick up char from table
+			characterInHand, characterInHand.location !== '__pool__'
+		delete char from entire table
+			pick up char from pool
+			characterInHand, characterInHand.location === '__pool__'
+		clear a whole track
+			chose a track
+			chosenHeader.type === 'track', chosenHeader.name === trackName ???, !characterInHand.name, (who is resetting this?)
+		clear a whole scene
+			chose a scene	
+			chosenHeader.type === 'scene', chosenHeader.name === sceneName ???, !characterInHand.name, (need another flag for this and above?)
+		clear entire table contents
+			did not choose a scene, track, or character
+			!characterInHand.name,
+		*/
+
 		// nothing is selected
-		if (!$characterInHand && !$selectedHeader.type) {
+		if (!$characterInHand.name && !$selectedHeader.type) {
 			clearTable()
 		}
 		// selected a character from the TABLE
-		else if ($lastClickedCharacter.location !== '__pool__') {
-			deleteCharacterFromScene()
+		else if ($characterInHand.location !== '__pool__') {
+			deleteCharacterInHandFromScene()
 		}
 		// selected a character from the POOL
-		else if ($lastClickedCharacter.location === '__pool__') {
+		else if ($characterInHand.location === '__pool__') {
 			deleteCharacterInHandEverywhere()
 			console.log('selected a character from the POOL')
 		}
@@ -32,60 +50,41 @@
 			console.log('selected a SCENE header')
 		}
 
-		/* 
-		WHAT ARE ALL THE CASES THAT I WILL PRESS DELETE BUTTON?
-
-		pick up char from...
-		table				want to delete that char from that scene
-		pool 				want to delete that character from pool and table
-
-		didn't pick up character 
-
-		all the goals?
-		
-		delete char from specific scene
-			pick up char from table
-			characterInHand, lastClickedCharacter.location !== '__pool__'
-		delete char from entire table
-			pick up char from pool
-			characterInHand, lastClickedCharacter.location === '__pool__'
-		clear a whole track
-			chose a track
-			chosenHeader.type === 'track', choseHeader.name === trackName, !characterInHand, !lastClickedCharacter (who is resetting this?)
-		clear a whole scene
-			chose a scene	
-			chosenHeader.type === 'scene', choseHeader.name === sceneName, !characterInHand, !lastClickedCharacter (need another flag for this and above?)
-		clear entire table contents
-			did not choose a scene, track, or character
-			!characterInHand, 
-		*/
-
 		resetUiSelectionFlags()
 	}
 
-	function deleteCharacterFromScene() {
-		// get the scene from $lastClickedCharacter
-		const location = $lastClickedCharacter.location
-
-		if (location === '__pool__') {
-			// delete character from every scene
-			deleteCharacterInHandEverywhere()
-			return
-		}
-
-		const sceneIndex = $table.scenes.findIndex((_) => _.name === location)
-		if (sceneIndex < 0)
-			throw new Error('How did we get here? (toolbar.svelte > deleteCharacterFromScene())')
+	function deleteCharacterInHandFromScene() {
+		const sceneIndex = $table.scenes.findIndex((_) => _.name === $characterInHand.location)
+		if (sceneIndex === -1) throw new Error('How did we get here?')
 		const scene = $table.scenes[sceneIndex]
 
 		for (let trackListItem of scene.trackList) {
 			const names = trackListItem.characterNames
-			const characterIndex = names.findIndex((_) => _ === $lastClickedCharacter.name)
+			const characterIndex = names.findIndex((_) => _ === $characterInHand.name)
 			if (characterIndex > -1) names.splice(characterIndex, 1)
 		}
 
 		// TODO: is there a more efficient way (is this even inefficient)? i only need to update a single cell in the <table>
 		$table.scenes = $table.scenes
+	}
+
+	function deleteCharacterInHandEverywhere() {
+		// delete from table.scenes
+		for (let scene of $table.scenes) {
+			for (let trackListItem of scene.trackList) {
+				const names = trackListItem.characterNames
+				if (names.length === 0) continue
+				const _index = names.findIndex((_) => _ === $characterInHand.name)
+				if (_index > -1) names.splice(_index, 1)
+			}
+		}
+		$table.scenes = $table.scenes // force ui update
+
+		// delete from table.characters
+		const index = $table.characters.findIndex((_) => _.name === $characterInHand.name)
+		if (index === -1) return
+		$table.characters.splice(index, 1)
+		$table.characters = $table.characters // force ui update
 	}
 
 	function clearTable() {
@@ -98,25 +97,6 @@
 			}
 		}
 		$table.scenes = $table.scenes // force ui update
-	}
-
-	function deleteCharacterInHandEverywhere() {
-		// delete from table.scenes
-		for (let scene of $table.scenes) {
-			for (let trackListItem of scene.trackList) {
-				const names = trackListItem.characterNames
-				if (names.length === 0) continue
-				const _index = names.findIndex((_) => _ === $characterInHand)
-				if (_index > -1) names.splice(_index, 1)
-			}
-		}
-		$table.scenes = $table.scenes // force ui update
-
-		// delete from table.characters
-		const index = $table.characters.findIndex((_) => _.name === $characterInHand)
-		if (index === -1) return
-		$table.characters.splice(index, 1)
-		// why don't we need to force a ui update here?! bc working directly on the store?
 	}
 </script>
 

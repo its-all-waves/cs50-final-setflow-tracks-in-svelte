@@ -2,18 +2,12 @@
 	import { newDropZoneInfo } from '../../lib/TableObjects/Table'
 	import { display } from '../../lib/util/util'
 
+	import { table, characterInHand, selectedDropZones, canEdit } from './store'
+
 	import Dropzone from './dropzone.svelte'
 
-	import {
-		table,
-		characterInHand,
-		selectedDropZones,
-		canEdit,
-		lastClickedCharacter
-	} from './store'
-
 	function addCharacterInHandToAllScenesOn(trackName) {
-		if (!$characterInHand) return
+		if (!$characterInHand.name) return
 
 		for (let scene of $table.scenes) {
 			addToSelectedDropZones(scene.name, trackName)
@@ -27,12 +21,12 @@
 	 * @param {string} trackName
 	 * */
 	function addToSelectedDropZones(sceneName, trackName) {
-		if (!$characterInHand) return
+		if (!$characterInHand.name) return
 
 		// return if character already in scene
 		const selectedScene = $table.scenes.find((_) => _.name === sceneName)
 		const selectedSceneContainsCharacterInHand = selectedScene.trackList.find((_) =>
-			_.characterNames.includes($characterInHand)
+			_.characterNames.includes($characterInHand.name)
 		)
 		if (selectedSceneContainsCharacterInHand) {
 			// console.log(`"${characterInHand}" is already in scene "${sceneName}"`)
@@ -40,7 +34,7 @@
 		}
 
 		// selected drop zones can't contain more than one DropZoneInfo obj with the same scene
-		// if the same scene is being added now, delete the old one
+		// if the same scene is being added now, overwrite the old one
 		const index = $selectedDropZones.findIndex((_) => _.sceneName === sceneName)
 		if (index > -1) $selectedDropZones.splice(index, 1)
 
