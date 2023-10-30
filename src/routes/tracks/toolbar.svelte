@@ -20,6 +20,7 @@
 		}
 		// selected a character from the POOL
 		else if ($lastClickedCharacter.location === '__pool__') {
+			deleteCharacterInHandEverywhere()
 			console.log('selected a character from the POOL')
 		}
 		// selected track header
@@ -68,7 +69,7 @@
 
 		if (location === '__pool__') {
 			// delete character from every scene
-			deleteCharacterFromAllScenes()
+			deleteCharacterInHandEverywhere()
 			return
 		}
 
@@ -96,23 +97,26 @@
 				trackListItem.characterNames = []
 			}
 		}
-		// scenes = scenes // force ui update
-		$table.scenes = $table.scenes
+		$table.scenes = $table.scenes // force ui update
 	}
 
-	function deleteCharacterFromAllScenes() {
+	function deleteCharacterInHandEverywhere() {
+		// delete from table.scenes
 		for (let scene of $table.scenes) {
 			for (let trackListItem of scene.trackList) {
 				const names = trackListItem.characterNames
-				const index = names.findIndex((_) => _ === $lastClickedCharacter.name)
-				if (index < 0) {
-					console.log('FUCKED UP')
-					return
-				}
-				names.splice(index, 1)
+				if (names.length === 0) continue
+				const _index = names.findIndex((_) => _ === $characterInHand)
+				if (_index > -1) names.splice(_index, 1)
 			}
 		}
-		$table.scenes = $table.scenes
+		$table.scenes = $table.scenes // force ui update
+
+		// delete from table.characters
+		const index = $table.characters.findIndex((_) => _.name === $characterInHand)
+		if (index === -1) return
+		$table.characters.splice(index, 1)
+		// why don't we need to force a ui update here?! bc working directly on the store?
 	}
 </script>
 
