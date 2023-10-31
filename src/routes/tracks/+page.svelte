@@ -5,7 +5,7 @@
 	import { newScene, newTrackListItem } from '../../lib/TableObjects/Scene'
 	import { newCharacter } from '../../lib/TableObjects/Character'
 
-	import { table, characterInHand, selectedDropZones, canEdit } from './store'
+	import { table, charactersInHand, selectedDropZones, canEdit } from './store'
 
 	import Table from './table.svelte'
 	import Character from './character.svelte'
@@ -116,14 +116,14 @@
 	/** Helper for commitDropZones() \
 	 * Forget what's currently selected */
 	function resetUiSelectionFlags() {
-		$characterInHand = {}
+		$charactersInHand = [] // TODO: is this right? was {}
 		$selectedDropZones = []
 	}
 
 	/** Helper for commitDropZones() \
 	 * put the CHARACTER on this TRACK, in this SCENE */
 	function addCharacterToSelectedScenes() {
-		if (!$characterInHand.name) {
+		if ($charactersInHand.length === 0 || $charactersInHand.length > 1) {
 			throw new Error('No idea how we got here...')
 		}
 
@@ -135,7 +135,7 @@
 			// TODO: handle error - scene undefined
 
 			scene.trackList = scene.trackList.concat(
-				newTrackListItem(trackName, $characterInHand.name)
+				newTrackListItem(trackName, $charactersInHand[0].name)
 			)
 			$table = $table
 		}
@@ -163,7 +163,7 @@
 	}
 </script>
 
-<svelte:window on:keydown={$characterInHand.name && commitDropZones} />
+<svelte:window on:keydown={$charactersInHand.length === 1 && commitDropZones} />
 
 <div class="container">
 	<article>
@@ -189,7 +189,7 @@
 		{/each}
 		<button
 			id="btn-commit"
-			class:hidden={!$characterInHand.name}
+			class:hidden={$charactersInHand.length === 0}
 			on:pointerup={commitDropZones}
 		>
 			&#x2713

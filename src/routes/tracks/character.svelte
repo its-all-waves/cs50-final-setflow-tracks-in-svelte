@@ -1,52 +1,43 @@
 <script>
 	import { display } from '../../lib/util/util'
-	import { table, characterInHand, selectedDropZones, canEdit } from './store'
+	import { table, charactersInHand, selectedDropZones, canEdit } from './store'
 
 	// exposed to parent as attr
 	export let name
 	export let location // === '__pool__' || scene.name
 
-	function setCharacterInHand() {
-		$characterInHand = {
+	function setCharactersInHand() {
+		// replace whatever is there with a single character's info
+		$charactersInHand = []
+		$charactersInHand.push({
 			name,
 			location
-		}
+		})
+		$charactersInHand = $charactersInHand
 	}
 
-	$: chosen = isLastClickedCharacterFromTable($characterInHand)
+	$: chosen = isLastClickedCharacterFromTable($charactersInHand)
 
 	function isLastClickedCharacterFromTable(charInHand) {
+		if (charInHand.length === 0 || charInHand.length > 1) {
+			return false
+		}
 		return (
-			charInHand.location !== '__pool__' &&
-			charInHand.location === location &&
-			charInHand.name === name
+			charInHand[0].location !== '__pool__' &&
+			charInHand[0].location === location &&
+			charInHand[0].name === name
 		)
 	}
-</script>
 
-<div
-	class:in-hand={name === $characterInHand.name}
-	class:chosen
-	data-draggable
-	data-character-name={name}
-	on:pointerup={setCharacterInHand}
->
-	{display(name)}
-</div>
-
-<!-- 
+	/* 
 	method for allowing deletion of entire scene and track
-
-	spit ball!
-
-	A)
 
 	change characterInHand to an array of the same obj
 
-	anytime a character is clicked -- regardless of location -- the 
-	array is cleared and the latest clicked character is inserted
+	a character is clicked -- regardless of location -- the 
+	contents of the array is replaced with the single clicked character
 
-	anytime a track is clicked, a fn would go thru every scene and
+	a track is clicked, a fn would go thru every scene and
 	gather all the names from every trackListItem with the same
 	.trackName into charactersInHand[]
 	
@@ -56,16 +47,19 @@
 			OR 
 			cancel, clearing the array itself
 
-	anytime a scene is clicked, a fn would go through all the scene's trackListItems, resetting all .characterNames[] to []
+	a scene is clicked, a fn would go through all the scene's trackListItems, resetting all .characterNames[] to []
+	*/
+</script>
 
-	This doesn't seem to crazy...
-	
-
-
-
-
-
- -->
+<div
+	class:in-hand={$charactersInHand.length === 1 && name === $charactersInHand[0].name}
+	class:chosen
+	data-draggable
+	data-character-name={name}
+	on:pointerup={setCharactersInHand}
+>
+	{display(name)}
+</div>
 
 <style>
 	[data-draggable] {

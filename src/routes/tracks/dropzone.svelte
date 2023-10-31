@@ -1,5 +1,5 @@
 <script>
-	import { table, characterInHand, selectedDropZones, canEdit } from './store'
+	import { table, charactersInHand, selectedDropZones, canEdit } from './store'
 
 	import Character from './character.svelte'
 

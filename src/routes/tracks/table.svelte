@@ -2,12 +2,12 @@
 	import { newDropZoneInfo } from '../../lib/TableObjects/Table'
 	import { display } from '../../lib/util/util'
 
-	import { table, characterInHand, selectedDropZones, canEdit } from './store'
+	import { table, charactersInHand, selectedDropZones, canEdit } from './store'
 
 	import Dropzone from './dropzone.svelte'
 
 	function addCharacterInHandToAllScenesOn(trackName) {
-		if (!$characterInHand.name) return
+		if ($charactersInHand.length === 0 || $charactersInHand.length > 1) return
 
 		for (let scene of $table.scenes) {
 			addToSelectedDropZones(scene.name, trackName)
@@ -21,15 +21,15 @@
 	 * @param {string} trackName
 	 * */
 	function addToSelectedDropZones(sceneName, trackName) {
-		if (!$characterInHand.name) return
+		if ($charactersInHand.length === 0) return
 
 		// return if character already in scene
 		const selectedScene = $table.scenes.find((_) => _.name === sceneName)
 		const selectedSceneContainsCharacterInHand = selectedScene.trackList.find((_) =>
-			_.characterNames.includes($characterInHand.name)
+			_.characterNames.includes($charactersInHand[0].name)
 		)
 		if (selectedSceneContainsCharacterInHand) {
-			// console.log(`"${characterInHand}" is already in scene "${sceneName}"`)
+			// console.log(`"${charactersInHand}" is already in scene "${sceneName}"`)
 			return
 		}
 

@@ -1,5 +1,5 @@
 <script>
-	import { table, characterInHand, selectedDropZones, canEdit, selectedHeader } from './store'
+	import { table, charactersInHand, selectedDropZones, canEdit, selectedHeader } from './store'
 
 	export let resetUiSelectionFlags // FUNCTION
 
@@ -29,15 +29,15 @@
 		*/
 
 		// nothing is selected
-		if (!$characterInHand.name && !$selectedHeader.type) {
+		if ($charactersInHand.length === 0 && !$selectedHeader.type) {
 			clearTable()
 		}
 		// selected a character from the TABLE
-		else if ($characterInHand.location !== '__pool__') {
+		else if ($charactersInHand.length === 1 && $charactersInHand[0].location !== '__pool__') {
 			deleteCharacterInHandFromScene()
 		}
 		// selected a character from the POOL
-		else if ($characterInHand.location === '__pool__') {
+		else if ($charactersInHand.length === 1 && $charactersInHand[0].location === '__pool__') {
 			deleteCharacterInHandEverywhere()
 			console.log('selected a character from the POOL')
 		}
@@ -54,13 +54,13 @@
 	}
 
 	function deleteCharacterInHandFromScene() {
-		const sceneIndex = $table.scenes.findIndex((_) => _.name === $characterInHand.location)
+		const sceneIndex = $table.scenes.findIndex((_) => _.name === $charactersInHand[0].location)
 		if (sceneIndex === -1) throw new Error('How did we get here?')
 		const scene = $table.scenes[sceneIndex]
 
 		for (let trackListItem of scene.trackList) {
 			const names = trackListItem.characterNames
-			const characterIndex = names.findIndex((_) => _ === $characterInHand.name)
+			const characterIndex = names.findIndex((_) => _ === $charactersInHand[0].name)
 			if (characterIndex > -1) names.splice(characterIndex, 1)
 		}
 
@@ -74,14 +74,14 @@
 			for (let trackListItem of scene.trackList) {
 				const names = trackListItem.characterNames
 				if (names.length === 0) continue
-				const _index = names.findIndex((_) => _ === $characterInHand.name)
+				const _index = names.findIndex((_) => _ === $charactersInHand[0].name)
 				if (_index > -1) names.splice(_index, 1)
 			}
 		}
 		$table.scenes = $table.scenes // force ui update
 
 		// delete from table.characters
-		const index = $table.characters.findIndex((_) => _.name === $characterInHand.name)
+		const index = $table.characters.findIndex((_) => _.name === $charactersInHand[0].name)
 		if (index === -1) return
 		$table.characters.splice(index, 1)
 		$table.characters = $table.characters // force ui update
