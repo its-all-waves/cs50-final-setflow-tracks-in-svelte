@@ -4,7 +4,7 @@
 
 	// exposed to parent as attr
 	export let name
-	export let location // === '__pool__' || <scene.name>
+	export let location // === '__pool__' || scene.name
 
 	function setCharacterInHand() {
 		$characterInHand = {
@@ -33,6 +33,39 @@
 >
 	{display(name)}
 </div>
+
+<!-- 
+	method for allowing deletion of entire scene and track
+
+	spit ball!
+
+	A)
+
+	change characterInHand to an array of the same obj
+
+	anytime a character is clicked -- regardless of location -- the 
+	array is cleared and the latest clicked character is inserted
+
+	anytime a track is clicked, a fn would go thru every scene and
+	gather all the names from every trackListItem with the same
+	.trackName into charactersInHand[]
+	
+		possible next moves	
+			delete everyone ref'd in the array
+			+ the array,
+			OR 
+			cancel, clearing the array itself
+
+	anytime a scene is clicked, a fn would go through all the scene's trackListItems, resetting all .characterNames[] to []
+
+	This doesn't seem to crazy...
+	
+
+
+
+
+
+ -->
 
 <style>
 	[data-draggable] {
