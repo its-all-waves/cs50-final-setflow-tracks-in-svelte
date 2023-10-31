@@ -4,8 +4,7 @@
 
 	// exposed to parent as attr
 	export let name
-	export let location
-	// export let trackName
+	export let location // === '__pool__' || <scene.name>
 
 	function setCharacterInHand() {
 		$characterInHand = {
@@ -39,14 +38,43 @@
 	[data-draggable] {
 		margin: 0.5rem 0.5rem;
 		padding: 0.2rem 1rem;
-		border: 1px solid goldenrod;
+		max-width: 16ch;
+		border-top: 2px solid goldenrod;
+		border-left: 2px solid goldenrod;
+		border-bottom: 2px solid goldenrod;
+		border-right: 2px solid goldenrod;
 		border-radius: 1.5rem;
 		background-color: #11191f;
 		line-height: 2rem;
-		max-width: 16ch;
 		text-overflow: clip;
 		font-size: 1.25rem;
 		user-select: none;
+		text-shadow: 0 2px 0 black;
+
+		box-shadow: 0 3px 1.5px rgba(0, 0, 0, 0.7);
+
+		position: relative;
+	}
+
+	[data-draggable]::before {
+		position: absolute;
+		content: '';
+		left: 0;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		border-radius: 1.5rem;
+		border-top: 3px solid black;
+		border-left: 3px solid black;
+		border-right: 3px solid black;
+		opacity: 0.75;
+		filter: blur(1px);
+
+		box-shadow: 0 -2px 0 white, inset 0 2px 0px rgba(255, 230, 165, 0.607);
+	}
+
+	.in-hand::before {
+		opacity: 1;
 	}
 
 	.in-hand {
