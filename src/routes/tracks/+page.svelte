@@ -105,7 +105,15 @@
 		// committing is executed only by Enter key (+focus) or button click
 		if (event.type !== 'pointerup' && event.key !== 'Enter') return
 
-		addCharacterToSelectedScenes()
+		if ($charactersInHand.length === 0) throw new Error('But how did we get here, tho?')
+
+		if ($charactersInHand.length === 1 && !$selectedHeader.type) {
+			// one character in hand and have not selected a track or scene
+			addCharacterInHandToSelectedScenes()
+		} else if ($selectedHeader.type === 'track') {
+			// any # of characters in hand and have selected a track
+			addCharacterInHandToAllScenesOn($selectedHeader.name)
+		}
 
 		resetUiSelectionFlags()
 	}
@@ -120,10 +128,10 @@
 
 	/** Helper for commitDropZones() \
 	 * put the CHARACTER on this TRACK, in this SCENE */
-	function addCharacterToSelectedScenes() {
-		// if ($charactersInHand.length !== 1) {
-		// 	throw new Error('No idea how we got here...')
-		// }
+	function addCharacterInHandToSelectedScenes() {
+		if ($charactersInHand.length !== 1) {
+			throw new Error('No idea how we got here...')
+		}
 
 		for (let i = 0; i < $selectedDropZones.length; i++) {
 			const { sceneName, trackName } = $selectedDropZones[i]
@@ -135,8 +143,17 @@
 			scene.trackList = scene.trackList.concat(
 				newTrackListItem(trackName, $charactersInHand[0].name)
 			)
-			$table = $table
+			$table.scenes = $table.scenes
 		}
+	}
+
+	function addCharacterInHandToAllScenesOn(trackName) {
+		if ($charactersInHand.length !== 1) return
+
+		for (let scene of $table.scenes) {
+			addToSelectedDropZones(scene.name, trackName)
+		}
+		$selectedDropZones = $selectedDropZones // force ui update
 	}
 
 	// DEBUG
@@ -187,8 +204,8 @@
 		{/each}
 		<button
 			id="btn-commit"
-			class:hidden={$selectedHeader.type || $charactersInHand.length === 0}
-			on:pointerup={!$selectedHeader.type && commitDropZones}
+			class:hidden={$charactersInHand.length === 0}
+			on:pointerup={commitDropZones}
 		>
 			&#x2713
 		</button>

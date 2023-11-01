@@ -8,14 +8,14 @@
 
 	export let resetUiSelectionFlags // FUNCTION
 
-	function addCharacterInHandToAllScenesOn(trackName) {
-		if ($charactersInHand.length !== 1) return
+	// function addCharacterInHandToAllScenesOn(trackName) {
+	// 	if ($charactersInHand.length !== 1) return
 
-		for (let scene of $table.scenes) {
-			addToSelectedDropZones(scene.name, trackName)
-		}
-		$selectedDropZones = $selectedDropZones // force ui update
-	}
+	// 	for (let scene of $table.scenes) {
+	// 		addToSelectedDropZones(scene.name, trackName)
+	// 	}
+	// 	$selectedDropZones = $selectedDropZones // force ui update
+	// }
 
 	/**
 	 * @returns {void}
@@ -51,35 +51,36 @@
 		$selectedHeader = $selectedHeader
 	}
 
-	function handleTrackHeaderClick(type, trackName) {
-		// if ($charactersInHand.length === 1 && !$selectedHeader.type) {
-		// 	addCharacterInHandToAllScenesOn(trackName)
-		// 	// $charactersInHand = []
-		// } else if ($charactersInHand.length === 0 && !$selectedHeader.type) {
-		// 	setSelectedHeader(type, trackName) // TODO: necessary?
-		// 	addAllToCharactersInHandFromTrack(trackName)
-		// 	/*
-		// 			if selectedHeader.type === 'track'
-		// 				trigger the track fn
-		// 	*/
-
-		$selectedHeader = {}
-
-		if ($charactersInHand.length === 1) {
-			addCharacterInHandToAllScenesOn(trackName)
-		} else if ($charactersInHand.length === 0) {
-			addAllToCharactersInHandFromTrack(trackName)
-		}
-
-		setSelectedHeader(type, trackName) // TODO: necessary?
-
-		// DEBUG
-		console.log('IN HAND:')
+	function handleTrackHeaderClick(trackName) {
+		console.log('charactersInHand:')
 		console.dir($charactersInHand)
-		console.log(`SELECTED HEADER: ${JSON.stringify($selectedHeader)}`)
 
-		// also reset characters in hand -- can have but ONE selection! (TODO: FIGURE OUT HOW TO EXPLICIT STATE THIS!)
-		$charactersInHand = []
+		// CASE A) WANT TO ADD CHAR IN HAND TO ALL SCENES ON THIS TRACK
+		// STARTING STATE: ONE CHAR IN HAND
+		// ACTION: ADD CHAR IN HAND TO SELECTED DROP ZONES...
+		// (commitDropZones() does stuff with the selectedDropZones[])
+		if ($charactersInHand.length === 1) {
+			for (let scene of $table.scenes) {
+				$selectedDropZones.push(newDropZoneInfo(scene.name, trackName))
+			}
+			$selectedDropZones = $selectedDropZones
+			return
+		}
+		// CASE B) WANT TO CLEAR THIS TRACK FOR ALL SCENES
+		// STARTING STATE: NO CHAR IN HAND
+		// ACTION: SET SELECTED HEADER
+		// (delete button function will change if selectedHeader.type defined)
+		else if ($charactersInHand.length === 0) {
+			setSelectedHeader('track', trackName)
+			console.log('SELECTED DROP ZONES:')
+			console.dir($selectedDropZones)
+			console.log(`SELECTED HEADER: ${JSON.stringify($selectedHeader)}`)
+			// ONCE SELECTED HEADER
+		}
+		// default: ??
+		else {
+			throw new Error('TODO: WHAT IF THERE ARE MANY CHARS IN HAND? return?')
+		}
 	}
 
 	function addAllToCharactersInHandFromTrack(trackName) {
@@ -129,7 +130,7 @@
 			<!-- a row + header per track -->
 			{#each $table.tracks as track}
 				<tr data-track-row={track.name}>
-					<th on:pointerup={handleTrackHeaderClick('track', track.name)}>
+					<th on:pointerup={handleTrackHeaderClick(track.name)}>
 						{display(track.name)}
 					</th>
 

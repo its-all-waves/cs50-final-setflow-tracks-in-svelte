@@ -42,8 +42,9 @@
 			// console.log('selected a character from the POOL')
 		}
 		// selected track header
-		else if ($charactersInHand.length > 1) {
+		else if ($selectedHeader.type === 'track') {
 			// console.log('selected a TRACK header')
+			clearSelectedTrackInAllScenes()
 		}
 		// // selected a scene header
 		// else if ($selectedHeader.type === 'scene') {
@@ -51,6 +52,17 @@
 		// }
 
 		resetUiSelectionFlags()
+	}
+
+	function clearSelectedTrackInAllScenes() {
+		const trackName = $selectedHeader.name
+		for (let scene of $table.scenes) {
+			for (let trackListItem of scene.trackList) {
+				if (trackListItem.trackName !== trackName) continue
+				trackListItem.characterNames = []
+			}
+		}
+		$table.scenes = $table.scenes
 	}
 
 	function deleteCharacterInHandFromScene() {
@@ -64,7 +76,6 @@
 			if (characterIndex > -1) names.splice(characterIndex, 1)
 		}
 
-		// TODO: is there a more efficient way (is this even inefficient)? i only need to update a single cell in the <table>
 		$table.scenes = $table.scenes
 	}
 
