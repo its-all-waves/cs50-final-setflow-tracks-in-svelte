@@ -103,9 +103,7 @@
 
 	function commitDropZones(event) {
 		// committing is executed only by Enter key (+focus) or button click
-		if (event.type !== 'pointerup' && event.key !== 'Enter') {
-			return
-		}
+		if (event.type !== 'pointerup' && event.key !== 'Enter') return
 
 		addCharacterToSelectedScenes()
 
@@ -123,9 +121,9 @@
 	/** Helper for commitDropZones() \
 	 * put the CHARACTER on this TRACK, in this SCENE */
 	function addCharacterToSelectedScenes() {
-		if ($charactersInHand.length === 0 || $charactersInHand.length > 1) {
-			throw new Error('No idea how we got here...')
-		}
+		// if ($charactersInHand.length !== 1) {
+		// 	throw new Error('No idea how we got here...')
+		// }
 
 		for (let i = 0; i < $selectedDropZones.length; i++) {
 			const { sceneName, trackName } = $selectedDropZones[i]
@@ -175,7 +173,7 @@
 				class="table"
 				class:glow={$canEdit}
 			>
-				<Table />
+				<Table {resetUiSelectionFlags} />
 			</div>
 		{/if}
 	</article>
@@ -189,8 +187,8 @@
 		{/each}
 		<button
 			id="btn-commit"
-			class:hidden={$charactersInHand.length === 0}
-			on:pointerup={commitDropZones}
+			class:hidden={$selectedHeader.type || $charactersInHand.length === 0}
+			on:pointerup={!$selectedHeader.type && commitDropZones}
 		>
 			&#x2713
 		</button>

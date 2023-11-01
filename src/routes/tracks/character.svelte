@@ -15,6 +15,9 @@
 			location
 		})
 		$charactersInHand = $charactersInHand
+
+		// also reset the selected header -- can have but ONE selection! (TODO: FIGURE OUT HOW TO EXPLICIT STATE THIS!)
+		$selectedHeader = {}
 	}
 
 	$: inHand = $charactersInHand.length > 0 && isInHand($charactersInHand)
@@ -46,9 +49,7 @@
 	$: chosen = isLastClickedCharacterFromTable($charactersInHand)
 
 	function isLastClickedCharacterFromTable(charsInHand) {
-		if (charsInHand.length !== 1) {
-			return false
-		}
+		if (charsInHand.length !== 1) return false
 		return (
 			charsInHand[0].location !== '__pool__' &&
 			charsInHand[0].location === location &&

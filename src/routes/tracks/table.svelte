@@ -6,8 +6,10 @@
 
 	import Dropzone from './dropzone.svelte'
 
+	export let resetUiSelectionFlags // FUNCTION
+
 	function addCharacterInHandToAllScenesOn(trackName) {
-		if ($charactersInHand.length === 0 || $charactersInHand.length > 1) return
+		if ($charactersInHand.length !== 1) return
 
 		for (let scene of $table.scenes) {
 			addToSelectedDropZones(scene.name, trackName)
@@ -49,17 +51,35 @@
 		$selectedHeader = $selectedHeader
 	}
 
-	function handleTableHeaderClick(type, trackName) {
+	function handleTrackHeaderClick(type, trackName) {
+		// if ($charactersInHand.length === 1 && !$selectedHeader.type) {
+		// 	addCharacterInHandToAllScenesOn(trackName)
+		// 	// $charactersInHand = []
+		// } else if ($charactersInHand.length === 0 && !$selectedHeader.type) {
+		// 	setSelectedHeader(type, trackName) // TODO: necessary?
+		// 	addAllToCharactersInHandFromTrack(trackName)
+		// 	/*
+		// 			if selectedHeader.type === 'track'
+		// 				trigger the track fn
+		// 	*/
+
+		$selectedHeader = {}
+
 		if ($charactersInHand.length === 1) {
 			addCharacterInHandToAllScenesOn(trackName)
 		} else if ($charactersInHand.length === 0) {
-			setSelectedHeader(type, trackName) // TODO: necessary?
 			addAllToCharactersInHandFromTrack(trackName)
-			/* 
-					if selectedHeader.type === 'track'
-						trigger the track fn
-			*/
 		}
+
+		setSelectedHeader(type, trackName) // TODO: necessary?
+
+		// DEBUG
+		console.log('IN HAND:')
+		console.dir($charactersInHand)
+		console.log(`SELECTED HEADER: ${JSON.stringify($selectedHeader)}`)
+
+		// also reset characters in hand -- can have but ONE selection! (TODO: FIGURE OUT HOW TO EXPLICIT STATE THIS!)
+		$charactersInHand = []
 	}
 
 	function addAllToCharactersInHandFromTrack(trackName) {
@@ -109,13 +129,7 @@
 			<!-- a row + header per track -->
 			{#each $table.tracks as track}
 				<tr data-track-row={track.name}>
-					<th
-						on:click={() => {
-							console.dir($charactersInHand)
-							console.dir($selectedHeader)
-						}}
-						on:pointerup={handleTableHeaderClick('track', track.name)}
-					>
+					<th on:pointerup={handleTrackHeaderClick('track', track.name)}>
 						{display(track.name)}
 					</th>
 
