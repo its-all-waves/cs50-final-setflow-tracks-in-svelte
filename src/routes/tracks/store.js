@@ -11,4 +11,7 @@ export const selectedDropZones = writable(/** @type {DropZoneInfo[]} */ [])
 
 export const canEdit = writable(true)
 
-export const selectedHeader = writable({})
+export const selectedHeader = writable(
+	/** @type {{type: string, name: string}} */
+	{}
+)

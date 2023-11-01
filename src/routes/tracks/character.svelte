@@ -1,10 +1,11 @@
 <script>
 	import { display } from '../../lib/util/util'
-	import { table, charactersInHand, selectedDropZones, canEdit } from './store'
+	import { table, charactersInHand, selectedDropZones, canEdit, selectedHeader } from './store'
 
 	// exposed to parent as attr
 	export let name
 	export let location // === '__pool__' || scene.name
+	export let trackName
 
 	function setCharactersInHand() {
 		// replace whatever is there with a single character's info
@@ -16,16 +17,42 @@
 		$charactersInHand = $charactersInHand
 	}
 
+	$: inHand = $charactersInHand.length > 0 && isInHand($charactersInHand)
+
+	function isInHand(charsInHand) {
+		if (charsInHand.length === 0) return false
+
+		// CASE A) one character in hand
+		const isTheCharacterInHand = charsInHand.length === 1 && name === charsInHand[0].name
+
+		// return what we have if there's only one of us selected, AND WE HAVE NOT SELECTED A TRACK OR SCENE
+		if (charsInHand.length === 1 && !$selectedHeader.type) return isTheCharacterInHand
+
+		// CASE B) more than 1 character in hand (IOW, we have selected a track or scene)
+		let onSameTrackAsSelectedHeader = false
+		for (let character of charsInHand) {
+			if (character.name !== name) continue
+			for (let scene of $table.scenes) {
+				if (location !== scene.name) continue
+				for (let trackListItem of scene.trackList) {
+					if (trackListItem.trackName !== $selectedHeader.name) continue
+					onSameTrackAsSelectedHeader = true
+				}
+			}
+		}
+		return onSameTrackAsSelectedHeader
+	}
+
 	$: chosen = isLastClickedCharacterFromTable($charactersInHand)
 
-	function isLastClickedCharacterFromTable(charInHand) {
-		if (charInHand.length === 0 || charInHand.length > 1) {
+	function isLastClickedCharacterFromTable(charsInHand) {
+		if (charsInHand.length !== 1) {
 			return false
 		}
 		return (
-			charInHand[0].location !== '__pool__' &&
-			charInHand[0].location === location &&
-			charInHand[0].name === name
+			charsInHand[0].location !== '__pool__' &&
+			charsInHand[0].location === location &&
+			charsInHand[0].name === name
 		)
 	}
 
@@ -48,11 +75,23 @@
 			cancel, clearing the array itself
 
 	a scene is clicked, a fn would go through all the scene's trackListItems, resetting all .characterNames[] to []
+
+	BUT PROBLEM
+
+	what state tells us that we can delete all from a track vs all from a scene
+
+	atm -- if charactersInHand.length > 1, we know we're deleting everyone in the list, but from where are we deleting them? how do we know?
+
+	need way to ref selected header -- setSelectedHeader = {type, name}
+
+	a track is chosen...
+		set characterInHand.name to characterName, location to scene.name
+
 	*/
 </script>
 
 <div
-	class:in-hand={$charactersInHand.length === 1 && name === $charactersInHand[0].name}
+	class:in-hand={inHand}
 	class:chosen
 	data-draggable
 	data-character-name={name}

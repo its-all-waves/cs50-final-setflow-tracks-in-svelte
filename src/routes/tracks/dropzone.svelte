@@ -28,6 +28,7 @@
 				<Character
 					name={characterName}
 					location={scene.name}
+					{trackName}
 				/>
 			{/each}
 		{/if}

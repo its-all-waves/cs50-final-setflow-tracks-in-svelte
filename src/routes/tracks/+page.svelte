@@ -5,7 +5,7 @@
 	import { newScene, newTrackListItem } from '../../lib/TableObjects/Scene'
 	import { newCharacter } from '../../lib/TableObjects/Character'
 
-	import { table, charactersInHand, selectedDropZones, canEdit } from './store'
+	import { table, charactersInHand, selectedDropZones, canEdit, selectedHeader } from './store'
 
 	import Table from './table.svelte'
 	import Character from './character.svelte'
@@ -85,7 +85,6 @@
 		const characters = $table.characters
 		let swapCounter = -1
 		while (true) {
-			console.log('DEBUG')
 			if (swapCounter === 0) break
 			swapCounter = 0
 			for (let i = 0; i < characters.length - 1; i++) {
@@ -118,6 +117,7 @@
 	function resetUiSelectionFlags() {
 		$charactersInHand = [] // TODO: is this right? was {}
 		$selectedDropZones = []
+		$selectedHeader = {}
 	}
 
 	/** Helper for commitDropZones() \

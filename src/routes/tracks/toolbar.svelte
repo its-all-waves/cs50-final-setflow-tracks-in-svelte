@@ -39,16 +39,16 @@
 		// selected a character from the POOL
 		else if ($charactersInHand.length === 1 && $charactersInHand[0].location === '__pool__') {
 			deleteCharacterInHandEverywhere()
-			console.log('selected a character from the POOL')
+			// console.log('selected a character from the POOL')
 		}
 		// selected track header
-		else if ($selectedHeader.type === 'track') {
-			console.log('selected a TRACK header')
+		else if ($charactersInHand.length > 1) {
+			// console.log('selected a TRACK header')
 		}
-		// selected a scene header
-		else if ($selectedHeader.type === 'scene') {
-			console.log('selected a SCENE header')
-		}
+		// // selected a scene header
+		// else if ($selectedHeader.type === 'scene') {
+		// 	console.log('selected a SCENE header')
+		// }
 
 		resetUiSelectionFlags()
 	}
@@ -88,7 +88,7 @@
 	}
 
 	function clearTable() {
-		console.log('CLEAR TABLE')
+		// console.log('CLEAR TABLE')
 		alert('SURE YOU WANT TO CLEAR THE TABLE CONTENTS?')
 
 		for (let scene of $table.scenes) {

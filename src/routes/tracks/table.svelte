@@ -2,7 +2,7 @@
 	import { newDropZoneInfo } from '../../lib/TableObjects/Table'
 	import { display } from '../../lib/util/util'
 
-	import { table, charactersInHand, selectedDropZones, canEdit } from './store'
+	import { table, charactersInHand, selectedDropZones, canEdit, selectedHeader } from './store'
 
 	import Dropzone from './dropzone.svelte'
 
@@ -40,6 +40,45 @@
 
 		$selectedDropZones = $selectedDropZones.concat(newDropZoneInfo(sceneName, trackName))
 	}
+
+	function setSelectedHeader(type, name) {
+		$selectedHeader = {
+			type,
+			name
+		}
+		$selectedHeader = $selectedHeader
+	}
+
+	function handleTableHeaderClick(type, trackName) {
+		if ($charactersInHand.length === 1) {
+			addCharacterInHandToAllScenesOn(trackName)
+		} else if ($charactersInHand.length === 0) {
+			setSelectedHeader(type, trackName) // TODO: necessary?
+			addAllToCharactersInHandFromTrack(trackName)
+			/* 
+					if selectedHeader.type === 'track'
+						trigger the track fn
+			*/
+		}
+	}
+
+	function addAllToCharactersInHandFromTrack(trackName) {
+		$charactersInHand = [] // TODO: IS THIS RIGHT  ???????????????????????
+		for (let scene of $table.scenes) {
+			for (let trackListItem of scene.trackList) {
+				if (trackListItem.trackName !== trackName) continue
+				for (let name of trackListItem.characterNames) {
+					$charactersInHand.push({
+						name,
+						location: scene.name
+					})
+				}
+			}
+		}
+		$charactersInHand = $charactersInHand
+		// console.log('UPDATED charactersInHand: ')
+		// console.log($charactersInHand)
+	}
 </script>
 
 <table
@@ -56,6 +95,7 @@
 					<th
 						data-scene-col={scene.name}
 						class:selected={false}
+						on:pointerup={() => setSelectedHeader('scene', scene.name)}
 					>
 						{display(scene.name)}
 					</th>
@@ -69,7 +109,13 @@
 			<!-- a row + header per track -->
 			{#each $table.tracks as track}
 				<tr data-track-row={track.name}>
-					<th on:pointerup={() => addCharacterInHandToAllScenesOn(track.name)}>
+					<th
+						on:click={() => {
+							console.dir($charactersInHand)
+							console.dir($selectedHeader)
+						}}
+						on:pointerup={handleTableHeaderClick('track', track.name)}
+					>
 						{display(track.name)}
 					</th>
 
@@ -155,9 +201,9 @@
 	}
 
 	/* .in-hand comes from character.svelte */
-	tbody :global(.in-hand) {
+	/* tbody :global(.in-hand) {
 		scale: 1;
-	}
+	} */
 
 	table.canEdit {
 		pointer-events: all;
