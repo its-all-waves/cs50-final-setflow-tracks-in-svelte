@@ -68,14 +68,19 @@
 		}
 		// CASE B) WANT TO CLEAR THIS TRACK FOR ALL SCENES
 		// STARTING STATE: NO CHAR IN HAND
-		// ACTION: SET SELECTED HEADER
+		// ACTION: SET SELECTED HEADER, ADD TO SELECTED DROP ZONES FOR UI FDBK
 		// (delete button function will change if selectedHeader.type defined)
 		else if ($charactersInHand.length === 0) {
 			setSelectedHeader('track', trackName)
 			console.log('SELECTED DROP ZONES:')
 			console.dir($selectedDropZones)
 			console.log(`SELECTED HEADER: ${JSON.stringify($selectedHeader)}`)
-			// ONCE SELECTED HEADER
+
+			// ADD TO SELECTED DROP ZONES FOR UI FEEDBACK (SHOW SELECTED TRACK)
+			for (let scene of $table.scenes) {
+				$selectedDropZones.push(newDropZoneInfo(scene.name, trackName))
+			}
+			$selectedDropZones = $selectedDropZones
 		}
 		// default: ??
 		else {

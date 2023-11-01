@@ -8,8 +8,6 @@
 
 	export let addToSelectedDropZones // FUNCTION
 
-	/** whether to apply .selected class
-	 * @type {boolean} */
 	$: selected = $selectedDropZones.some(
 		(_) => _.sceneName === scene.name && _.trackName === trackName
 	)

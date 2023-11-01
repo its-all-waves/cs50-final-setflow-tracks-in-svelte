@@ -42,7 +42,7 @@
 			// console.log('selected a character from the POOL')
 		}
 		// selected track header
-		else if ($selectedHeader.type === 'track') {
+		else if ($charactersInHand.length === 0 && $selectedHeader.type === 'track') {
 			// console.log('selected a TRACK header')
 			clearSelectedTrackInAllScenes()
 		}
