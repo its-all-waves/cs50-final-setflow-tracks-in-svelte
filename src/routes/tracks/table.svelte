@@ -18,21 +18,30 @@
 	// }
 
 	/**
+	 * Adds a dropZoneInfo obj to $selectedDropZones *if* it can be added. \
+	 * Rules: A) The scene obj ref'd by `sceneName` cannot contain the same
+	 * character twice. B) If adding a drop zone for the same scene twice (in
+	 * one motion), overwrite the last one selected in this scene.
 	 * @returns {void}
 	 * @param {string} sceneName
 	 * @param {string} trackName
 	 * */
 	function addToSelectedDropZones(sceneName, trackName) {
-		if ($charactersInHand.length === 0) return
+		// return early if no char in hand and no header selected
+		if ($charactersInHand.length === 0 && !$selectedHeader.type) return
 
-		// return if character already in scene
-		const selectedScene = $table.scenes.find((_) => _.name === sceneName)
-		const selectedSceneContainsCharacterInHand = selectedScene.trackList.find((_) =>
-			_.characterNames.includes($charactersInHand[0].name)
-		)
-		if (selectedSceneContainsCharacterInHand) {
-			// console.log(`"${charactersInHand}" is already in scene "${sceneName}"`)
-			return
+		// return early if one char in hand and this scene (w/ sceneName) already
+		// contains the char in hand
+		if ($charactersInHand.length === 1) {
+			// return if character already in scene
+			const selectedScene = $table.scenes.find((_) => _.name === sceneName)
+			const selectedSceneContainsCharacterInHand = selectedScene.trackList.find((_) =>
+				_.characterNames.includes($charactersInHand[0].name)
+			)
+			if (selectedSceneContainsCharacterInHand) {
+				// console.log(`"${charactersInHand}" is already in scene "${sceneName}"`)
+				return
+			}
 		}
 
 		// selected drop zones can't contain more than one DropZoneInfo obj with the same scene
@@ -40,7 +49,8 @@
 		const index = $selectedDropZones.findIndex((_) => _.sceneName === sceneName)
 		if (index > -1) $selectedDropZones.splice(index, 1)
 
-		$selectedDropZones = $selectedDropZones.concat(newDropZoneInfo(sceneName, trackName))
+		$selectedDropZones.push(newDropZoneInfo(sceneName, trackName))
+		$selectedDropZones = $selectedDropZones
 	}
 
 	function setSelectedHeader(type, name) {
@@ -62,7 +72,6 @@
 		if ($charactersInHand.length === 1) {
 			for (let scene of $table.scenes) {
 				addToSelectedDropZones(scene.name, trackName)
-				// 	$selectedDropZones.push(newDropZoneInfo(scene.name, trackName))
 			}
 			$selectedDropZones = $selectedDropZones
 			return
@@ -245,9 +254,9 @@
 	}
 
 	/* .in-hand comes from character.svelte */
-	/* tbody :global(.in-hand) {
-		scale: 1;
-	} */
+	tbody :global(.in-hand) {
+		scale: 1.05;
+	}
 
 	table.canEdit {
 		pointer-events: all;
