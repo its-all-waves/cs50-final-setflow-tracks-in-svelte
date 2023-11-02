@@ -147,14 +147,14 @@
 		}
 	}
 
-	function addCharacterInHandToAllScenesOn(trackName) {
-		if ($charactersInHand.length !== 1) return
+	// function addCharacterInHandToAllScenesOn(trackName) {
+	// 	if ($charactersInHand.length !== 1) return
 
-		for (let scene of $table.scenes) {
-			addToSelectedDropZones(scene.name, trackName)
-		}
-		$selectedDropZones = $selectedDropZones // force ui update
-	}
+	// 	for (let scene of $table.scenes) {
+	// 		addToSelectedDropZones(scene.name, trackName)
+	// 	}
+	// 	$selectedDropZones = $selectedDropZones // force ui update
+	// }
 
 	// DEBUG
 	onMount(DEV_populate_table)

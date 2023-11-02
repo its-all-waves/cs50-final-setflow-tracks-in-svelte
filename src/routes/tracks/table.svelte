@@ -61,13 +61,14 @@
 		// (commitDropZones() does stuff with the selectedDropZones[])
 		if ($charactersInHand.length === 1) {
 			for (let scene of $table.scenes) {
-				$selectedDropZones.push(newDropZoneInfo(scene.name, trackName))
+				addToSelectedDropZones(scene.name, trackName)
+				// 	$selectedDropZones.push(newDropZoneInfo(scene.name, trackName))
 			}
 			$selectedDropZones = $selectedDropZones
 			return
 		}
 		// CASE B) WANT TO CLEAR THIS TRACK FOR ALL SCENES
-		// STARTING STATE: NO CHAR IN HAND
+		// STARTING STATE: NO CHAR IN HAND AND WHAT !?!??!?!?!??!?!?!?
 		// ACTION: SET SELECTED HEADER, ADD TO SELECTED DROP ZONES FOR UI FDBK
 		// (delete button function will change if selectedHeader.type defined)
 		else if ($charactersInHand.length === 0) {
@@ -77,8 +78,11 @@
 			console.log(`SELECTED HEADER: ${JSON.stringify($selectedHeader)}`)
 
 			// ADD TO SELECTED DROP ZONES FOR UI FEEDBACK (SHOW SELECTED TRACK)
+			// $selectedDropZones = []
+			// $selectedDropZones = $selectedDropZones
 			for (let scene of $table.scenes) {
-				$selectedDropZones.push(newDropZoneInfo(scene.name, trackName))
+				addToSelectedDropZones(scene.name, trackName)
+				// 	$selectedDropZones.push(newDropZoneInfo(scene.name, trackName))
 			}
 			$selectedDropZones = $selectedDropZones
 		}
@@ -86,6 +90,26 @@
 		else {
 			throw new Error('TODO: WHAT IF THERE ARE MANY CHARS IN HAND? return?')
 		}
+
+		/* 
+		LATEST BUG // LEAVING OFF HERE FOR NOW
+
+		can have more than one selectedDropZone in a scene
+
+		still the case: if select one character, then cell(s), cannot select
+		more than one cell per scene
+
+		this behavior must be consistent in the cases where...
+			A) no char in hand
+				- select a track, pick up character, select more cells
+			B) char in hand
+				- 
+		
+		
+		
+		
+		
+		*/
 	}
 
 	function addAllToCharactersInHandFromTrack(trackName) {
