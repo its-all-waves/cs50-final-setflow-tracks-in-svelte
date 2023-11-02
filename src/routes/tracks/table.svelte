@@ -25,7 +25,7 @@
 			// return if character already in scene
 			const characterName = $charactersInHand[0].name
 			const scene = $table.scenes.find((_) => _.name === sceneName)
-			const sceneContainsCharacterInHand = scene.trackList.find((_) =>
+			const sceneContainsCharacterInHand = scene.trackList.some((_) =>
 				_.characterNames.includes(characterName)
 			)
 			if (sceneContainsCharacterInHand) {
@@ -163,9 +163,11 @@
 		background: linear-gradient(90deg, rgba(17, 25, 31, 1) 75%, rgba(17, 25, 31, 0) 100%);
 	}
 
-	tbody tr th:hover {
+	tbody tr th:hover,
+	thead th:hover {
 		text-shadow: 0px 0px 6px black, 0 0 6px rgba(255, 255, 255, 0.75),
 			0 0 12px rgba(255, 242, 0, 0.75), 0 0 18px rgba(255, 255, 255, 0.75);
+		cursor: pointer;
 	}
 
 	tbody tr th.chosen {

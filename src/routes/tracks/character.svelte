@@ -19,24 +19,24 @@
 		removeSelectedDropZonesIfConflict()
 	}
 
-	/**
+	/** Helper for setCharacterInHand()
 	 * If the character in hand is in this scene, remove this drop zone from
 	 * selected drop zones
 	 */
 	function removeSelectedDropZonesIfConflict() {
-		const characterName = $charactersInHand[0].name
-		for (let scene of $table.scenes) {
-			for (let trackListItem of scene.trackList) {
-				for (let name of trackListItem.characterNames) {
-					if (name !== characterName) continue
-					for (let dropZone of $selectedDropZones) {
-						if (dropZone.sceneName !== scene.name) continue
-						const index = $selectedDropZones.findIndex(
-							(_) => _.sceneName === scene.name
-						)
-						$selectedDropZones.splice(index, 1)
-					}
-				}
+		const charInHand = $charactersInHand[0].name
+		while ($selectedDropZones.length > 0) {
+			for (let dropZone of $selectedDropZones) {
+				// get the scene this dropZone refers to
+				const scene = $table.scenes.find((_) => _.name === dropZone.sceneName)
+				if (!scene) continue
+				const sceneContainsCharacterInHand = scene.trackList.some((_) =>
+					_.characterNames.includes(charInHand)
+				)
+				if (!sceneContainsCharacterInHand) continue
+				const index = $selectedDropZones.indexOf(dropZone)
+				if (index === -1) throw new Error('heh?')
+				$selectedDropZones.splice(index, 1)
 			}
 		}
 		$selectedDropZones = $selectedDropZones
@@ -113,6 +113,10 @@
 		box-shadow: 0 3px 1.5px rgba(0, 0, 0, 0.7);
 
 		position: relative;
+	}
+
+	[data-draggable]:hover {
+		cursor: pointer;
 	}
 
 	[data-draggable]::before {
