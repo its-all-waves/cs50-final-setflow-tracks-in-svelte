@@ -16,9 +16,14 @@
 		// replace whatever is there with a single character's info
 		$charactersInHand = [{ name, location }]
 
-		/* if the character in hand is in this scene, splice out this drop zone
-		from selected drop zones */
+		removeSelectedDropZonesIfConflict()
+	}
 
+	/**
+	 * If the character in hand is in this scene, remove this drop zone from
+	 * selected drop zones
+	 */
+	function removeSelectedDropZonesIfConflict() {
 		const characterName = $charactersInHand[0].name
 		for (let scene of $table.scenes) {
 			for (let trackListItem of scene.trackList) {
