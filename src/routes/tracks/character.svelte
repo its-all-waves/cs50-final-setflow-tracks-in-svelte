@@ -8,14 +8,16 @@
 	export let location // === '__pool__' || scene.name
 
 	function setCharacterInHand() {
-		// without this, bug: allows case where character can be added to same scene twice
+		// prevents: character could be added to same scene twice
 		if (!$selectedHeader.type) $selectedDropZones = []
-		// also reset the selected header -- can have but ONE selection! (TODO: FIGURE OUT HOW TO EXPLICIT STATE THIS!)
+
+		// only one can be selected: a track/scene header || character (TODO: FIGURE OUT HOW TO EXPLICIT STATE THIS!)
 		$selectedHeader = {}
 
 		// replace whatever is there with a single character's info
 		$charactersInHand = [{ name, location }]
 
+		// prevents: character could be added to same scene twice
 		removeSelectedDropZonesIfConflict()
 	}
 
@@ -25,19 +27,22 @@
 	 */
 	function removeSelectedDropZonesIfConflict() {
 		const charInHand = $charactersInHand[0].name
-		while ($selectedDropZones.length > 0) {
-			for (let dropZone of $selectedDropZones) {
-				// get the scene this dropZone refers to
-				const scene = $table.scenes.find((_) => _.name === dropZone.sceneName)
-				if (!scene) continue
-				const sceneContainsCharacterInHand = scene.trackList.some((_) =>
-					_.characterNames.includes(charInHand)
-				)
-				if (!sceneContainsCharacterInHand) continue
-				const index = $selectedDropZones.indexOf(dropZone)
-				if (index === -1) throw new Error('heh?')
-				$selectedDropZones.splice(index, 1)
-			}
+
+		const copyOfSelectedDropZones = [...$selectedDropZones]
+		for (let dropZone of copyOfSelectedDropZones) {
+			// get the scene this dropZone refers to
+			const scene = $table.scenes.find((_) => _.name === dropZone.sceneName)
+			if (!scene) continue
+
+			const sceneContainsCharacterInHand = scene.trackList.some((_) =>
+				_.characterNames.includes(charInHand)
+			)
+
+			if (!sceneContainsCharacterInHand) continue
+
+			const index = $selectedDropZones.indexOf(dropZone)
+			if (index === -1) throw new Error('heh?')
+			$selectedDropZones.splice(index, 1)
 		}
 		$selectedDropZones = $selectedDropZones
 	}

@@ -50,6 +50,15 @@
 	 * @param {string} name
 	 */
 	function setSelectedHeader(type, name) {
+		// TODO: try enabling this
+		// if there's already a selected track/scene header and a character in
+		// hand, unset selected header and unselect drop zones
+		// if ($selectedHeader.type && $charactersInHand.length === 0) {
+		// 	$selectedHeader = {}
+		// 	$selectedDropZones = []
+		// 	return
+		// }
+
 		/* TODO: NECESSARY TO CLEAR CHARACTERS IN HAND?
 		*SEEMS* TO MAKE SENSE (no logic yet) AS I MUST CLEAR $selectedHeader
 		IN setCharactersInHand(), I THINK... */
