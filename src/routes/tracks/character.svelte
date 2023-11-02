@@ -42,39 +42,11 @@
 		$selectedDropZones = $selectedDropZones
 	}
 
-	$: inHand = $charactersInHand.length === 1 && $charactersInHand[0].name === name
-	// && isInHand($charactersInHand)
+	$: inHand = $charactersInHand.length && $charactersInHand[0].name === name
 
-	// function isInHand(charsInHand) {
-	// 	// if (charsInHand.length === 0) return false
-
-	// 	// CASE A) one character in hand
-	// 	const isTheCharacterInHand = charsInHand.length === 1 && name === charsInHand[0].name
-
-	// 	// return what we have if there's only one of us selected, and no scene or track header selected
-	// 	if (charsInHand.length === 1 && !$selectedHeader.type) {
-	// 		return isTheCharacterInHand
-	// 	}
-
-	// 	// CASE B) more than 1 character in hand (IOW, we have selected a track or scene)
-	// 	let onSameTrackAsSelectedHeader = false
-	// 	for (let character of charsInHand) {
-	// 		if (character.name !== name) continue
-	// 		for (let scene of $table.scenes) {
-	// 			if (location !== scene.name) continue
-	// 			for (let trackListItem of scene.trackList) {
-	// 				if (trackListItem.trackName !== $selectedHeader.name) continue
-	// 				onSameTrackAsSelectedHeader = true
-	// 			}
-	// 		}
-	// 	}
-	// 	return onSameTrackAsSelectedHeader
-	// }
-
-	$: chosen = isLastClickedCharacterFromTable($charactersInHand)
+	$: chosen = $charactersInHand.length && isLastClickedCharacterFromTable($charactersInHand)
 
 	function isLastClickedCharacterFromTable(charsInHand) {
-		if (charsInHand.length !== 1) return false
 		return (
 			charsInHand[0].location !== '__pool__' &&
 			charsInHand[0].location === location &&
@@ -84,9 +56,9 @@
 </script>
 
 <div
-	class:in-hand={inHand}
+	class="character"
+	class:inHand
 	class:chosen
-	data-draggable
 	data-character-name={name}
 	on:pointerup={setCharacterInHand}
 >
@@ -94,7 +66,7 @@
 </div>
 
 <style>
-	[data-draggable] {
+	.character {
 		margin: 0.5rem 0.5rem;
 		padding: 0.2rem 1rem;
 		max-width: 16ch;
@@ -115,11 +87,11 @@
 		position: relative;
 	}
 
-	[data-draggable]:hover {
+	.character:hover {
 		cursor: pointer;
 	}
 
-	[data-draggable]::before {
+	.character::before {
 		position: absolute;
 		content: '';
 		left: 0;
@@ -136,14 +108,15 @@
 		box-shadow: 0 -2px 0 white, inset 0 2px 0px rgba(255, 230, 165, 0.607);
 	}
 
-	.in-hand::before {
+	.inHand::before {
 		opacity: 1;
 	}
 
-	.in-hand {
+	.inHand {
 		/* border-color: goldenrod; */
 		border-width: 1;
 		scale: 1.25;
+		/* scale: 1.25; */
 		transform: translateY(-0.3rem);
 		box-shadow: 0 10px 1.5px rgba(0, 0, 0, 0.588), 0 0 30px rgb(255, 193, 37),
 			inset 0 1px 1px goldenrod, inset 0 -2px 3px rgba(0, 0, 0, 0.681);

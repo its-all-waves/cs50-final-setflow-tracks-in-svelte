@@ -197,12 +197,8 @@
 	}
 
 	/* .in-hand comes from character.svelte */
-	tbody :global(.in-hand) {
-		scale: 1.05;
-	}
-
-	table.canEdit {
-		pointer-events: all;
+	tbody :global(.inHand) {
+		scale: 1.15;
 	}
 
 	table.read-only {
