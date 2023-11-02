@@ -6,18 +6,8 @@
 
 	import Dropzone from './dropzone.svelte'
 
-	export let resetUiSelectionFlags // FUNCTION
-
-	// function addCharacterInHandToAllScenesOn(trackName) {
-	// 	if ($charactersInHand.length !== 1) return
-
-	// 	for (let scene of $table.scenes) {
-	// 		addToSelectedDropZones(scene.name, trackName)
-	// 	}
-	// 	$selectedDropZones = $selectedDropZones // force ui update
-	// }
-
 	/**
+	 * Helper for `handleTrackHeaderClick()`.
 	 * Adds a dropZoneInfo obj to $selectedDropZones *if* it can be added. \
 	 * Rules: A) The scene obj ref'd by `sceneName` cannot contain the same
 	 * character twice. B) If adding a drop zone for the same scene twice (in
@@ -27,25 +17,24 @@
 	 * @param {string} trackName
 	 * */
 	function addToSelectedDropZones(sceneName, trackName) {
-		// return early if no char in hand and no header selected
+		// proceed only if we have a character in hand or a header selected
 		if ($charactersInHand.length === 0 && !$selectedHeader.type) return
 
-		// return early if one char in hand and this scene (w/ sceneName) already
-		// contains the char in hand
+		// proceed only if the [only] char in hand isn't already in this scene
 		if ($charactersInHand.length === 1) {
 			// return if character already in scene
-			const selectedScene = $table.scenes.find((_) => _.name === sceneName)
-			const selectedSceneContainsCharacterInHand = selectedScene.trackList.find((_) =>
-				_.characterNames.includes($charactersInHand[0].name)
+			const characterName = $charactersInHand[0].name
+			const scene = $table.scenes.find((_) => _.name === sceneName)
+			const sceneContainsCharacterInHand = scene.trackList.find((_) =>
+				_.characterNames.includes(characterName)
 			)
-			if (selectedSceneContainsCharacterInHand) {
+			if (sceneContainsCharacterInHand) {
 				// console.log(`"${charactersInHand}" is already in scene "${sceneName}"`)
 				return
 			}
 		}
 
-		// selected drop zones can't contain more than one DropZoneInfo obj with the same scene
-		// if the same scene is being added now, overwrite the old one
+		// if a drop zone is being added to the same scene twice, overwrite the old one
 		const index = $selectedDropZones.findIndex((_) => _.sceneName === sceneName)
 		if (index > -1) $selectedDropZones.splice(index, 1)
 
@@ -53,90 +42,42 @@
 		$selectedDropZones = $selectedDropZones
 	}
 
+	/**
+	 * * Used on scene header click.
+	 * * Helper for `handleTrackHeaderClick()`.
+	 * @returns {void}
+	 * @param {string} type
+	 * @param {string} name
+	 */
 	function setSelectedHeader(type, name) {
-		$selectedHeader = {
-			type,
-			name
-		}
-		$selectedHeader = $selectedHeader
+		/* TODO: NECESSARY TO CLEAR CHARACTERS IN HAND?
+		*SEEMS* TO MAKE SENSE (no logic yet) AS I MUST CLEAR $selectedHeader
+		IN setCharactersInHand(), I THINK... */
+
+		// also reset the characters in hand -- can have but ONE selection!
+		$charactersInHand = []
+
+		$selectedHeader = { type, name }
 	}
 
+	/**
+	 * Case A) Goal: clear this track for all scenes \
+	 * Starting State: no char in hand \
+	 * Action: set selected header, add to selected drop zones for ui feedback \
+	 * (delete button function will change if selectedHeader.type defined)
+	 *
+	 * CASE B) GOAL: add char in hand to all scenes on this track \
+	 * Starting State: one char in hand \
+	 * Action: add to selected drop zones \
+	 * (commitDropZones() does stuff with the selectedDropZones[])
+	 */
 	function handleTrackHeaderClick(trackName) {
-		console.log('charactersInHand:')
-		console.dir($charactersInHand)
+		if ($charactersInHand.length === 0) setSelectedHeader('track', trackName)
 
-		// CASE A) WANT TO ADD CHAR IN HAND TO ALL SCENES ON THIS TRACK
-		// STARTING STATE: ONE CHAR IN HAND
-		// ACTION: ADD CHAR IN HAND TO SELECTED DROP ZONES...
-		// (commitDropZones() does stuff with the selectedDropZones[])
-		if ($charactersInHand.length === 1) {
-			for (let scene of $table.scenes) {
-				addToSelectedDropZones(scene.name, trackName)
-			}
-			$selectedDropZones = $selectedDropZones
-			return
-		}
-		// CASE B) WANT TO CLEAR THIS TRACK FOR ALL SCENES
-		// STARTING STATE: NO CHAR IN HAND AND WHAT !?!??!?!?!??!?!?!?
-		// ACTION: SET SELECTED HEADER, ADD TO SELECTED DROP ZONES FOR UI FDBK
-		// (delete button function will change if selectedHeader.type defined)
-		else if ($charactersInHand.length === 0) {
-			setSelectedHeader('track', trackName)
-			console.log('SELECTED DROP ZONES:')
-			console.dir($selectedDropZones)
-			console.log(`SELECTED HEADER: ${JSON.stringify($selectedHeader)}`)
-
-			// ADD TO SELECTED DROP ZONES FOR UI FEEDBACK (SHOW SELECTED TRACK)
-			// $selectedDropZones = []
-			// $selectedDropZones = $selectedDropZones
-			for (let scene of $table.scenes) {
-				addToSelectedDropZones(scene.name, trackName)
-				// 	$selectedDropZones.push(newDropZoneInfo(scene.name, trackName))
-			}
-			$selectedDropZones = $selectedDropZones
-		}
-		// default: ??
-		else {
-			throw new Error('TODO: WHAT IF THERE ARE MANY CHARS IN HAND? return?')
-		}
-
-		/* 
-		LATEST BUG // LEAVING OFF HERE FOR NOW
-
-		can have more than one selectedDropZone in a scene
-
-		still the case: if select one character, then cell(s), cannot select
-		more than one cell per scene
-
-		this behavior must be consistent in the cases where...
-			A) no char in hand
-				- select a track, pick up character, select more cells
-			B) char in hand
-				- 
-		
-		
-		
-		
-		
-		*/
-	}
-
-	function addAllToCharactersInHandFromTrack(trackName) {
-		$charactersInHand = [] // TODO: IS THIS RIGHT  ???????????????????????
+		// for ui feedback (show selected track)
 		for (let scene of $table.scenes) {
-			for (let trackListItem of scene.trackList) {
-				if (trackListItem.trackName !== trackName) continue
-				for (let name of trackListItem.characterNames) {
-					$charactersInHand.push({
-						name,
-						location: scene.name
-					})
-				}
-			}
+			addToSelectedDropZones(scene.name, trackName)
 		}
-		$charactersInHand = $charactersInHand
-		// console.log('UPDATED charactersInHand: ')
-		// console.log($charactersInHand)
 	}
 </script>
 

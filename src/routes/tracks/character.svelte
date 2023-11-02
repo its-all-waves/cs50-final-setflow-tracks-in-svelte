@@ -1,50 +1,70 @@
 <script>
 	import { display } from '../../lib/util/util'
+	import Dropzone from './dropzone.svelte'
 	import { table, charactersInHand, selectedDropZones, canEdit, selectedHeader } from './store'
 
 	// exposed to parent as attr
 	export let name
 	export let location // === '__pool__' || scene.name
-	export let trackName
 
-	function setCharactersInHand() {
-		// replace whatever is there with a single character's info
-		$charactersInHand = []
-		$charactersInHand.push({
-			name,
-			location
-		})
-		$charactersInHand = $charactersInHand
-
+	function setCharacterInHand() {
+		// without this, bug: allows case where character can be added to same scene twice
+		if (!$selectedHeader.type) $selectedDropZones = []
 		// also reset the selected header -- can have but ONE selection! (TODO: FIGURE OUT HOW TO EXPLICIT STATE THIS!)
 		$selectedHeader = {}
-	}
 
-	$: inHand = $charactersInHand.length > 0 && isInHand($charactersInHand)
+		// replace whatever is there with a single character's info
+		$charactersInHand = [{ name, location }]
 
-	function isInHand(charsInHand) {
-		if (charsInHand.length === 0) return false
+		/* if the character in hand is in this scene, splice out this drop zone
+		from selected drop zones */
 
-		// CASE A) one character in hand
-		const isTheCharacterInHand = charsInHand.length === 1 && name === charsInHand[0].name
-
-		// return what we have if there's only one of us selected, AND WE HAVE NOT SELECTED A TRACK OR SCENE
-		if (charsInHand.length === 1 && !$selectedHeader.type) return isTheCharacterInHand
-
-		// CASE B) more than 1 character in hand (IOW, we have selected a track or scene)
-		let onSameTrackAsSelectedHeader = false
-		for (let character of charsInHand) {
-			if (character.name !== name) continue
-			for (let scene of $table.scenes) {
-				if (location !== scene.name) continue
-				for (let trackListItem of scene.trackList) {
-					if (trackListItem.trackName !== $selectedHeader.name) continue
-					onSameTrackAsSelectedHeader = true
+		const characterName = $charactersInHand[0].name
+		for (let scene of $table.scenes) {
+			for (let trackListItem of scene.trackList) {
+				for (let name of trackListItem.characterNames) {
+					if (name !== characterName) continue
+					for (let dropZone of $selectedDropZones) {
+						if (dropZone.sceneName !== scene.name) continue
+						const index = $selectedDropZones.findIndex(
+							(_) => _.sceneName === scene.name
+						)
+						$selectedDropZones.splice(index, 1)
+					}
 				}
 			}
 		}
-		return onSameTrackAsSelectedHeader
+		$selectedDropZones = $selectedDropZones
 	}
+
+	$: inHand = $charactersInHand.length === 1 && $charactersInHand[0].name === name
+	// && isInHand($charactersInHand)
+
+	// function isInHand(charsInHand) {
+	// 	// if (charsInHand.length === 0) return false
+
+	// 	// CASE A) one character in hand
+	// 	const isTheCharacterInHand = charsInHand.length === 1 && name === charsInHand[0].name
+
+	// 	// return what we have if there's only one of us selected, and no scene or track header selected
+	// 	if (charsInHand.length === 1 && !$selectedHeader.type) {
+	// 		return isTheCharacterInHand
+	// 	}
+
+	// 	// CASE B) more than 1 character in hand (IOW, we have selected a track or scene)
+	// 	let onSameTrackAsSelectedHeader = false
+	// 	for (let character of charsInHand) {
+	// 		if (character.name !== name) continue
+	// 		for (let scene of $table.scenes) {
+	// 			if (location !== scene.name) continue
+	// 			for (let trackListItem of scene.trackList) {
+	// 				if (trackListItem.trackName !== $selectedHeader.name) continue
+	// 				onSameTrackAsSelectedHeader = true
+	// 			}
+	// 		}
+	// 	}
+	// 	return onSameTrackAsSelectedHeader
+	// }
 
 	$: chosen = isLastClickedCharacterFromTable($charactersInHand)
 
@@ -56,39 +76,6 @@
 			charsInHand[0].name === name
 		)
 	}
-
-	/* 
-	method for allowing deletion of entire scene and track
-
-	change characterInHand to an array of the same obj
-
-	a character is clicked -- regardless of location -- the 
-	contents of the array is replaced with the single clicked character
-
-	a track is clicked, a fn would go thru every scene and
-	gather all the names from every trackListItem with the same
-	.trackName into charactersInHand[]
-	
-		possible next moves	
-			delete everyone ref'd in the array
-			+ the array,
-			OR 
-			cancel, clearing the array itself
-
-	a scene is clicked, a fn would go through all the scene's trackListItems, resetting all .characterNames[] to []
-
-	BUT PROBLEM
-
-	what state tells us that we can delete all from a track vs all from a scene
-
-	atm -- if charactersInHand.length > 1, we know we're deleting everyone in the list, but from where are we deleting them? how do we know?
-
-	need way to ref selected header -- setSelectedHeader = {type, name}
-
-	a track is chosen...
-		set characterInHand.name to characterName, location to scene.name
-
-	*/
 </script>
 
 <div
@@ -96,7 +83,7 @@
 	class:chosen
 	data-draggable
 	data-character-name={name}
-	on:pointerup={setCharactersInHand}
+	on:pointerup={setCharacterInHand}
 >
 	{display(name)}
 </div>

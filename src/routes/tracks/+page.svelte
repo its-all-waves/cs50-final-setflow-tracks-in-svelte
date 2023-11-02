@@ -70,7 +70,7 @@
 		let inputField = event.target
 		const name = inputField.value.replace(' ', '_')
 
-		// TODO: sanitize input
+		// TODO: validate input
 		if (!name) return
 
 		// create a character, push it to characters[]
@@ -105,23 +105,29 @@
 		// committing is executed only by Enter key (+focus) or button click
 		if (event.type !== 'pointerup' && event.key !== 'Enter') return
 
-		if ($charactersInHand.length === 0) throw new Error('But how did we get here, tho?')
-
-		if ($charactersInHand.length === 1 && !$selectedHeader.type) {
-			// one character in hand and have not selected a track or scene
-			addCharacterInHandToSelectedScenes()
-		} else if ($selectedHeader.type === 'track') {
-			// any # of characters in hand and have selected a track
-			addCharacterInHandToAllScenesOn($selectedHeader.name)
+		// unknown case atm
+		if ($charactersInHand.length === 0) {
+			throw new Error('But how did we get here, tho?')
 		}
 
-		resetUiSelectionFlags()
+		// currently the only valid case
+		else if ($charactersInHand.length === 1) {
+			// one character in hand and have not selected a track or scene
+			addCharacterInHandToSelectedScenes()
+		}
+
+		// characters in hand > 1
+		else {
+			throw new Error("We haven't a need for this case yet...")
+		}
+
+		clearAllSelections()
 	}
 
 	/** Helper for commitDropZones() \
 	 * Forget what's currently selected */
-	function resetUiSelectionFlags() {
-		$charactersInHand = [] // TODO: is this right? was {}
+	function clearAllSelections() {
+		$charactersInHand = []
 		$selectedDropZones = []
 		$selectedHeader = {}
 	}
@@ -147,15 +153,6 @@
 		}
 	}
 
-	// function addCharacterInHandToAllScenesOn(trackName) {
-	// 	if ($charactersInHand.length !== 1) return
-
-	// 	for (let scene of $table.scenes) {
-	// 		addToSelectedDropZones(scene.name, trackName)
-	// 	}
-	// 	$selectedDropZones = $selectedDropZones // force ui update
-	// }
-
 	// DEBUG
 	onMount(DEV_populate_table)
 
@@ -167,15 +164,22 @@
 		}
 
 		// add 2 scenes
-		$table.scenes[0] = newScene('33A')
-		$table.scenes[1] = newScene('66B')
+		$table.scenes[0] = newScene('33-A')
+		$table.scenes[1] = newScene('66-B')
+		// $table.scenes[2] = newScene('101-D')
+		// $table.scenes[3] = newScene('V-101-C')
 
 		// add characters
-		$table.characters[0] = newCharacter('Alex')
+		$table.characters[0] = newCharacter('Né-né')
 		$table.characters[1] = newCharacter('Zina')
 		$table.characters[2] = newCharacter('Yuki')
 		$table.characters[3] = newCharacter('Igor')
+		// $table.characters[4] = newCharacter('Alex')
 	}
+
+	// // DEBUG
+	// $: console.log(`$selectedHeader changed to: ${JSON.stringify($selectedHeader)}`)
+	// $: console.log(`$charactersInHand changed to: ${JSON.stringify($charactersInHand)}`)
 </script>
 
 <svelte:window on:keydown={$charactersInHand.length === 1 && commitDropZones} />
@@ -183,14 +187,14 @@
 <div class="container">
 	<article>
 		<!-- does character in hand need to be a bind: ? -->
-		<Toolbar {resetUiSelectionFlags} />
+		<Toolbar {clearAllSelections} />
 		<!-- a poor-man's OR op? -->
 		{#if $table.tracks.length + $table.scenes.length > 0}
 			<div
 				class="table"
 				class:glow={$canEdit}
 			>
-				<Table {resetUiSelectionFlags} />
+				<Table resetUiSelectionFlags={clearAllSelections} />
 			</div>
 		{/if}
 	</article>

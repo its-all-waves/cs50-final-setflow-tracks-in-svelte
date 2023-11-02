@@ -1,33 +1,32 @@
 <script>
 	import { table, charactersInHand, selectedDropZones, canEdit, selectedHeader } from './store'
 
-	export let resetUiSelectionFlags // FUNCTION
+	export let clearAllSelections // FUNCTION
 
+	/**
+	 * Goals for delete button:
+	 *
+	 * goal \
+	 * 	   - state \
+	 * 	   - info
+	 *
+	 * delete char from specific scene \
+	 * 	   - pick up char from table \
+	 * 	   - characterInHand, characterInHand.location !== '__pool__' \
+	 * delete char from entire table \
+	 * 	   - pick up char from pool \
+	 * 	   - characterInHand, characterInHand.location === '__pool__' \
+	 * clear a whole track \
+	 * 	   - chose a track \
+	 * 	   - chosenHeader.type === 'track', chosenHeader.name === trackName ???, !characterInHand.name, (who is resetting this?) \
+	 * clear a whole scene \
+	 * 	   - chose a scene	 \
+	 * 	   - chosenHeader.type === 'scene', chosenHeader.name === sceneName ???, !characterInHand.name, (need another flag for this and above?) \
+	 * clear entire table contents \
+	 * 	   - did not choose a scene, track, or character \
+	 * 	   - !characterInHand.name,
+	 */
 	function handleTrashButtonClick() {
-		/* 
-		GOALS FOR DELETE BUTTON
-
-		goal	
-			state...
-			...info
-		
-		delete char from specific scene
-			pick up char from table
-			characterInHand, characterInHand.location !== '__pool__'
-		delete char from entire table
-			pick up char from pool
-			characterInHand, characterInHand.location === '__pool__'
-		clear a whole track
-			chose a track
-			chosenHeader.type === 'track', chosenHeader.name === trackName ???, !characterInHand.name, (who is resetting this?)
-		clear a whole scene
-			chose a scene	
-			chosenHeader.type === 'scene', chosenHeader.name === sceneName ???, !characterInHand.name, (need another flag for this and above?)
-		clear entire table contents
-			did not choose a scene, track, or character
-			!characterInHand.name,
-		*/
-
 		// nothing is selected
 		if ($charactersInHand.length === 0 && !$selectedHeader.type) {
 			clearTable()
@@ -39,22 +38,22 @@
 		// selected a character from the POOL
 		else if ($charactersInHand.length === 1 && $charactersInHand[0].location === '__pool__') {
 			deleteCharacterInHandEverywhere()
-			// console.log('selected a character from the POOL')
 		}
 		// selected track header
 		else if ($charactersInHand.length === 0 && $selectedHeader.type === 'track') {
-			// console.log('selected a TRACK header')
-			clearSelectedTrackInAllScenes()
+			clearTrackInAllScenes()
 		}
 		// // selected a scene header
 		// else if ($selectedHeader.type === 'scene') {
 		// 	console.log('selected a SCENE header')
 		// }
 
-		resetUiSelectionFlags()
+		clearAllSelections()
 	}
 
-	function clearSelectedTrackInAllScenes() {
+	// DELETE FUNCTIONS 👇🏽
+
+	function clearTrackInAllScenes() {
 		const trackName = $selectedHeader.name
 		for (let scene of $table.scenes) {
 			for (let trackListItem of scene.trackList) {
@@ -66,14 +65,14 @@
 	}
 
 	function deleteCharacterInHandFromScene() {
-		const sceneIndex = $table.scenes.findIndex((_) => _.name === $charactersInHand[0].location)
-		if (sceneIndex === -1) throw new Error('How did we get here?')
-		const scene = $table.scenes[sceneIndex]
+		const index = $table.scenes.findIndex((_) => _.name === $charactersInHand[0].location)
+		if (index === -1) throw new Error('How did we get here?')
+		const scene = $table.scenes[index]
 
 		for (let trackListItem of scene.trackList) {
 			const names = trackListItem.characterNames
-			const characterIndex = names.findIndex((_) => _ === $charactersInHand[0].name)
-			if (characterIndex > -1) names.splice(characterIndex, 1)
+			const index = names.findIndex((_) => _ === $charactersInHand[0].name)
+			if (index > -1) names.splice(index, 1)
 		}
 
 		$table.scenes = $table.scenes
@@ -85,8 +84,8 @@
 			for (let trackListItem of scene.trackList) {
 				const names = trackListItem.characterNames
 				if (names.length === 0) continue
-				const _index = names.findIndex((_) => _ === $charactersInHand[0].name)
-				if (_index > -1) names.splice(_index, 1)
+				const index = names.findIndex((_) => _ === $charactersInHand[0].name)
+				if (index > -1) names.splice(index, 1)
 			}
 		}
 		$table.scenes = $table.scenes // force ui update
@@ -99,7 +98,7 @@
 	}
 
 	function clearTable() {
-		// console.log('CLEAR TABLE')
+		// TODO: make this not an alert(), and a choice! currently it just warns of the inevitable
 		alert('SURE YOU WANT TO CLEAR THE TABLE CONTENTS?')
 
 		for (let scene of $table.scenes) {
