@@ -1,28 +1,14 @@
 /**
- * @typedef {object} Table
- * @property {Track[]} tracks
- * @property {Scene[]} scenes
- * @property {Character[]} characters
- */
-
-/**
- * @typedef {object} DropZoneInfo
- * @property {string} sceneName
- * @property {string} trackName
- */
-
-const DEFAULT_TRACK_COUNT = 4
-
-// TODO: in .svelte, name the table .main-table
-
-/** TODO: how to handle track options?
- * @param {string?} trackPrefix
- * @param {number?} trackCount
- * @returns {Table}
+ * @returns {import('../types').Table}
  * */
-export function newTableObj(trackPrefix = 'track', trackCount = DEFAULT_TRACK_COUNT) {
+export function newTableObj() {
+	/** @type {import('../types').Track[]} */
 	const tracks = []
+
+	/** @type {import('../types').Scene[]} */
 	const scenes = []
+
+	/** @type {import('../types').Character[]} */
 	const characters = []
 
 	return {
@@ -33,9 +19,13 @@ export function newTableObj(trackPrefix = 'track', trackCount = DEFAULT_TRACK_CO
 }
 
 /**
- * @returns {DropZoneInfo}
+ * @returns {import('../types').DropZoneInfo}
  * @param {string} sceneName
- * @param {string} trackName */
+ * @param {string} trackName
+ * */
 export function newDropZoneInfo(sceneName, trackName) {
-	return { sceneName, trackName }
+	return {
+		sceneName,
+		trackName
+	}
 }

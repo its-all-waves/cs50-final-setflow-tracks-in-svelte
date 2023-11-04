@@ -1,34 +1,14 @@
 import { nanoid, NANO_ID_LENGTH } from '../util/util'
 
 /**
- * @typedef {object} TrackListItem
- * @property {string} trackName
- * @property {string[]} characterNames
- */
-
-/**
- * @typedef {object} Scene
- * @property {string} id
- * @property {string} name
- * @property {TrackListItem[]} trackList
- */
-
-/**
- * @returns {TrackListItem}
+ * @returns {import('../types').TrackListItem}
+ * @param {string} trackName
+ * @param {string?} charName
  * */
 export function newTrackListItem(trackName, charName = null) {
-	// TODO: fill in 'context:' in below comment...
-	// charName not given         (context: when ??? we're adding to existing scenes (not starting from 0)? )
-	if (charName === null) {
-		let characterNames = []
-		return {
-			trackName,
-			characterNames
-		}
-	}
+	// TODO: forgot... under what circumstance is this fn called with a charName?
+	const characterNames = charName ? [charName] : []
 
-	// charName is given
-	let characterNames = [charName]
 	return {
 		trackName,
 		characterNames
@@ -37,10 +17,15 @@ export function newTrackListItem(trackName, charName = null) {
 
 /**
  * @param {string} name
+ * @param {import('../types').Scene[]} scenes
+ * @param {import('../types').Track[]} tracks
  * @returns {Scene}
  * */
 export function newScene(name, scenes = null, tracks = null) {
+	/** @type {string} */
 	const id = nanoid(NANO_ID_LENGTH)
+
+	/** @type {import('../types').TrackListItem[]} */
 	const trackList = []
 
 	/* my thinking:
@@ -48,6 +33,8 @@ export function newScene(name, scenes = null, tracks = null) {
 	add those tracks to this scene's trackList as trackListItems with empty
 	characterNames[] */
 
+	// TODO: should this condition be scenes.length > 0 ? Then make scenes a
+	// required param?
 	// if we are creating the first scene...
 	if (scenes === null) {
 		return {
@@ -78,10 +65,11 @@ export function newScene(name, scenes = null, tracks = null) {
 /** Helper for newScene ...feels like there's a better way...
  * Returns a list of current track names by creating a new set
  * @returns {Set<string>}
+ * @param {import('../types').Track[]}
  */
-function currentTrackNames(tracksArr) {
-	let trackNames = new Set()
-	for (let track of tracksArr) {
+function currentTrackNames(tracks) {
+	const trackNames = new Set()
+	for (let track of tracks) {
 		trackNames.add(track.name)
 	}
 	return trackNames

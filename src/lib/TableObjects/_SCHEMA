@@ -6,7 +6,6 @@ SCHEMA FOR MAIN DATA STRUCTURE
             {
                 id,
                 name,
-                rowElem
             },
             ...
         ],
@@ -18,7 +17,7 @@ SCHEMA FOR MAIN DATA STRUCTURE
             {
                 trackName,
                 characterNames: [
-                    name,
+                    'name',
                     ...
                 ]
             }
@@ -29,7 +28,6 @@ SCHEMA FOR MAIN DATA STRUCTURE
         characters: [
         {
             name,
-            elem,
             defaultTrackName
         },
         ...
