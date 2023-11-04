@@ -1,5 +1,7 @@
+/** @typedef {import('../types').Character} Character */
+
 /**
- * @returns {import('../types').Character}
+ * @returns {Character}
  * @param {string} name
  * @param {string?} defaultTrackName
  * */

@@ -1,31 +1,23 @@
+//@ts-check
 import { nanoid, NANO_ID_LENGTH } from '../util/util'
 
-/**
- * @returns {import('../types').TrackListItem}
- * @param {string} trackName
- * @param {string?} charName
- * */
-export function newTrackListItem(trackName, charName = null) {
-	// TODO: forgot... under what circumstance is this fn called with a charName?
-	const characterNames = charName ? [charName] : []
+/** @typedef {import('../types').Track} Track */
+/** @typedef {import('../types').TrackListItem} TrackListItem */
+/** @typedef {import('../types').Scene} Scene */
 
-	return {
-		trackName,
-		characterNames
-	}
-}
+// TODO: UNDER WHAT CIRCUMSTANCES SHOULD I CALL newScene() WITH scenes AND tracks?
 
 /**
- * @param {string} name
- * @param {import('../types').Scene[]} scenes
- * @param {import('../types').Track[]} tracks
  * @returns {Scene}
+ * @param {string} name
+ * @param {Scene[]?} scenes
+ * @param {Track[]?} tracks
  * */
 export function newScene(name, scenes = null, tracks = null) {
 	/** @type {string} */
 	const id = nanoid(NANO_ID_LENGTH)
 
-	/** @type {import('../types').TrackListItem[]} */
+	/** @type {TrackListItem[]} */
 	const trackList = []
 
 	/* my thinking:
@@ -51,8 +43,10 @@ export function newScene(name, scenes = null, tracks = null) {
 	// we're adding to existing scenes...
 
 	// add new trackListItems to trackList
-	for (let trackName of currentTrackNames(tracks)) {
-		trackList.push(newTrackListItem(trackName))
+	if (tracks) {
+		for (let trackName of currentTrackNames(tracks)) {
+			trackList.push(newTrackListItem(trackName))
+		}
 	}
 
 	return {
@@ -65,7 +59,7 @@ export function newScene(name, scenes = null, tracks = null) {
 /** Helper for newScene ...feels like there's a better way...
  * Returns a list of current track names by creating a new set
  * @returns {Set<string>}
- * @param {import('../types').Track[]}
+ * @param {Track[]} tracks
  */
 function currentTrackNames(tracks) {
 	const trackNames = new Set()
@@ -73,4 +67,19 @@ function currentTrackNames(tracks) {
 		trackNames.add(track.name)
 	}
 	return trackNames
+}
+
+/**
+ * @returns {TrackListItem}
+ * @param {string} trackName
+ * @param {string?} charName
+ * */
+export function newTrackListItem(trackName, charName = null) {
+	// TODO: forgot... under what circumstance is this fn called with a charName?
+	const characterNames = charName ? [charName] : []
+
+	return {
+		trackName,
+		characterNames
+	}
 }

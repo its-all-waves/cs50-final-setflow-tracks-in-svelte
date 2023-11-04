@@ -1,14 +1,21 @@
+//@ts-check
+/** @typedef {import('../types').Character} Character */
+/** @typedef {import('../types').Track} Track */
+/** @typedef {import('../types').Scene} Scene */
+/** @typedef {import('../types').DropZoneInfo} DropZoneInfo */
+/** @typedef {import('../types').Table} Table */
+
 /**
- * @returns {import('../types').Table}
+ * @returns {Table}
  * */
 export function newTableObj() {
-	/** @type {import('../types').Track[]} */
+	/** @type {Track[]} */
 	const tracks = []
 
-	/** @type {import('../types').Scene[]} */
+	/** @type {Scene[]} */
 	const scenes = []
 
-	/** @type {import('../types').Character[]} */
+	/** @type {Character[]} */
 	const characters = []
 
 	return {
@@ -19,7 +26,7 @@ export function newTableObj() {
 }
 
 /**
- * @returns {import('../types').DropZoneInfo}
+ * @returns {DropZoneInfo}
  * @param {string} sceneName
  * @param {string} trackName
  * */
