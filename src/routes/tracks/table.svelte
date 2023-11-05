@@ -44,7 +44,7 @@
 
 	/**
 	 * @returns {void}
-	 * @param {string} type
+	 * @param {'track' | 'scene'} type
 	 * @param {string} name
 	 */
 	function setSelectedHeader(type, name) {

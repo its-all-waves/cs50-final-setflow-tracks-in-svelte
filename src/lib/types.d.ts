@@ -28,10 +28,21 @@ export type Scene = {
 export type Table = {
     tracks: Track[],
     scenes: Scene[],
-    characters: Characters[]
+    characters: Character[]
 }
 
 export type DropZoneInfo = {
     sceneName: string,
     trackName: string
+}
+
+export type SelectedHeader = {} | {
+    type: 'track' | 'scene',
+    name: string
+}
+
+/** `location === '__pool__' | <trackName> | <sceneName>` */
+export type CharacterInHand = {
+    name: string,
+    location: '__pool__' | string
 }
