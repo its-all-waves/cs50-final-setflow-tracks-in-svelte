@@ -50,21 +50,16 @@
 	 * @param {string} name
 	 */
 	function setSelectedHeader(type, name) {
-		// TODO: try enabling this
-		// if there's already a selected track/scene header and a character in
-		// hand, unset selected header and unselect drop zones
-		// if ($selectedHeader.type && $charactersInHand.length === 0) {
-		// 	$selectedHeader = {}
-		// 	$selectedDropZones = []
-		// 	return
-		// }
-
-		/* TODO: NECESSARY TO CLEAR CHARACTERS IN HAND?
-		*SEEMS* TO MAKE SENSE (no logic yet) AS I MUST CLEAR $selectedHeader
-		IN setCharactersInHand(), I THINK... */
-
 		// also reset the characters in hand -- can have but ONE selection!
 		$charactersInHand = []
+
+		// deselect the track if clicking it again
+		const clickedSelectedHeaderAgain = $selectedHeader.name === name
+		if (clickedSelectedHeaderAgain) {
+			$selectedHeader = {}
+			$selectedDropZones = []
+			return
+		}
 
 		$selectedHeader = { type, name }
 	}
@@ -75,7 +70,7 @@
 	 * Action: set selected header, add to selected drop zones for ui feedback \
 	 * (delete button function will change if selectedHeader.type defined)
 	 *
-	 * CASE B) GOAL: add char in hand to all scenes on this track \
+	 * CASE B) Goal: add char in hand to all scenes on this track \
 	 * Starting State: one char in hand \
 	 * Action: add to selected drop zones \
 	 * (commitDropZones() does stuff with the selectedDropZones[])
