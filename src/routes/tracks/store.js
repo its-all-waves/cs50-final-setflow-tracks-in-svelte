@@ -1,6 +1,10 @@
+//@ts-check
 import { writable } from 'svelte/store'
 
-export const table = writable({}) // object? // set in +page.svelte
+/** @typedef {import('../../lib/types').DropZoneInfo} DropZoneInfo */
+/** @typedef {import('../../lib/types').Table} Table */
+
+export const table = writable(/** @type {Table} */ {})
 
 export const charactersInHand = writable(
 	/** @type {{name: string, location: string}[]} */
