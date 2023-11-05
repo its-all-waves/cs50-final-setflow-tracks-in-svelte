@@ -43,38 +43,19 @@
 	}
 
 	/**
-	 * * Used on scene header click.
-	 * * Helper for `handleTrackHeaderClick()`.
 	 * @returns {void}
 	 * @param {string} type
 	 * @param {string} name
 	 */
 	function setSelectedHeader(type, name) {
-		// deselect the track if clicking it again
-		const clickedSelectedHeaderAgain = $selectedHeader.name === name
-		if (clickedSelectedHeaderAgain) {
+		// deselect the header if clicking it again
+		if ($selectedHeader.name === name) {
 			$selectedHeader = {}
 			$selectedDropZones = []
-			return
+		} else if ($selectedHeader.name !== name) {
+			// clicking an unselected header, so select it
+			$selectedHeader = { type, name }
 		}
-
-		// select the header
-		$selectedHeader = { type, name }
-	}
-
-	/**
-	 * Case A) Goal: clear this track for all scenes \
-	 * Starting State: no char in hand \
-	 * Action: set selected header, add to selected drop zones for ui feedback \
-	 * (delete button function will change if selectedHeader.type defined)
-	 *
-	 * CASE B) Goal: add char in hand to all scenes on this track \
-	 * Starting State: one char in hand \
-	 * Action: add to selected drop zones \
-	 * (commitDropZones() does stuff with the selectedDropZones[])
-	 */
-	function handleTrackHeaderClick(trackName) {
-		setSelectedHeader('track', trackName)
 
 		// if no header selected, clear selected drop zones and be done
 		if (!$selectedHeader.type) {
@@ -82,10 +63,19 @@
 			return
 		}
 
-		// a header is selected, so show selected tracks in ui
-		for (let scene of $table.scenes) {
-			addToSelectedDropZones(scene.name, trackName)
+		// if selected header is a track, show it
+		if ($selectedHeader.type === 'track') {
+			for (let scene of $table.scenes) {
+				addToSelectedDropZones(scene.name, name)
+			}
 		}
+		// if selected header is a scene, show it
+		else if ($selectedHeader.type === 'scene') {
+			// a scene is selected, so show selected scene column in ui
+		}
+
+		/* TODO: TEST: clicking track header selects drop zones on track,
+		clicking again deselects all */
 	}
 </script>
 
@@ -117,7 +107,7 @@
 			<!-- a row + header per track -->
 			{#each $table.tracks as track}
 				<tr data-track-row={track.name}>
-					<th on:pointerup={handleTrackHeaderClick(track.name)}>
+					<th on:pointerup={setSelectedHeader('track', track.name)}>
 						{display(track.name)}
 					</th>
 
