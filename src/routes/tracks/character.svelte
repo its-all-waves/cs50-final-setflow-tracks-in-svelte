@@ -9,10 +9,8 @@
 
 	function setCharacterInHand() {
 		// prevents: character could be added to same scene twice
+		// if no header selected, clear selected drop zones
 		if (!$selectedHeader.type) $selectedDropZones = []
-
-		// only one can be selected: a track/scene header || character (TODO: FIGURE OUT HOW TO EXPLICIT STATE THIS!)
-		$selectedHeader = {}
 
 		// replace whatever is there with a single character's info
 		$charactersInHand = [{ name, location }]

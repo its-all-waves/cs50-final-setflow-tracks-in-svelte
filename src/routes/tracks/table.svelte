@@ -50,9 +50,6 @@
 	 * @param {string} name
 	 */
 	function setSelectedHeader(type, name) {
-		// also reset the characters in hand -- can have but ONE selection!
-		$charactersInHand = []
-
 		// deselect the track if clicking it again
 		const clickedSelectedHeaderAgain = $selectedHeader.name === name
 		if (clickedSelectedHeaderAgain) {
@@ -61,6 +58,7 @@
 			return
 		}
 
+		// select the header
 		$selectedHeader = { type, name }
 	}
 
@@ -76,9 +74,15 @@
 	 * (commitDropZones() does stuff with the selectedDropZones[])
 	 */
 	function handleTrackHeaderClick(trackName) {
-		if ($charactersInHand.length === 0) setSelectedHeader('track', trackName)
+		setSelectedHeader('track', trackName)
 
-		// for ui feedback (show selected track)
+		// if no header selected, clear selected drop zones and be done
+		if (!$selectedHeader.type) {
+			$selectedDropZones = []
+			return
+		}
+
+		// a header is selected, so show selected tracks in ui
 		for (let scene of $table.scenes) {
 			addToSelectedDropZones(scene.name, trackName)
 		}
