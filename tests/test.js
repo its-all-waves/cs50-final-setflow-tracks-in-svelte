@@ -38,12 +38,8 @@ test.describe('selected drop zone rules', () => {
 		allDropZones = await page.locator(`[data-drop-zone]`).all()
 	})
 
-	// test.afterEach(async ({ page }) => {
-	// 	// TODO: do i need this?
-	// 	await page.close()
-	// })
-
-	// TEST 1
+	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	// TEST
 	test(`can add "${CHARACTER}" to "${SCENE_A}" > "${TRACK_A}"`, async ({ page }) => {
 		// pick up a character and put it in dropZone
 		await character.click()
@@ -56,8 +52,8 @@ test.describe('selected drop zone rules', () => {
 		expect(innerText).toBe(CHARACTER)
 	})
 
-	/**  */
-	// test(`rejects duplicate characters in scene`, async ({ page }) => {
+	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	// TEST
 	test(`a selected drop zone deselects when grabbing a dupl character from pool`, async ({
 		page
 	}) => {
@@ -69,17 +65,13 @@ test.describe('selected drop zone rules', () => {
 		await dropZone.click()
 
 		// assert: dropZone is selected after click
-		// let classes = await dropZone.getAttribute('class')
-		// expect(classes?.includes('selected')).toBeTruthy()
-		expect(dropZone).toHaveClass(/selected/)
+		expect(dropZone).toHaveClass(/\bselected\b/)
 
 		// drop the character
 		await commitButton.click()
 
 		// assert: dropZone deselects after commit
-		// classes = await dropZone.getAttribute('class')
-		// expect(classes?.includes('selected')).toBeFalsy()
-		expect(dropZone).not.toHaveClass(/selected/)
+		expect(dropZone).not.toHaveClass(/\bselected\b/)
 
 		// assert: character landed in the dropZone
 		const characterInDropZone = dropZone.locator('.character')
@@ -99,14 +91,13 @@ test.describe('selected drop zone rules', () => {
 		// grab the same character from the pool
 		await character.click()
 
-		// assert: all on TRACK are selected except dropZone
+		// FINAL ASSERT: all on TRACK are selected except dropZone
 		// dropZone not selected, and...
-		await expect(dropZone).not.toHaveClass(/selected/)
+		await expect(dropZone).not.toHaveClass(/\bselected\b/)
 		// ...rest on track are selected
 		selectedDropZones = await page.locator(`[data-drop-zone].selected`).all()
 		for (let _dropZone of selectedDropZones) {
-			await expect(_dropZone).toHaveClass(/selected/)
+			await expect(_dropZone).toHaveClass(/\bselected\b/)
 		}
-		/// END OF TEST
 	})
 })
