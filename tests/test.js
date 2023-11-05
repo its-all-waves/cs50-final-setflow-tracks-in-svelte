@@ -17,11 +17,12 @@ test.describe('selected drop zone rules', () => {
 	const TRACK_B = 'Track_4'
 	const CHARACTER = 'Né-né'
 
-	/** @type {Locator} */ let commitButton
-	/** @type {Locator} */ let characterPool
-	/** @type {Locator} */ let character
-	/** @type {Locator} */ let dropZoneA, dropZoneB
+	/** @type {Locator}   */ let commitButton
+	/** @type {Locator}   */ let characterPool
+	/** @type {Locator}   */ let character
+	/** @type {Locator}   */ let dropZoneA, dropZoneB
 	/** @type {Locator[]} */ let allDropZones
+	/** @type {Locator}   */ let headerTrackA
 
 	// get all the elements for the this batch of tests
 	test.beforeEach(async ({ page }) => {
@@ -36,6 +37,7 @@ test.describe('selected drop zone rules', () => {
 			`[data-drop-zone][data-scene-name='${SCENE_B}'][data-track-name='${TRACK_B}']`
 		)
 		allDropZones = await page.locator(`[data-drop-zone]`).all()
+		headerTrackA = page.locator(`[data-track-row="${TRACK_A}"] th`).getByText(display(TRACK_A))
 	})
 
 	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -79,8 +81,7 @@ test.describe('selected drop zone rules', () => {
 		expect(innerText).toBe(CHARACTER)
 
 		// select all dropZones on a track
-		const trackHeader = page.locator(`[data-track-row] th`).getByText(display(TRACK))
-		await trackHeader.click()
+		await headerTrackA.click()
 
 		// assert: only dropZones on TRACK are selected
 		let selectedDropZones = await page.locator(`[data-drop-zone].selected`).all()
@@ -91,13 +92,51 @@ test.describe('selected drop zone rules', () => {
 		// grab the same character from the pool
 		await character.click()
 
-		// FINAL ASSERT: all on TRACK are selected except dropZone
-		// dropZone not selected, and...
+		// FINAL ASSERTS: all on TRACK are selected except dropZone
+		// all the selected dropZones are on TRACK and don't include dropZone
+		const selectedDropZonesOnTrack = await page
+			.locator(`[data-track-row] [data-drop-zone][data-track-name="${TRACK}"].selected`)
+			.all()
+
+		// assert: only dropZones on TRACK are selected
+		for (let _dropZone of selectedDropZonesOnTrack) {
+			expect(_dropZone).toHaveAttribute(`data-track-name`, TRACK)
+		}
+
+		// assert: dropZone not selected
 		await expect(dropZone).not.toHaveClass(/\bselected\b/)
-		// ...rest on track are selected
-		selectedDropZones = await page.locator(`[data-drop-zone].selected`).all()
-		for (let _dropZone of selectedDropZones) {
+
+		// assert: all selected drop zones on track (excl dropZone) are selected
+		for (let _dropZone of selectedDropZonesOnTrack) {
+			if (_dropZone === dropZone) continue
 			await expect(_dropZone).toHaveClass(/\bselected\b/)
 		}
+	})
+
+	// TODO: FIX THIS TEST -- IT DONT WORK
+	test('clicking a table header twice selects then deselects it', async ({ page }) => {
+		const TRACK = TRACK_A
+		const headerTrack = headerTrackA
+
+		// select TRACK header
+		await headerTrack.click()
+
+		// get all selected drop zones
+		let selectedDropZones = await page.locator(`[data-drop-zone].selected`).all()
+
+		// assert: there are selected drop zones
+		expect(selectedDropZones.length).toBeGreaterThan(0)
+
+		// assert: every selected drop zone is on TRACK
+		for (let _dropZone of selectedDropZones) {
+			await expect(_dropZone).toHaveAttribute(`data-track-name`, TRACK)
+		}
+
+		// click the track header again to clear the selection
+		await headerTrack.click()
+
+		// assert: all dropZones are deselected
+		selectedDropZones = await page.locator(`[data-drop-zone].selected`).all()
+		expect(selectedDropZones).toHaveLength(0)
 	})
 })
