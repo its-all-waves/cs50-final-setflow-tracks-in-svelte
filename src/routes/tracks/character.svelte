@@ -8,6 +8,12 @@
 	export let location // === '__pool__' || scene.name
 
 	function setCharacterInHand() {
+		// deselect the character if clicking it again
+		if ($charactersInHand.length === 1 && $charactersInHand[0].name === name) {
+			$charactersInHand = []
+			return
+		}
+
 		// prevents: character could be added to same scene twice
 		// if no header selected, clear selected drop zones
 		if (!$selectedHeader.type) $selectedDropZones = []
