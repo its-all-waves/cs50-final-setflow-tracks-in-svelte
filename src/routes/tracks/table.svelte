@@ -2,12 +2,17 @@
 	import { newDropZoneInfo } from '../../lib/TableObjects/Table'
 	import { display } from '../../lib/util/util'
 
+	/** @typedef {import('../../lib/types').CharacterInHand} CharacterInHand */
+	/** @typedef {import('../../lib/types').Scene} Scene */
+	/** @typedef {import('../../lib/types').Table} Table */
+	/** @typedef {import('../../lib/types').SelectedHeader} SelectedHeader */
+
 	import { table, charactersInHand, selectedDropZones, canEdit, selectedHeader } from './store'
 
 	import Dropzone from './dropzone.svelte'
 
 	/**
-	 * Helper for `handleTrackHeaderClick()`.
+	 * Helper for `setSelectedHeader()`.
 	 * Adds a dropZoneInfo obj to $selectedDropZones *if* it can be added. \
 	 * Rules: A) The scene obj ref'd by `sceneName` cannot contain the same
 	 * character twice. B) If adding a drop zone for the same scene twice (in
@@ -29,7 +34,7 @@
 				_.characterNames.includes(characterName)
 			)
 			if (sceneContainsCharacterInHand) {
-				// console.log(`"${charactersInHand}" is already in scene "${sceneName}"`)
+				// TODO: show feedback to user `"${charactersInHand}" is already in scene "${sceneName}"`
 				return
 			}
 		}

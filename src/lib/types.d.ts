@@ -3,7 +3,6 @@
  * https://fettblog.eu/typescript-jsdoc-superpowers/
  */
 
-
 export type Character = {
     name: string,
     defaultTrackName: string
@@ -25,7 +24,7 @@ export type Scene = {
     trackList: TrackListItem[]
 }
 
-export type Table = {
+export type Table = {} | {
     tracks: Track[],
     scenes: Scene[],
     characters: Character[]
