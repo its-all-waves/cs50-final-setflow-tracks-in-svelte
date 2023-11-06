@@ -13,7 +13,7 @@
 	import Header from './header.svelte'
 
 	/**
-	 * Helper for `setSelectedHeader()`.
+	 * Gets passed to children <Header> and <DropZone>.
 	 * Adds a dropZoneInfo obj to $selectedDropZones *if* it can be added. \
 	 * Rules: A) The scene obj ref'd by `sceneName` cannot contain the same
 	 * character twice. B) If adding a drop zone for the same scene twice (in

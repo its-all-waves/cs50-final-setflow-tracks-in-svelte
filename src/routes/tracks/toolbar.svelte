@@ -65,16 +65,17 @@
 	}
 
 	function deleteCharacterInHandFromScene() {
+		// get the scene the character in hand came from
 		const index = $table.scenes.findIndex((_) => _.name === $charactersInHand[0].location)
 		if (index === -1) throw new Error('How did we get here?')
 		const scene = $table.scenes[index]
 
+		// in the scene's trackList, delete the character in hand
 		for (let trackListItem of scene.trackList) {
 			const names = trackListItem.characterNames
 			const index = names.findIndex((_) => _ === $charactersInHand[0].name)
 			if (index > -1) names.splice(index, 1)
 		}
-
 		$table.scenes = $table.scenes
 	}
 

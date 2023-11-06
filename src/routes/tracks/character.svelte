@@ -1,27 +1,28 @@
 <script>
 	import { display } from '../../lib/util/util'
-	import Dropzone from './dropzone.svelte'
-	import { table, charactersInHand, selectedDropZones, canEdit, selectedHeader } from './store'
+	import { table, charactersInHand, selectedDropZones } from './store'
 
 	// exposed to parent as attr
 	export let name
+	/** @type {'__pool__' | string} */
 	export let location // === '__pool__' || scene.name
 
 	function setCharacterInHand() {
-		// deselect the character if clicking it again
-		if ($charactersInHand.length === 1 && $charactersInHand[0].name === name) {
+		// clicked character in table that was already chosen (and necessarily in hand)
+		if (location !== '__pool__' && chosen) return
+
+		// clicked a character in the pool
+		if (location === '__pool__' && inHand) {
+			// deselect the pool character if clicking it again, return
 			$charactersInHand = []
 			return
 		}
 
-		// prevents: character could be added to same scene twice
-		// if no header selected, clear selected drop zones
-		if (!$selectedHeader.type) $selectedDropZones = []
-
-		// replace whatever is there with a single character's info
+		// character was unselected when clicked
+		// replace what's there with a single character's info
 		$charactersInHand = [{ name, location }]
 
-		// prevents: character could be added to same scene twice
+		// prevents: character can be added to same scene twice
 		removeSelectedDropZonesIfConflict()
 	}
 
@@ -51,9 +52,9 @@
 		$selectedDropZones = $selectedDropZones
 	}
 
-	$: inHand = $charactersInHand.length && $charactersInHand[0].name === name
+	$: inHand = $charactersInHand.length === 1 && $charactersInHand[0].name === name
 
-	$: chosen = $charactersInHand.length && isLastClickedCharacterFromTable($charactersInHand)
+	$: chosen = $charactersInHand.length === 1 && isLastClickedCharacterFromTable($charactersInHand)
 
 	function isLastClickedCharacterFromTable(charsInHand) {
 		return (
