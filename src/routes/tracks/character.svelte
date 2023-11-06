@@ -1,6 +1,6 @@
 <script>
 	import { display } from '../../lib/util/util'
-	import { table, charactersInHand, selectedDropZones } from './store'
+	import { table, charactersInHand, selectedDropZones, selectedHeader } from './store'
 
 	// exposed to parent as attr
 	export let name
@@ -33,6 +33,11 @@
 	function removeSelectedDropZonesIfConflict() {
 		const charInHand = $charactersInHand[0].name
 
+		if (wholeSceneIsSelected) {
+			$selectedDropZones = []
+			return
+		}
+
 		const copyOfSelectedDropZones = [...$selectedDropZones]
 		for (let dropZone of copyOfSelectedDropZones) {
 			// get the scene this dropZone refers to
@@ -50,6 +55,13 @@
 			$selectedDropZones.splice(index, 1)
 		}
 		$selectedDropZones = $selectedDropZones
+	}
+
+	$: wholeSceneIsSelected = isWholeSceneSelected($selectedDropZones, $selectedHeader)
+
+	function isWholeSceneSelected(_selectedDropZones, _selectedHeader) {
+		if (_selectedHeader.type !== 'scene') return
+		return _selectedDropZones.every((_) => _.sceneName === _selectedHeader.name)
 	}
 
 	$: inHand = $charactersInHand.length === 1 && $charactersInHand[0].name === name

@@ -25,6 +25,10 @@
 	function addToSelectedDropZones(sceneName, trackName) {
 		// proceed only if we have a character in hand or a header selected
 		if ($charactersInHand.length === 0 && !$selectedHeader.type) return
+
+		// if char in hand, cannot select scene
+		if ($charactersInHand.length === 1 && $selectedHeader.type === 'scene') return
+
 		// proceed only if the [only] char in hand isn't already in this scene
 		if ($charactersInHand.length === 1) {
 			// return if character already in scene
@@ -38,9 +42,21 @@
 				return
 			}
 		}
-		// if a drop zone is being added to the same scene twice, overwrite the old one
-		const index = $selectedDropZones.findIndex((_) => _.sceneName === sceneName)
-		if (index > -1) $selectedDropZones.splice(index, 1)
+
+		// note: can select one track or scene at a time
+
+		// if character in hand and a drop zone is being added to the same scene
+		// twice, overwrite the old one
+		if ($charactersInHand.length === 1 || $selectedHeader.type === 'track') {
+			const index = $selectedDropZones.findIndex((_) => _.sceneName === sceneName)
+			if (index > -1) $selectedDropZones.splice(index, 1)
+		}
+
+		if ($selectedHeader.type === 'scene') {
+			const index = $selectedDropZones.findIndex((_) => _.trackName === trackName)
+			if (index > -1) $selectedDropZones.splice(index, 1)
+		}
+
 		$selectedDropZones.push(newDropZoneInfo(sceneName, trackName))
 		$selectedDropZones = $selectedDropZones
 	}

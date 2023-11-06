@@ -27,39 +27,70 @@
 	 * 	   - !characterInHand.name,
 	 */
 	function handleTrashButtonClick() {
+		const length = $charactersInHand.length
+		const noCharacterInHand = length === 0
+		const characterInHand = length === 1
+		const location = length > 0 && length < 2 ? $charactersInHand[0].location : undefined
+
 		// nothing is selected
-		if ($charactersInHand.length === 0 && !$selectedHeader.type) {
+		if (noCharacterInHand && !$selectedHeader.type) {
 			clearTable()
 		}
 		// selected a character from the TABLE
-		else if ($charactersInHand.length === 1 && $charactersInHand[0].location !== '__pool__') {
+		else if (characterInHand && location !== '__pool__') {
 			deleteCharacterInHandFromScene()
 		}
 		// selected a character from the POOL
-		else if ($charactersInHand.length === 1 && $charactersInHand[0].location === '__pool__') {
+		else if (characterInHand && location === '__pool__') {
 			deleteCharacterInHandEverywhere()
 		}
 		// selected track header
-		else if ($charactersInHand.length === 0 && $selectedHeader.type === 'track') {
-			clearTrackInAllScenes()
+		else if (noCharacterInHand && $selectedHeader.type === 'track') {
+			clearTrack()
 		}
-		// // selected a scene header
-		// else if ($selectedHeader.type === 'scene') {
-		// 	console.log('selected a SCENE header')
-		// }
+		// selected a scene header
+		else if ($selectedHeader.type === 'scene') {
+			clearScene()
+		}
 
 		clearAllSelections()
 	}
 
 	// DELETE FUNCTIONS 👇🏽
 
-	function clearTrackInAllScenes() {
+	function clearTrack() {
+		if ($selectedHeader.type !== 'track') return
+
 		const trackName = $selectedHeader.name
 		for (let scene of $table.scenes) {
 			for (let trackListItem of scene.trackList) {
 				if (trackListItem.trackName !== trackName) continue
 				trackListItem.characterNames = []
 			}
+		}
+		$table.scenes = $table.scenes
+	}
+
+	function clearScene() {
+		if ($selectedHeader.type !== 'scene') return
+		const sceneName = $selectedHeader.name
+		for (let scene of $table.scenes) {
+			if (scene.name !== sceneName) continue
+			for (let trackListItem of scene.trackList) {
+				trackListItem.characterNames = []
+			}
+		}
+		$table.scenes = $table.scenes
+	}
+
+	function deleteContentsOfSelectedDropZones() {
+		for (let dropZone of $selectedDropZones) {
+			// find the scene, clear the track
+			const { sceneName, trackName } = dropZone
+			const scene = $table.scenes.find((_) => _.name === sceneName)
+			const trackListItem = scene.trackList.find((_) => _.trackName === trackName)
+			if (!trackListItem) continue
+			trackListItem.characterNames = []
 		}
 		$table.scenes = $table.scenes
 	}

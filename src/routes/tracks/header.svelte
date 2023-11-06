@@ -33,11 +33,13 @@
 		}
 		// TODO: update selected drop zones when a scene header is selected
 		else if (header.type === 'scene') {
-			// for (let _ of $table.___) {
-			// 	addToSelectedDropZones(scene.name, $selectedHeader.name)
-			// }
+			for (let track of $table.tracks) {
+				addToSelectedDropZones(header.name, track.name)
+			}
 		}
 	}
+
+	// TODO: if no one is in the scene, it cannot be selected
 </script>
 
 <th
