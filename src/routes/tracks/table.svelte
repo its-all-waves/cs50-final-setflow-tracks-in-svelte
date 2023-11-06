@@ -10,6 +10,7 @@
 	import { table, charactersInHand, selectedDropZones, canEdit, selectedHeader } from './store'
 
 	import Dropzone from './dropzone.svelte'
+	import Header from './header.svelte'
 
 	/**
 	 * Helper for `setSelectedHeader()`.
@@ -24,7 +25,6 @@
 	function addToSelectedDropZones(sceneName, trackName) {
 		// proceed only if we have a character in hand or a header selected
 		if ($charactersInHand.length === 0 && !$selectedHeader.type) return
-
 		// proceed only if the [only] char in hand isn't already in this scene
 		if ($charactersInHand.length === 1) {
 			// return if character already in scene
@@ -38,50 +38,15 @@
 				return
 			}
 		}
-
 		// if a drop zone is being added to the same scene twice, overwrite the old one
 		const index = $selectedDropZones.findIndex((_) => _.sceneName === sceneName)
 		if (index > -1) $selectedDropZones.splice(index, 1)
-
 		$selectedDropZones.push(newDropZoneInfo(sceneName, trackName))
 		$selectedDropZones = $selectedDropZones
 	}
 
-	/**
-	 * @returns {void}
-	 * @param {'track' | 'scene'} type
-	 * @param {string} name
-	 */
-	function setSelectedHeader(type, name) {
-		// deselect the header if clicking it again
-		if ($selectedHeader.name === name) {
-			$selectedHeader = {}
-			$selectedDropZones = []
-		} else if ($selectedHeader.name !== name) {
-			// clicking an unselected header, so select it
-			$selectedHeader = { type, name }
-		}
-
-		// if no header selected, clear selected drop zones and be done
-		if (!$selectedHeader.type) {
-			$selectedDropZones = []
-			return
-		}
-
-		// if selected header is a track, show it
-		if ($selectedHeader.type === 'track') {
-			for (let scene of $table.scenes) {
-				addToSelectedDropZones(scene.name, name)
-			}
-		}
-		// if selected header is a scene, show it
-		else if ($selectedHeader.type === 'scene') {
-			// a scene is selected, so show selected scene column in ui
-		}
-
-		/* TODO: TEST: clicking track header selects drop zones on track,
-		clicking again deselects all */
-	}
+	// TODO: make selectedDropZones change with selected header???
+	// how would this affect selecting individual drop zones?
 </script>
 
 <table
@@ -95,13 +60,11 @@
 			{#if $table.scenes.length > 0}
 				<!-- a column header per scene -->
 				{#each $table.scenes as scene}
-					<th
-						data-scene-col={scene.name}
-						class:selected={false}
-						on:pointerup={() => setSelectedHeader('scene', scene.name)}
-					>
-						{display(scene.name)}
-					</th>
+					<Header
+						type="scene"
+						name={scene.name}
+						{addToSelectedDropZones}
+					/>
 				{/each}
 			{/if}
 		</tr>
@@ -112,10 +75,11 @@
 			<!-- a row + header per track -->
 			{#each $table.tracks as track}
 				<tr data-track-row={track.name}>
-					<th on:pointerup={setSelectedHeader('track', track.name)}>
-						{display(track.name)}
-					</th>
-
+					<Header
+						type="track"
+						name={track.name}
+						{addToSelectedDropZones}
+					/>
 					<!-- a cell (col) per scene -->
 					{#each $table.scenes as scene}
 						<td>
@@ -173,10 +137,10 @@
 		cursor: pointer;
 	}
 
-	tbody tr th.chosen {
+	/* tbody tr th.chosen {
 		border-top: 2px solid white;
 		border-bottom: 2px solid white;
-	}
+	} */
 
 	/* column headers */
 	thead th {
@@ -192,12 +156,12 @@
 		height: 4rem;
 	}
 
-	th.selected {
+	/* 	th.selected {
 		text-shadow: 0px 0px 6px black, 0 0 6px rgba(255, 255, 255, 0.75),
 			0 0 12px rgba(255, 242, 0, 0.75), 0 0 18px rgba(255, 255, 255, 0.75);
 		transition: text-shadow 0.1s 0s, font-size 0.075s 0s;
 		font-size: 1.25rem;
-	}
+	} */
 
 	/* .in-hand comes from character.svelte */
 	tbody :global(.inHand) {
