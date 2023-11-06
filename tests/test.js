@@ -22,7 +22,7 @@ test.describe('selected drop zone rules', () => {
 	/** @type {Locator}   */ let character
 	/** @type {Locator}   */ let dropZoneA, dropZoneB
 	/** @type {Locator[]} */ let allDropZones
-	/** @type {Locator}   */ let headerTrackA
+	/** @type {Locator}   */ let headerTrackA, headerTrackB
 
 	// get all the elements for the this batch of tests
 	test.beforeEach(async ({ page }) => {
@@ -38,6 +38,7 @@ test.describe('selected drop zone rules', () => {
 		)
 		allDropZones = await page.locator(`[data-drop-zone]`).all()
 		headerTrackA = page.locator(`[data-track-row="${TRACK_A}"] th`).getByText(display(TRACK_A))
+		headerTrackB = page.locator(`[data-track-row="${TRACK_B}"] th`).getByText(display(TRACK_B))
 	})
 
 	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -113,8 +114,7 @@ test.describe('selected drop zone rules', () => {
 		}
 	})
 
-	// TODO: FIX THIS TEST -- IT DONT WORK
-	test('clicking a table header twice selects then deselects it', async ({ page }) => {
+	test('clicking a track header twice selects then deselects it', async ({ page }) => {
 		const TRACK = TRACK_A
 		const headerTrack = headerTrackA
 
@@ -138,5 +138,35 @@ test.describe('selected drop zone rules', () => {
 		// assert: all dropZones are deselected
 		selectedDropZones = await page.locator(`[data-drop-zone].selected`).all()
 		expect(selectedDropZones).toHaveLength(0)
+	})
+
+	test('clicking 2 track headers selects 1st then 2nd', async ({ page }) => {
+		// select TRACK header
+		await headerTrackA.click()
+
+		// get all selected drop zones to assert that only TRACK A is selected
+		let selectedDropZones = await page.locator(`[data-drop-zone].selected`).all()
+
+		// assert: there are selected drop zones
+		expect(selectedDropZones.length).toBeGreaterThan(0)
+
+		// assert: every selected drop zone is on TRACK A
+		for (let _dropZone of selectedDropZones) {
+			await expect(_dropZone).toHaveAttribute(`data-track-name`, TRACK_A)
+		}
+
+		// click the track header again to clear the selection
+		await headerTrackB.click()
+
+		// get all selected drop zones to assert that only TRACK B is selected
+		selectedDropZones = await page.locator(`[data-drop-zone].selected`).all()
+
+		// assert: there are selected drop zones
+		expect(selectedDropZones.length).toBeGreaterThan(0)
+
+		// assert: every selected drop zone is on TRACK B
+		for (let _dropZone of selectedDropZones) {
+			await expect(_dropZone).toHaveAttribute(`data-track-name`, TRACK_B)
+		}
 	})
 })
