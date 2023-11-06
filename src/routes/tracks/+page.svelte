@@ -297,7 +297,6 @@
 	.character-pool {
 		position: relative;
 		display: flex;
-		align-items: center;
 		margin: 1.5rem;
 		border: 1px solid rgb(0, 157, 255);
 		border-radius: 1.5rem;

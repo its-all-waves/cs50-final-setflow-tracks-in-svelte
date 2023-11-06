@@ -110,58 +110,18 @@
 	thead,
 	tbody,
 	th,
-	td,
-	td div {
+	td {
 		pointer-events: inherit;
 	}
 
-	thead th,
-	tbody th {
-		text-align: center;
-	}
-
-	/* row headers - keep narrow */
-	tbody tr th {
-		position: sticky;
-		left: 0;
-		width: 12ch;
-		min-width: 9ch;
+	th.empty {
 		background: rgb(17, 25, 31);
-		background: linear-gradient(90deg, rgba(17, 25, 31, 1) 75%, rgba(17, 25, 31, 0) 100%);
-	}
-
-	tbody tr th:hover,
-	thead th:hover {
-		text-shadow: 0px 0px 6px black, 0 0 6px rgba(255, 255, 255, 0.75),
-			0 0 12px rgba(255, 242, 0, 0.75), 0 0 18px rgba(255, 255, 255, 0.75);
-		cursor: pointer;
-	}
-
-	/* tbody tr th.chosen {
-		border-top: 2px solid white;
-		border-bottom: 2px solid white;
-	} */
-
-	/* column headers */
-	thead th {
-		position: sticky; /* currently does nothing... */
-		top: -0.6rem;
-		height: 3rem;
-		background: rgb(17, 25, 31);
-		background: linear-gradient(180deg, rgba(17, 25, 31, 1) 75%, rgba(17, 25, 31, 0) 100%);
 	}
 
 	/* limit cell (and dropZone) height */
 	td {
 		height: 4rem;
 	}
-
-	/* 	th.selected {
-		text-shadow: 0px 0px 6px black, 0 0 6px rgba(255, 255, 255, 0.75),
-			0 0 12px rgba(255, 242, 0, 0.75), 0 0 18px rgba(255, 255, 255, 0.75);
-		transition: text-shadow 0.1s 0s, font-size 0.075s 0s;
-		font-size: 1.25rem;
-	} */
 
 	/* .in-hand comes from character.svelte */
 	tbody :global(.inHand) {

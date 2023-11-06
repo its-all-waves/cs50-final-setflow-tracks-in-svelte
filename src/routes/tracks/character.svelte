@@ -94,6 +94,8 @@
 		box-shadow: 0 3px 1.5px rgba(0, 0, 0, 0.7);
 
 		position: relative;
+
+		align-self: center; /* somehow made the top and bottom shrink up to the content?! woo! */
 	}
 
 	.character:hover {
