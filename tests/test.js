@@ -20,7 +20,8 @@ test.describe('selected drop zone rules', () => {
 	/** @type {Locator}   */ let commitButton
 	/** @type {Locator}   */ let characterPool
 	/** @type {Locator}   */ let character
-	/** @type {Locator}   */ let dropZoneA, dropZoneB
+	/** @type {Locator}   */ let dropZoneA
+	/** @type {Locator}   */ let dropZoneB
 	/** @type {Locator[]} */ let allDropZones
 	/** @type {Locator}   */ let headerTrackA
 	/** @type {Locator}   */ let headerTrackB
@@ -188,4 +189,45 @@ test.describe('selected drop zone rules', () => {
 		let selectedDropZones = page.locator(`[data-drop-zone].selected`)
 		await expect(selectedDropZones).toHaveCount(0)
 	})
+
+	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	// TEST
+	test('track selection replaces scene selection & vice versa', async ({ page }) => {
+		// note: a scene must contain at least one character to be selected
+
+		// put character in each drop zone (thus each scene)
+		await character.click()
+		// assert: character is selected
+		await expect(character).toHaveClass(/\binHand\b/)
+
+		await dropZoneA.click()
+		// assert: drop zone is selected
+		await expect(dropZoneA).toHaveClass(/\bselected\b/)
+
+		await dropZoneB.click()
+		// assert: drop zone is selected
+		await expect(dropZoneB).toHaveClass(/\bselected\b/)
+
+		await commitButton.click()
+
+		// select scene, select track
+		await headerSceneA.click()
+
+		// assert: scene is selected
+		let selectedDropZones = await page.locator(`[data-drop-zone].selected`).all()
+		for (let _dropZone of selectedDropZones) {
+			await expect(_dropZone).toHaveAttribute(`data-scene-name`, SCENE_A)
+		}
+
+		await headerTrackA.click()
+
+		// assert: only TRACK A is selected
+		selectedDropZones = await page.locator(`[data-drop-zone].selected`).all()
+		for (let _dropZone of selectedDropZones) {
+			await expect(_dropZone).toHaveAttribute(`data-track-name`, TRACK_A)
+		}
+	})
 })
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// HELPERS
