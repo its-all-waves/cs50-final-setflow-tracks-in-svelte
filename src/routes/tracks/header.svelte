@@ -9,37 +9,72 @@
 	export let name
 
 	function setSelectedHeader() {
+		console.log('debug')
 		// deselect the header if clicking it again
 		if ($selectedHeader.name === name && $selectedHeader.type === type) {
 			$selectedHeader = {}
-			return
 		}
 		// clicking an unselected header, so select it
-		$selectedHeader = { type, name }
+		else {
+			$selectedHeader = { type, name }
+		}
+
+		setSelectedDropZonesBySelectedHeader()
 	}
 
-	// clear selected drop zones when no header selected
-	$: setSelectedDropZonesBy($selectedHeader)
+	function setSelectedDropZonesBySelectedHeader() {
+		console.log('debug')
 
-	function setSelectedDropZonesBy(header) {
-		if (!header.type) {
-			$selectedDropZones = []
+		// $selectedDropZones = [] // else we just keep adding to the array
+
+		// if no header selected, clear selected drop zones
+		if (!$selectedHeader.type) {
+			// TODO: tell the user why nothing happened
+			$selectedDropZones = [] // else we just keep adding to the array
+			return
 		}
+
 		// update selected drop zones when a track header is selected
-		else if (header.type === 'track') {
+		else if ($selectedHeader.type === 'track') {
+			$selectedDropZones = [] // else we just keep adding to the array
 			for (let scene of $table.scenes) {
-				addToSelectedDropZones(scene.name, header.name)
+				addToSelectedDropZones(scene.name, $selectedHeader.name)
+				// console.log('how many times do you see me? -- SHOULD BE TWO')
 			}
 		}
-		// TODO: update selected drop zones when a scene header is selected
-		else if (header.type === 'scene') {
+
+		// update selected drop zones when a scene header is selected
+		else if ($selectedHeader.type === 'scene') {
+			$selectedDropZones = [] // else we just keep adding to the array
+			// if no one is in the scene, it cannot be selected
+			const scene = $table.scenes.find((_) => _.name === $selectedHeader.name)
+			if (!scene) throw new Error('Huuwhat?')
+			if (isEmpty(scene)) {
+				$selectedHeader = {} // side effect: clears any existing track selection -- i am ok with that
+				return
+			}
 			for (let track of $table.tracks) {
-				addToSelectedDropZones(header.name, track.name)
+				addToSelectedDropZones($selectedHeader.name, track.name)
+				console.log(
+					`how many times do you see me? "${$selectedHeader.name}" // "${track.name}"`
+				)
 			}
 		}
+
+		/* TODO: TESTS: 
+		
+		- selecting a scene with no char in hand does nothing
+		- selecting a scene when a track is selected does nothing
+		- selecting a scene when 
+
+		
+		
+		*/
 	}
 
-	// TODO: if no one is in the scene, it cannot be selected
+	function isEmpty(scene) {
+		return scene.trackList.every((_) => _.characterNames.length === 0)
+	}
 </script>
 
 <th

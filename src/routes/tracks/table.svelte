@@ -22,44 +22,57 @@
 	 * @param {string} sceneName
 	 * @param {string} trackName
 	 * */
-	function addToSelectedDropZones(sceneName, trackName) {
-		// proceed only if we have a character in hand or a header selected
-		if ($charactersInHand.length === 0 && !$selectedHeader.type) return
-
+	function addToSelectedDropZones(sceneName, trackName, clickedDropZone = false) {
+		console.log('debug')
 		// if char in hand, cannot select scene
-		if ($charactersInHand.length === 1 && $selectedHeader.type === 'scene') return
+		if ($charactersInHand.length === 1 && $selectedHeader.type === 'scene') {
+			// TODO: tell user why nothing happened
+			return
+		}
 
-		// proceed only if the [only] char in hand isn't already in this scene
-		if ($charactersInHand.length === 1) {
-			// return if character already in scene
-			const characterName = $charactersInHand[0].name
-			const scene = $table.scenes.find((_) => _.name === sceneName)
-			const sceneContainsCharacterInHand = scene.trackList.some((_) =>
-				_.characterNames.includes(characterName)
-			)
-			if (sceneContainsCharacterInHand) {
-				// TODO: show feedback to user `"${charactersInHand}" is already in scene "${sceneName}"`
-				return
-			}
+		// // proceed only if the [only] char in hand isn't already in this scene
+		// if ($charactersInHand.length === 1) {
+		// 	// return if character already in scene
+		// 	const characterName = $charactersInHand[0].name
+		// 	const scene = $table.scenes.find((_) => _.name === sceneName)
+		// 	const sceneContainsCharacterInHand = scene.trackList.some((_) =>
+		// 		_.characterNames.includes(characterName)
+		// 	)
+		// 	if (sceneContainsCharacterInHand) {
+		// 		// TODO: show feedback to user `"${charactersInHand}" is already in scene "${sceneName}"`
+		// 		return
+		// 	}
+		// }
+
+		// if clicking in a scene that already has a selected drop zone,
+		// replace the old selected drop zone with the new one
+		if (
+			!$selectedHeader.type && // a header is selected
+			$selectedDropZones.length && // at least one drop zone is selected
+			$selectedDropZones.some((_) => _.sceneName === sceneName) // a selected drop zone is already in this scene
+		) {
+			// get index of this scene's selected drop zone to splice it out
+			const index = $selectedDropZones.findIndex((_) => _.sceneName === sceneName)
+			if (index !== -1) $selectedDropZones.splice(index, 1)
+			console.log('debug')
+		}
+		// if a scene header is selected, this click on a drop zone removes the
+		// current selection from selected scene's col
+		else if ($selectedHeader.type && clickedDropZone) {
+			$selectedHeader = {}
+			$selectedDropZones = []
 		}
 
 		// note: can select one track or scene at a time
 
-		// if character in hand and a drop zone is being added to the same scene
-		// twice, overwrite the old one
-		if ($charactersInHand.length === 1 || $selectedHeader.type === 'track') {
-			const index = $selectedDropZones.findIndex((_) => _.sceneName === sceneName)
-			if (index > -1) $selectedDropZones.splice(index, 1)
-		}
-
-		if ($selectedHeader.type === 'scene') {
-			const index = $selectedDropZones.findIndex((_) => _.trackName === trackName)
-			if (index > -1) $selectedDropZones.splice(index, 1)
-		}
-
 		$selectedDropZones.push(newDropZoneInfo(sceneName, trackName))
 		$selectedDropZones = $selectedDropZones
+		console.log('debug')
 	}
+
+	// DEBUG
+	$: console.log('selected drop zones:'), console.dir($selectedDropZones)
+	$: console.log('selected header:'), console.dir($selectedHeader)
 
 	// TODO: make selectedDropZones change with selected header???
 	// how would this affect selecting individual drop zones?

@@ -1,5 +1,5 @@
 <script>
-	import { table, charactersInHand, selectedDropZones, canEdit } from './store'
+	import { table, charactersInHand, selectedDropZones, canEdit, selectedHeader } from './store'
 
 	import Character from './character.svelte'
 
@@ -7,6 +7,15 @@
 	export let trackName
 
 	export let addToSelectedDropZones // FUNCTION
+
+	function handleClick() {
+		// if a header is selected when a drop zone is clicked, clear selected header, select clicked
+		// drop zone
+		// if ($selectedHeader.type === 'scene') return
+		// if ($selectedHeader.type === 'scene') $selectedHeader = {}
+
+		addToSelectedDropZones(scene.name, trackName, true)
+	}
 
 	$: selected = $selectedDropZones.some(
 		(_) => _.sceneName === scene.name && _.trackName === trackName
@@ -18,7 +27,7 @@
 	data-drop-zone
 	data-scene-name={scene.name}
 	data-track-name={trackName}
-	on:pointerup={() => addToSelectedDropZones(scene.name, trackName)}
+	on:pointerup={() => handleClick()}
 >
 	{#each scene.trackList as trackListItem}
 		{#if trackListItem.trackName === trackName}
