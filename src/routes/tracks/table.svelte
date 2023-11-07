@@ -30,19 +30,19 @@
 			return
 		}
 
-		// // proceed only if the [only] char in hand isn't already in this scene
-		// if ($charactersInHand.length === 1) {
-		// 	// return if character already in scene
-		// 	const characterName = $charactersInHand[0].name
-		// 	const scene = $table.scenes.find((_) => _.name === sceneName)
-		// 	const sceneContainsCharacterInHand = scene.trackList.some((_) =>
-		// 		_.characterNames.includes(characterName)
-		// 	)
-		// 	if (sceneContainsCharacterInHand) {
-		// 		// TODO: show feedback to user `"${charactersInHand}" is already in scene "${sceneName}"`
-		// 		return
-		// 	}
-		// }
+		// proceed only if the [only] char in hand isn't already in this scene
+		if ($charactersInHand.length === 1) {
+			// return if character already in scene
+			const characterName = $charactersInHand[0].name
+			const scene = $table.scenes.find((_) => _.name === sceneName)
+			const sceneContainsCharacterInHand = scene.trackList.some((_) =>
+				_.characterNames.includes(characterName)
+			)
+			if (sceneContainsCharacterInHand) {
+				// TODO: show feedback to user `"${charactersInHand}" is already in scene "${sceneName}"`
+				return
+			}
+		}
 
 		// if clicking in a scene that already has a selected drop zone,
 		// replace the old selected drop zone with the new one
@@ -73,9 +73,6 @@
 	// DEBUG
 	$: console.log('selected drop zones:'), console.dir($selectedDropZones)
 	$: console.log('selected header:'), console.dir($selectedHeader)
-
-	// TODO: make selectedDropZones change with selected header???
-	// how would this affect selecting individual drop zones?
 </script>
 
 <table
