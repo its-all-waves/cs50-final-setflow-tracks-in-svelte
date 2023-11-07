@@ -177,9 +177,31 @@
 		// $table.characters[4] = newCharacter('Alex')
 	}
 
-	// // DEBUG
-	// $: console.log(`$selectedHeader changed to: ${JSON.stringify($selectedHeader)}`)
-	// $: console.log(`$charactersInHand changed to: ${JSON.stringify($charactersInHand)}`)
+	// DEBUG
+	// log selected header
+	$: {
+		const { type, name } = $selectedHeader
+		console.log(type ? `- selected header: ${type} : ${name}` : '- no header selected')
+	}
+
+	// log selected drop zones
+	$: {
+		console.log(
+			$selectedDropZones.length === 0 ? '- no drop zones selected' : '- selected drop zones:'
+		)
+		for (let dz of $selectedDropZones) {
+			console.log('\t', dz.sceneName, ':', dz.trackName)
+		}
+	}
+
+	// log character in hand
+	$: {
+		console.log(
+			$charactersInHand.length
+				? `- character in hand: ${$charactersInHand[0].name}`
+				: '- no character in hand'
+		)
+	}
 </script>
 
 <svelte:window on:keydown={$charactersInHand.length === 1 && commitDropZones} />
