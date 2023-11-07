@@ -22,7 +22,10 @@ test.describe('selected drop zone rules', () => {
 	/** @type {Locator}   */ let character
 	/** @type {Locator}   */ let dropZoneA, dropZoneB
 	/** @type {Locator[]} */ let allDropZones
-	/** @type {Locator}   */ let headerTrackA, headerTrackB
+	/** @type {Locator}   */ let headerTrackA
+	/** @type {Locator}   */ let headerTrackB
+	/** @type {Locator}   */ let headerSceneA
+	/** @type {Locator}   */ let headerSceneB
 
 	// get all the elements for the this batch of tests
 	test.beforeEach(async ({ page }) => {
@@ -37,8 +40,10 @@ test.describe('selected drop zone rules', () => {
 			`[data-drop-zone][data-scene-name='${SCENE_B}'][data-track-name='${TRACK_B}']`
 		)
 		allDropZones = await page.locator(`[data-drop-zone]`).all()
-		headerTrackA = page.locator(`[data-track-row="${TRACK_A}"] th`).getByText(display(TRACK_A))
-		headerTrackB = page.locator(`[data-track-row="${TRACK_B}"] th`).getByText(display(TRACK_B))
+		headerTrackA = page.locator(`[data-track-header="${TRACK_A}"]`)
+		headerTrackB = page.locator(`[data-track-header="${TRACK_B}"]`)
+		headerSceneA = page.locator(`[data-scene-header="${SCENE_A}"]`)
+		headerSceneB = page.locator(`[data-scene-header="${SCENE_B}"]`)
 	})
 
 	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -114,6 +119,8 @@ test.describe('selected drop zone rules', () => {
 		}
 	})
 
+	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	// TEST
 	test('clicking a track header twice selects then deselects it', async ({ page }) => {
 		const TRACK = TRACK_A
 		const headerTrack = headerTrackA
@@ -140,6 +147,8 @@ test.describe('selected drop zone rules', () => {
 		expect(selectedDropZones).toHaveLength(0)
 	})
 
+	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	// TEST
 	test('clicking 2 track headers selects 1st then 2nd', async ({ page }) => {
 		// select TRACK header
 		await headerTrackA.click()
@@ -168,5 +177,15 @@ test.describe('selected drop zone rules', () => {
 		for (let _dropZone of selectedDropZones) {
 			await expect(_dropZone).toHaveAttribute(`data-track-name`, TRACK_B)
 		}
+	})
+
+	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	// TEST
+	test('clicking a scene with no char in hand selects nothing', async ({ page }) => {
+		await headerSceneA.click()
+
+		// assert: no drop zones are selected
+		let selectedDropZones = page.locator(`[data-drop-zone].selected`)
+		await expect(selectedDropZones).toHaveCount(0)
 	})
 })
