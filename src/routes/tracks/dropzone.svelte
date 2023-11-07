@@ -6,8 +6,9 @@
 	export let scene
 	export let trackName
 
-	export let addToSelectedDropZones // FUNCTION
+	export let addToSelectedDropZones // function(sceneName, trackName)
 
+	// drop zone gets .selected css if it exists in selected drop zones
 	$: selected = $selectedDropZones.some(
 		(_) => _.sceneName === scene.name && _.trackName === trackName
 	)
@@ -34,7 +35,6 @@
 </div>
 
 <style>
-	/* DROP ZONES */
 	[data-drop-zone] {
 		display: flex;
 		border: 1px solid #885df1;
@@ -43,7 +43,7 @@
 		min-width: 12ch;
 	}
 
-	.selected[data-drop-zone] {
+	.selected {
 		border: 2px solid rgb(255, 255, 255);
 	}
 </style>
