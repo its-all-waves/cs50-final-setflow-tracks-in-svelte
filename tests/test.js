@@ -20,8 +20,8 @@ test.describe('selected drop zone rules', () => {
 	/** @type {Locator}   */ let commitButton
 	/** @type {Locator}   */ let characterPool
 	/** @type {Locator}   */ let character
-	/** @type {Locator}   */ let dropZoneA
-	/** @type {Locator}   */ let dropZoneB
+	/** @type {Locator}   */ let dropZoneAA
+	/** @type {Locator}   */ let dropZoneBB
 	/** @type {Locator[]} */ let allDropZones
 	/** @type {Locator}   */ let headerTrackA
 	/** @type {Locator}   */ let headerTrackB
@@ -34,10 +34,10 @@ test.describe('selected drop zone rules', () => {
 		commitButton = page.locator('#btn-commit')
 		characterPool = page.locator('.character-pool')
 		character = characterPool.getByText(CHARACTER)
-		dropZoneA = page.locator(
+		dropZoneAA = page.locator(
 			`[data-drop-zone][data-scene-name='${SCENE_A}'][data-track-name='${TRACK_A}']`
 		)
-		dropZoneB = page.locator(
+		dropZoneBB = page.locator(
 			`[data-drop-zone][data-scene-name='${SCENE_B}'][data-track-name='${TRACK_B}']`
 		)
 		allDropZones = await page.locator(`[data-drop-zone]`).all()
@@ -52,11 +52,11 @@ test.describe('selected drop zone rules', () => {
 	test(`can add "${CHARACTER}" to "${SCENE_A}" > "${TRACK_A}"`, async ({ page }) => {
 		// pick up a character and put it in dropZone
 		await character.click()
-		await dropZoneA.click()
+		await dropZoneAA.click()
 		await commitButton.click()
 
 		// check that dropZone contains CHARACTER
-		const characterInDropZone = dropZoneA.locator('.character')
+		const characterInDropZone = dropZoneAA.locator('.character')
 		const innerText = await characterInDropZone.innerText()
 		expect(innerText).toBe(CHARACTER)
 	})
@@ -67,7 +67,7 @@ test.describe('selected drop zone rules', () => {
 		page
 	}) => {
 		const TRACK = TRACK_A
-		const dropZone = dropZoneA
+		const dropZone = dropZoneAA
 
 		// grab the character, select the dropZone
 		await character.click()
@@ -200,13 +200,13 @@ test.describe('selected drop zone rules', () => {
 		// assert: character is selected
 		await expect(character).toHaveClass(/\binHand\b/)
 
-		await dropZoneA.click()
+		await dropZoneAA.click()
 		// assert: drop zone is selected
-		await expect(dropZoneA).toHaveClass(/\bselected\b/)
+		await expect(dropZoneAA).toHaveClass(/\bselected\b/)
 
-		await dropZoneB.click()
+		await dropZoneBB.click()
 		// assert: drop zone is selected
-		await expect(dropZoneB).toHaveClass(/\bselected\b/)
+		await expect(dropZoneBB).toHaveClass(/\bselected\b/)
 
 		await commitButton.click()
 
@@ -226,6 +226,37 @@ test.describe('selected drop zone rules', () => {
 		for (let _dropZone of selectedDropZones) {
 			await expect(_dropZone).toHaveAttribute(`data-track-name`, TRACK_A)
 		}
+	})
+
+	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	// TEST
+	test('click 2 drop zones in the same scene and only the last clicked is selected', async ({
+		page
+	}) => {
+		await dropZoneAA.click()
+
+		const dropZoneAB = page.locator(
+			`[data-drop-zone][data-scene-name="${SCENE_A}"][data-track-name="${TRACK_B}"]`
+		)
+		await dropZoneAB.click()
+
+		// assert: only drop zone AB is selected
+		let selectedDropZones = await page.locator(`[data-drop-zone].selected`).all()
+		expect(selectedDropZones).toHaveLength(1)
+		for (let _dropZone of selectedDropZones) {
+			await expect(_dropZone).toHaveAttribute(`data-scene-name`, SCENE_A)
+			await expect(_dropZone).toHaveAttribute(`data-track-name`, TRACK_B)
+		}
+	})
+
+	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	// TEST - WILL FAIL UNTIL FEATURE IS ADDED
+	test('clicking the same drop zone twice selects then deselects it', async ({ page }) => {
+		await dropZoneAA.click()
+		await expect(dropZoneAA).toHaveClass(/\bselected\b/)
+
+		await dropZoneAA.click()
+		await expect(dropZoneAA).not.toHaveClass(/\bselected\b/)
 	})
 })
 
