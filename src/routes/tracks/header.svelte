@@ -60,16 +60,6 @@
 				)
 			}
 		}
-
-		/* TODO: TESTS: 
-		
-		- selecting a scene with no char in hand does nothing
-		- selecting a scene when a track is selected does nothing
-		- selecting a scene when 
-
-		
-		
-		*/
 	}
 
 	function isEmpty(scene) {
