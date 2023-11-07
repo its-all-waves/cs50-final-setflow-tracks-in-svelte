@@ -1,6 +1,6 @@
 <script>
 	import { display } from '../../lib/util/util'
-	import { table, selectedHeader, selectedDropZones } from './store'
+	import { table, selectedHeader, selectedDropZones, charactersInHand } from './store'
 
 	export let addToSelectedDropZones // FUNCTION
 
@@ -9,28 +9,40 @@
 	export let name
 
 	function setSelectedHeader() {
-		console.log('debug')
+		// prevents: have to click scene header twice to select scene under
+		// certain conditions
+		// if character in hand and clicked a scene header, don't set selected header
+		if ($charactersInHand.length && type === 'scene') {
+			console.log('1) DENIED setting selected header')
+			return
+		}
+
+		// prevents: unnecessary update of selected drop zones and selected header
+		// if clicked a scene header with no header currently selected
+		const thisSceneIsEmpty =
+			type === 'scene' && isEmpty($table.scenes.find((_) => _.name === name))
+		// if no header selected and this scene is empty, don't set selected header
+		if (!$selectedHeader.type && thisSceneIsEmpty) {
+			console.log('2) DENIED setting selected header')
+			return
+		}
+
 		// deselect the header if clicking it again
-		if ($selectedHeader.name === name && $selectedHeader.type === type) {
-			$selectedHeader = {}
-		}
-		// clicking an unselected header, so select it
-		else {
-			$selectedHeader = { type, name }
-		}
+		const clickedSelectedHeader = $selectedHeader.name === name && $selectedHeader.type === type
+		$selectedHeader = clickedSelectedHeader ? {} : { type, name }
 
 		setSelectedDropZonesBySelectedHeader()
 	}
 
 	function setSelectedDropZonesBySelectedHeader() {
-		console.log('debug')
-
-		// $selectedDropZones = [] // else we just keep adding to the array
+		// TODO: confirm: seems i no longer need this
+		// // prevents: have to click scene twice to select in certain conditions
+		// if ($charactersInHand.length && $selectedHeader.type === 'scene') return
 
 		// if no header selected, clear selected drop zones
-		if (!$selectedHeader.type) {
-			// TODO: tell the user why nothing happened
-			$selectedDropZones = [] // else we just keep adding to the array
+		if (!$selectedHeader.type /* && type === 'track' */) {
+			$selectedDropZones = [] // else we just keep adding to the array; side effect: clears any existing track selection -- i am ok with that
+			// TODO: should i give ui feedback here?
 			return
 		}
 
@@ -39,25 +51,26 @@
 			$selectedDropZones = [] // else we just keep adding to the array
 			for (let scene of $table.scenes) {
 				addToSelectedDropZones(scene.name, $selectedHeader.name)
-				// console.log('how many times do you see me? -- SHOULD BE TWO')
 			}
 		}
 
 		// update selected drop zones when a scene header is selected
 		else if ($selectedHeader.type === 'scene') {
 			$selectedDropZones = [] // else we just keep adding to the array
-			// if no one is in the scene, it cannot be selected
-			const scene = $table.scenes.find((_) => _.name === $selectedHeader.name)
-			if (!scene) throw new Error('Huuwhat?')
-			if (isEmpty(scene)) {
+
+			// if scene is empty, it cannot be selected, so return
+			const selectedScene = $table.scenes.find((_) => _.name === $selectedHeader.name)
+			if (!selectedScene) throw new Error('Huuwhat?')
+			if (isEmpty(selectedScene)) {
+				// TODO: why does it feel wrong to do stuff to selectedHeader here?
 				$selectedHeader = {} // side effect: clears any existing track selection -- i am ok with that
 				return
 			}
+
+			// selected scene contains >= 1 character (thus allowing selection),
+			// so select the scene's drop zones
 			for (let track of $table.tracks) {
 				addToSelectedDropZones($selectedHeader.name, track.name)
-				console.log(
-					`how many times do you see me? "${$selectedHeader.name}" // "${track.name}"`
-				)
 			}
 		}
 	}
@@ -70,7 +83,7 @@
 <th
 	data-scene-header={type === 'scene' ? name : undefined}
 	data-track-header={type === 'track' ? name : undefined}
-	on:pointerup={setSelectedHeader(type, name)}
+	on:pointerup={setSelectedHeader}
 >
 	{display(name)}
 </th>
