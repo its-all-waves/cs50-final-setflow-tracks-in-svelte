@@ -92,9 +92,7 @@ test.describe('selected drop zone rules', () => {
 
 		// assert: only dropZones on TRACK are selected
 		let selectedDropZones = await arrayOfSelectedDropZones(page)
-		for (let _dropZone of selectedDropZones) {
-			await expect(_dropZone).toHaveAttribute('data-track-name', TRACK)
-		}
+		await expect_locators_have_attribute_value(selectedDropZones, `data-track-name`, TRACK)
 
 		// grab the same character from the pool
 		await character.click()
@@ -102,13 +100,15 @@ test.describe('selected drop zone rules', () => {
 		// FINAL ASSERTS: all on TRACK are selected except dropZone
 		// all the selected dropZones are on TRACK and don't include dropZone
 		const selectedDropZonesOnTrack = await page
-			.locator(`[data-track-row] [data-drop-zone][data-track-name="${TRACK}"].selected`)
+			.locator(`[data-drop-zone][data-track-name="${TRACK}"].selected`)
 			.all()
 
 		// assert: only dropZones on TRACK are selected
-		for (let _dropZone of selectedDropZonesOnTrack) {
-			expect(_dropZone).toHaveAttribute(`data-track-name`, TRACK)
-		}
+		await expect_locators_have_attribute_value(
+			selectedDropZonesOnTrack,
+			`data-track-name`,
+			TRACK
+		)
 
 		// assert: dropZone not selected
 		await expect(dropZone).not.toHaveClass(/\bselected\b/)
@@ -136,9 +136,7 @@ test.describe('selected drop zone rules', () => {
 		expect(selectedDropZones.length).toBeGreaterThan(0)
 
 		// assert: every selected drop zone is on TRACK
-		for (let _dropZone of selectedDropZones) {
-			await expect(_dropZone).toHaveAttribute(`data-track-name`, TRACK)
-		}
+		await expect_locators_have_attribute_value(selectedDropZones, `data-track-name`, TRACK)
 
 		// click the track header again to clear the selection
 		await headerTrack.click()
@@ -161,9 +159,7 @@ test.describe('selected drop zone rules', () => {
 		expect(selectedDropZones.length).toBeGreaterThan(0)
 
 		// assert: every selected drop zone is on TRACK A
-		for (let _dropZone of selectedDropZones) {
-			await expect(_dropZone).toHaveAttribute(`data-track-name`, TRACK_A)
-		}
+		await expect_locators_have_attribute_value(selectedDropZones, `data-track-name`, TRACK_A)
 
 		// click the track header again to clear the selection
 		await headerTrackB.click()
@@ -175,9 +171,7 @@ test.describe('selected drop zone rules', () => {
 		expect(selectedDropZones.length).toBeGreaterThan(0)
 
 		// assert: every selected drop zone is on TRACK B
-		for (let _dropZone of selectedDropZones) {
-			await expect(_dropZone).toHaveAttribute(`data-track-name`, TRACK_B)
-		}
+		await expect_locators_have_attribute_value(selectedDropZones, `data-track-name`, TRACK_B)
 	})
 
 	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -215,17 +209,13 @@ test.describe('selected drop zone rules', () => {
 
 		// assert: scene is selected
 		let selectedDropZones = await arrayOfSelectedDropZones(page)
-		for (let _dropZone of selectedDropZones) {
-			await expect(_dropZone).toHaveAttribute(`data-scene-name`, SCENE_A)
-		}
+		await expect_locators_have_attribute_value(selectedDropZones, `data-scene-name`, SCENE_A)
 
 		await headerTrackA.click()
 
 		// assert: only TRACK A is selected
 		selectedDropZones = await arrayOfSelectedDropZones(page)
-		for (let _dropZone of selectedDropZones) {
-			await expect(_dropZone).toHaveAttribute(`data-track-name`, TRACK_A)
-		}
+		await expect_locators_have_attribute_value(selectedDropZones, `data-track-name`, TRACK_A)
 	})
 
 	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -243,10 +233,8 @@ test.describe('selected drop zone rules', () => {
 		// assert: only drop zone AB is selected
 		let selectedDropZones = await arrayOfSelectedDropZones(page)
 		expect(selectedDropZones).toHaveLength(1)
-		for (let _dropZone of selectedDropZones) {
-			await expect(_dropZone).toHaveAttribute(`data-scene-name`, SCENE_A)
-			await expect(_dropZone).toHaveAttribute(`data-track-name`, TRACK_B)
-		}
+		await expect_locators_have_attribute_value(selectedDropZones, `data-scene-name`, SCENE_A)
+		await expect_locators_have_attribute_value(selectedDropZones, `data-track-name`, TRACK_B)
 	})
 
 	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -306,9 +294,7 @@ test.describe('selected drop zone rules', () => {
 		// if we have one selection per track, and all on selected scene, success!
 		const trackCount = await page.locator(`[data-track-header]`).count()
 		expect(selectedDropZones).toHaveLength(trackCount)
-		for (let _dropZone of selectedDropZones) {
-			await expect(_dropZone).toHaveAttribute(`data-scene-name`, SCENE_A)
-		}
+		await expect_locators_have_attribute_value(selectedDropZones, `data-scene-name`, SCENE_A)
 	})
 })
 
@@ -318,8 +304,13 @@ async function arrayOfSelectedDropZones(page) {
 	return await page.locator(`[data-drop-zone].selected`).all()
 }
 
-// async function other(page) {
-// 	for (let _dropZone of selectedDropZones) {
-// 		await expect(_dropZone).toHaveAttribute(`data-scene-name`, SCENE_A)
-// 	}
-// }
+/**
+ * @param {Locator[]} locArray
+ * @param {string} attr
+ * @param {string} val
+ */
+async function expect_locators_have_attribute_value(locArray, attr, val) {
+	for (let locator of locArray) {
+		await expect(locator).toHaveAttribute(attr, val)
+	}
+}
