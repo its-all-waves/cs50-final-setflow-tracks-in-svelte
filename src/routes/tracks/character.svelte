@@ -22,6 +22,9 @@
 		// replace what's there with a single character's info
 		$charactersInHand = [{ name, location }]
 
+		// prevents: unnecessary update of $selectedDropZones
+		if (!$selectedHeader.type && !$selectedDropZones.length && !$charactersInHand.length) return
+
 		// prevents: character can be added to same scene twice
 		removeSelectedDropZonesIfConflict()
 	}
