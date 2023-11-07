@@ -23,10 +23,21 @@
 	 * @param {string} trackName
 	 * */
 	function addToSelectedDropZones(sceneName, trackName, clickedDropZone = false) {
-		console.log('debug')
 		// if char in hand, cannot select scene
 		if ($charactersInHand.length === 1 && $selectedHeader.type === 'scene') {
 			// TODO: tell user why nothing happened
+			return
+		}
+
+		// TODO: handle case: more than one selected drop zones -- should always
+		// just deselect the one being clicked
+		// if clicked the selected drop zone, unselect it
+		if (
+			$selectedDropZones.length === 1 &&
+			$selectedDropZones[0].sceneName === sceneName &&
+			$selectedDropZones[0].trackName === trackName
+		) {
+			$selectedDropZones = []
 			return
 		}
 
@@ -44,7 +55,7 @@
 			}
 		}
 
-		// if clicking in a scene that already has a selected drop zone,
+		// if clicked in a scene that already has a selected drop zone,
 		// replace the old selected drop zone with the new one
 		if (
 			!$selectedHeader.type && // a header is selected
