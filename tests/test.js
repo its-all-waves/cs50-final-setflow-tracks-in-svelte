@@ -1,5 +1,6 @@
 //@ts-check
 /** @typedef {import('@playwright/test').Locator} Locator */
+/** @typedef {import('@playwright/test').Page} Page */
 
 import { expect, test } from '@playwright/test'
 
@@ -300,6 +301,8 @@ test.describe('selected drop zone rules', () => {
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // HELPERS
+
+/** @param {Page} page*/
 async function arrayOfSelectedDropZones(page) {
 	return await page.locator(`[data-drop-zone].selected`).all()
 }
