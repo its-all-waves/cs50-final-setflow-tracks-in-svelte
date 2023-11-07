@@ -23,11 +23,13 @@
 	 * @param {string} trackName
 	 * */
 	function addToSelectedDropZones(sceneName, trackName, clickedDropZone = false) {
-		// if char in hand, cannot select scene
-		if ($charactersInHand.length === 1 && $selectedHeader.type === 'scene') {
-			// TODO: tell user why nothing happened
-			return
-		}
+		// TODO: confirm: i can get rid of this -- ??? made obsolete by another change?
+		// // if char in hand, cannot select scene
+		// if ($charactersInHand.length === 1 && $selectedHeader.type === 'scene') {
+		// 	// TODO: tell user why nothing happened
+		// 	console.log('1 ???')
+		// 	return
+		// }
 
 		// TODO: handle case: more than one selected drop zones -- should always
 		// just deselect the one being clicked
@@ -38,6 +40,7 @@
 			$selectedDropZones[0].trackName === trackName
 		) {
 			$selectedDropZones = []
+			console.log('2 ???')
 			return
 		}
 
@@ -51,6 +54,7 @@
 			)
 			if (sceneContainsCharacterInHand) {
 				// TODO: show feedback to user `"${charactersInHand}" is already in scene "${sceneName}"`
+				console.log('3 ???')
 				return
 			}
 		}
@@ -64,26 +68,26 @@
 		) {
 			// get index of this scene's selected drop zone to splice it out
 			const index = $selectedDropZones.findIndex((_) => _.sceneName === sceneName)
-			if (index !== -1) $selectedDropZones.splice(index, 1)
-			console.log('debug')
+			if (index !== -1) {
+				$selectedDropZones.splice(index, 1)
+				console.log('3 ???')
+			}
 		}
 		// if a scene header is selected, this click on a drop zone removes the
 		// current selection from selected scene's col
 		else if ($selectedHeader.type && clickedDropZone) {
+			// TODO: why does it feel wrong to do stuff to selectedHeader here?
 			$selectedHeader = {}
 			$selectedDropZones = []
+			console.log('4 ???')
 		}
 
 		// note: can select one track or scene at a time
 
 		$selectedDropZones.push(newDropZoneInfo(sceneName, trackName))
 		$selectedDropZones = $selectedDropZones
-		console.log('debug')
+		console.log('5 ???')
 	}
-
-	// DEBUG
-	$: console.log('selected drop zones:'), console.dir($selectedDropZones)
-	$: console.log('selected header:'), console.dir($selectedHeader)
 </script>
 
 <table
