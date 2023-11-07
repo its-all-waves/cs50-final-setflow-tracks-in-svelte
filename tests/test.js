@@ -91,7 +91,7 @@ test.describe('selected drop zone rules', () => {
 		await headerTrackA.click()
 
 		// assert: only dropZones on TRACK are selected
-		let selectedDropZones = await page.locator(`[data-drop-zone].selected`).all()
+		let selectedDropZones = await arrayOfSelectedDropZones(page)
 		for (let _dropZone of selectedDropZones) {
 			await expect(_dropZone).toHaveAttribute('data-track-name', TRACK)
 		}
@@ -130,7 +130,7 @@ test.describe('selected drop zone rules', () => {
 		await headerTrack.click()
 
 		// get all selected drop zones
-		let selectedDropZones = await page.locator(`[data-drop-zone].selected`).all()
+		let selectedDropZones = await arrayOfSelectedDropZones(page)
 
 		// assert: there are selected drop zones
 		expect(selectedDropZones.length).toBeGreaterThan(0)
@@ -144,7 +144,7 @@ test.describe('selected drop zone rules', () => {
 		await headerTrack.click()
 
 		// assert: all dropZones are deselected
-		selectedDropZones = await page.locator(`[data-drop-zone].selected`).all()
+		selectedDropZones = await arrayOfSelectedDropZones(page)
 		expect(selectedDropZones).toHaveLength(0)
 	})
 
@@ -155,7 +155,7 @@ test.describe('selected drop zone rules', () => {
 		await headerTrackA.click()
 
 		// get all selected drop zones to assert that only TRACK A is selected
-		let selectedDropZones = await page.locator(`[data-drop-zone].selected`).all()
+		let selectedDropZones = await arrayOfSelectedDropZones(page)
 
 		// assert: there are selected drop zones
 		expect(selectedDropZones.length).toBeGreaterThan(0)
@@ -169,7 +169,7 @@ test.describe('selected drop zone rules', () => {
 		await headerTrackB.click()
 
 		// get all selected drop zones to assert that only TRACK B is selected
-		selectedDropZones = await page.locator(`[data-drop-zone].selected`).all()
+		selectedDropZones = await arrayOfSelectedDropZones(page)
 
 		// assert: there are selected drop zones
 		expect(selectedDropZones.length).toBeGreaterThan(0)
@@ -214,7 +214,7 @@ test.describe('selected drop zone rules', () => {
 		await headerSceneA.click()
 
 		// assert: scene is selected
-		let selectedDropZones = await page.locator(`[data-drop-zone].selected`).all()
+		let selectedDropZones = await arrayOfSelectedDropZones(page)
 		for (let _dropZone of selectedDropZones) {
 			await expect(_dropZone).toHaveAttribute(`data-scene-name`, SCENE_A)
 		}
@@ -222,7 +222,7 @@ test.describe('selected drop zone rules', () => {
 		await headerTrackA.click()
 
 		// assert: only TRACK A is selected
-		selectedDropZones = await page.locator(`[data-drop-zone].selected`).all()
+		selectedDropZones = await arrayOfSelectedDropZones(page)
 		for (let _dropZone of selectedDropZones) {
 			await expect(_dropZone).toHaveAttribute(`data-track-name`, TRACK_A)
 		}
@@ -241,7 +241,7 @@ test.describe('selected drop zone rules', () => {
 		await dropZoneAB.click()
 
 		// assert: only drop zone AB is selected
-		let selectedDropZones = await page.locator(`[data-drop-zone].selected`).all()
+		let selectedDropZones = await arrayOfSelectedDropZones(page)
 		expect(selectedDropZones).toHaveLength(1)
 		for (let _dropZone of selectedDropZones) {
 			await expect(_dropZone).toHaveAttribute(`data-scene-name`, SCENE_A)
@@ -258,7 +258,68 @@ test.describe('selected drop zone rules', () => {
 		await dropZoneAA.click()
 		await expect(dropZoneAA).not.toHaveClass(/\bselected\b/)
 	})
+
+	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	// TEST - WILL FAIL UNTIL BUG IS FIXED
+	test('EXPECT FAIL: clicking only once selects a scene after character in hand is clicked', async ({
+		page
+	}) => {
+		/* ADDRESSES BUG: 
+	repro:
+		- put a character in a drop zone
+		- click the character to select it
+		- click drop zone's scene's header (nothing should select)
+		- click the character again to deselect
+		- click the drop zone's scene's header again to select the scene
+	behavior:
+		- scene header must be clicked twice to be selected
+	*/
+
+		// put a character in the drop zone
+		await character.click()
+		await dropZoneAA.click()
+		await commitButton.click()
+
+		// assert: character is in drop zone
+		const characterInTable = dropZoneAA.getByText(CHARACTER)
+		expect(await characterInTable.count()).toBe(1)
+
+		// click the character
+		await character.click()
+		// assert: character in table is selected
+		await expect(character).toHaveClass(/\binHand\b/)
+
+		// PASSES UP TO HERE
+
+		// click drop zone's scene's header
+		await headerSceneA.click()
+
+		// click character in table [again] OR character [in pool]
+		await character.click()
+
+		// ASSERT: drop zone's scene's header need only be clicked once to be selected
+		// await headerSceneA.click() // DEBUG - this dupl click should make test pass
+		await headerSceneA.click()
+		let selectedDropZones = await arrayOfSelectedDropZones(page)
+
+		// assert: all selected drop zones are in selected scene & no others selected
+		// if we have one selection per track, and all on selected scene, success!
+		const trackCount = await page.locator(`[data-track-header]`).count()
+		expect(selectedDropZones).toHaveLength(trackCount)
+		for (let _dropZone of selectedDropZones) {
+			await expect(_dropZone).toHaveAttribute(`data-scene-name`, SCENE_A)
+		}
+	})
 })
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // HELPERS
+async function arrayOfSelectedDropZones(page) {
+	return await page.locator(`[data-drop-zone].selected`).all()
+}
+
+// async function other(page) {
+// 	for (let _dropZone of selectedDropZones) {
+// 		await expect(_dropZone).toHaveAttribute(`data-scene-name`, SCENE_A)
+// 	}
+// }
