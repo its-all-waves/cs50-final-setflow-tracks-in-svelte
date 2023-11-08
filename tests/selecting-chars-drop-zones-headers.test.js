@@ -2,64 +2,28 @@
 /** @typedef {import('@playwright/test').Locator} Locator */
 /** @typedef {import('@playwright/test').Page} Page */
 
-import { expect, test } from '@playwright/test'
+import { test, expect } from '@playwright/test'
 
-import { display } from '../src/lib/util/util'
+import {
+	SCENE_A,
+	SCENE_B,
+	TRACK_A,
+	TRACK_B,
+	CHARACTER,
+	characterPool,
+	commitButton,
+	headerSceneA,
+	headerSceneB,
+	headerTrackA,
+	headerTrackB,
+	dropZoneAA,
+	dropZoneBB,
+	character
+} from './test.symbols.js'
 
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// BATCH
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-test.describe('IS THE THING THERE ON LOAD?', () => {
-	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+test.describe('SELECTING CHARACTERS, DROP ZONES, HEADERS', () => {
 	// TEST
-	test('tracks page has expected heading', async ({ page }) => {
-		await page.goto('/tracks')
-		await expect(page.getByRole('heading', { name: 'Tracks' })).toBeVisible()
-	})
-})
-
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// BATCH
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-test.describe('SELECTING DROP ZONES', () => {
-	const SCENE_A = '33-A'
-	const SCENE_B = '66-B'
-	const TRACK_A = 'Track_3'
-	const TRACK_B = 'Track_4'
-	const CHARACTER = 'Né-né'
-
-	/** @type {Locator}   */ let commitButton
-	/** @type {Locator}   */ let characterPool
-	/** @type {Locator}   */ let character
-	/** @type {Locator}   */ let dropZoneAA
-	/** @type {Locator}   */ let dropZoneBB
-	/** @type {Locator[]} */ let allDropZones
-	/** @type {Locator}   */ let headerTrackA
-	/** @type {Locator}   */ let headerTrackB
-	/** @type {Locator}   */ let headerSceneA
-	/** @type {Locator}   */ let headerSceneB
-
-	// get all the elements for the this batch of tests
-	test.beforeEach(async ({ page }) => {
-		await page.goto('/tracks')
-		commitButton = page.locator('#btn-commit')
-		characterPool = page.locator('.character-pool')
-		character = characterPool.getByText(CHARACTER)
-		dropZoneAA = page.locator(
-			`[data-drop-zone][data-scene-name='${SCENE_A}'][data-track-name='${TRACK_A}']`
-		)
-		dropZoneBB = page.locator(
-			`[data-drop-zone][data-scene-name='${SCENE_B}'][data-track-name='${TRACK_B}']`
-		)
-		allDropZones = await page.locator(`[data-drop-zone]`).all()
-		headerTrackA = page.locator(`[data-track-header="${TRACK_A}"]`)
-		headerTrackB = page.locator(`[data-track-header="${TRACK_B}"]`)
-		headerSceneA = page.locator(`[data-scene-header="${SCENE_A}"]`)
-		headerSceneB = page.locator(`[data-scene-header="${SCENE_B}"]`)
-	})
-
 	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	// TEST
 	test(`can add "${CHARACTER}" to "${SCENE_A}" > "${TRACK_A}"`, async ({ page }) => {
 		// pick up a character and put it in dropZone
 		await character.click()
@@ -72,8 +36,8 @@ test.describe('SELECTING DROP ZONES', () => {
 		expect(innerText).toBe(CHARACTER)
 	})
 
-	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	// TEST
+	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	test(`a selected drop zone deselects when grabbing a dupl character from pool`, async ({
 		page
 	}) => {
@@ -85,13 +49,13 @@ test.describe('SELECTING DROP ZONES', () => {
 		await dropZone.click()
 
 		// assert: dropZone is selected after click
-		expect(dropZone).toHaveClass(/\bselected\b/)
+		await expect(dropZone).toHaveClass(/\bselected\b/)
 
 		// drop the character
 		await commitButton.click()
 
 		// assert: dropZone deselects after commit
-		expect(dropZone).not.toHaveClass(/\bselected\b/)
+		await expect(dropZone).not.toHaveClass(/\bselected\b/)
 
 		// assert: character landed in the dropZone
 		const characterInDropZone = dropZone.locator('.character')
@@ -405,8 +369,6 @@ test.describe('SELECTING DROP ZONES', () => {
 		// await expect(characterInTable).toHaveClass(/\bchosen\b/)
 		await expect(characterInTable).toHaveClass(/\binHand\b/)
 
-		// SHOULD PASS UP TO HERE
-
 		// click the character in the table again
 		await characterInTable.click()
 
@@ -426,18 +388,11 @@ test.describe('SELECTING DROP ZONES', () => {
 })
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// BATCH
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-test.describe(`DELETE BUTTON`, () => {
-	test(`can delete a character by selecting it first`, async ({ page }) => {})
-})
-
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // HELPERS
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-/** @param {Page} page */
-async function arrayOfSelectedDropZones(page) {
-	return await page.locator(`[data-drop-zone].selected`).all()
+/** @param {Page} _page */
+async function arrayOfSelectedDropZones(_page) {
+	return await _page.locator(`[data-drop-zone].selected`).all()
 }
 
 /**
