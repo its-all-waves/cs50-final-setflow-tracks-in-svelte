@@ -31,7 +31,7 @@
 			// if clicked the selected drop zone, deselect it
 			if ($selectedDropZones.length === 1) {
 				$selectedDropZones = []
-				console.log('2 ???')
+				// console.log('1 ???')
 				return
 			}
 
@@ -46,7 +46,7 @@
 					$selectedDropZones.splice(index, 1)
 					// TODO: force ui update?
 					$selectedDropZones = $selectedDropZones
-					console.log('6 ???')
+					// console.log('2 ???')
 					return
 				}
 			}
@@ -62,7 +62,7 @@
 			)
 			if (sceneContainsCharacterInHand) {
 				// TODO: show feedback to user `"${charactersInHand}" is already in scene "${sceneName}"`
-				console.log('3 ???')
+				// console.log('3 ???')
 				return
 			}
 		}
@@ -75,7 +75,7 @@
 			const index = $selectedDropZones.findIndex((_) => _.sceneName === sceneName)
 			if (index !== -1) {
 				$selectedDropZones.splice(index, 1)
-				console.log('3 ???')
+				// console.log('4 ???')
 			}
 		}
 		// if a scene header is selected, this click on a drop zone removes the
@@ -84,14 +84,14 @@
 			// TODO: why does it feel wrong to do stuff to selectedHeader here?
 			$selectedHeader = {}
 			$selectedDropZones = []
-			console.log('4 ???')
+			// console.log('5 ???')
 		}
 
 		// note: can select one track or scene at a time
 
 		$selectedDropZones.push(newDropZoneInfo(sceneName, trackName))
 		$selectedDropZones = $selectedDropZones
-		console.log('5 ???')
+		// console.log('6 ???')
 	}
 </script>
 
