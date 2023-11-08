@@ -6,12 +6,22 @@ import { expect, test } from '@playwright/test'
 
 import { display } from '../src/lib/util/util'
 
-test('tracks page has expected heading', async ({ page }) => {
-	await page.goto('/tracks')
-	await expect(page.getByRole('heading', { name: 'Tracks' })).toBeVisible()
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// BATCH
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+test.describe('IS THE THING THERE ON LOAD?', () => {
+	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	// TEST
+	test('tracks page has expected heading', async ({ page }) => {
+		await page.goto('/tracks')
+		await expect(page.getByRole('heading', { name: 'Tracks' })).toBeVisible()
+	})
 })
 
-test.describe('selected drop zone rules', () => {
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// BATCH
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+test.describe('SELECTING DROP ZONES', () => {
 	const SCENE_A = '33-A'
 	const SCENE_B = '66-B'
 	const TRACK_A = 'Track_3'
@@ -409,7 +419,7 @@ test.describe('selected drop zone rules', () => {
 		// assert: no characters in table (or pool) have .chosen class
 		const allCharactersInTableAndPool = await page.locator(`.character`).all()
 		for (let character of allCharactersInTableAndPool) {
-			expect(character).not.toHaveClass(`chosen`)
+			expect(character).not.toHaveClass(/\bchosen\b/)
 		}
 	})
 })

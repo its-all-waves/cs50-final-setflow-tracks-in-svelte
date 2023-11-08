@@ -156,6 +156,9 @@
 	// DEBUG
 	onMount(DEV_populate_table)
 
+	/** *DO NOT CHANGE VALUES IN THIS FUNCTION, TESTS DEPEND ON THEM.* \
+	 * YOU MAY ADD MORE... I THINK?
+	 */
 	function DEV_populate_table() {
 		// add X tracks
 		const NUM_TRACKS = 4
