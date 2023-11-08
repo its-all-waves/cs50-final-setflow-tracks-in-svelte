@@ -9,7 +9,11 @@
 
 	function setCharacterInHand() {
 		// clicked character in table that was already chosen (and necessarily in hand)
-		if (location !== '__pool__' && chosen) return
+		if (location !== '__pool__' && chosen) {
+			// TODO: SETTING THIS REACTIVE VAR chosen FEELS WRONG, BUT...
+			chosen = false // prevents: cannot de-chosen a character
+			return
+		}
 
 		// clicked a character in the pool
 		if (location === '__pool__' && inHand) {
