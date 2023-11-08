@@ -23,25 +23,33 @@
 	 * @param {string} trackName
 	 * */
 	function addToSelectedDropZones(sceneName, trackName, clickedDropZone = false) {
-		// TODO: confirm: i can get rid of this -- ??? made obsolete by another change?
-		// // if char in hand, cannot select scene
-		// if ($charactersInHand.length === 1 && $selectedHeader.type === 'scene') {
-		// 	// TODO: tell user why nothing happened
-		// 	console.log('1 ???')
-		// 	return
-		// }
+		const clickedASelectedDropZone = $selectedDropZones.some(
+			(_) => _.sceneName === sceneName && _.trackName === trackName
+		)
 
-		// TODO: handle case: more than one selected drop zones -- should always
-		// just deselect the one being clicked
-		// if clicked the selected drop zone, unselect it
-		if (
-			$selectedDropZones.length === 1 &&
-			$selectedDropZones[0].sceneName === sceneName &&
-			$selectedDropZones[0].trackName === trackName
-		) {
-			$selectedDropZones = []
-			console.log('2 ???')
-			return
+		if (clickedASelectedDropZone) {
+			// if clicked the selected drop zone, deselect it
+			if ($selectedDropZones.length === 1) {
+				$selectedDropZones = []
+				console.log('2 ???')
+				return
+			}
+
+			// if clicked a selected drop zone (with multiple selected),
+			// unselect the clicked one
+			if ($selectedDropZones.length > 1) {
+				// find the clicked drop zone to splice it out of the array
+				const index = $selectedDropZones.findIndex(
+					(_) => _.sceneName === sceneName && _.trackName === trackName
+				)
+				if (index !== -1) {
+					$selectedDropZones.splice(index, 1)
+					// TODO: force ui update?
+					$selectedDropZones = $selectedDropZones
+					console.log('6 ???')
+					return
+				}
+			}
 		}
 
 		// proceed only if the [only] char in hand isn't already in this scene
@@ -59,13 +67,10 @@
 			}
 		}
 
-		// if clicked in a scene that already has a selected drop zone,
+		const sceneAlreadyHasASelection = $selectedDropZones.some((_) => _.sceneName === sceneName)
+
 		// replace the old selected drop zone with the new one
-		if (
-			!$selectedHeader.type && // a header is selected
-			$selectedDropZones.length && // at least one drop zone is selected
-			$selectedDropZones.some((_) => _.sceneName === sceneName) // a selected drop zone is already in this scene
-		) {
+		if (clickedDropZone && sceneAlreadyHasASelection) {
 			// get index of this scene's selected drop zone to splice it out
 			const index = $selectedDropZones.findIndex((_) => _.sceneName === sceneName)
 			if (index !== -1) {

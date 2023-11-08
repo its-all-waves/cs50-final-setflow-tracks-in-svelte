@@ -239,7 +239,7 @@ test.describe('selected drop zone rules', () => {
 	})
 
 	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	// TEST - WILL FAIL UNTIL FEATURE IS ADDED
+	// TEST
 	test('clicking the same drop zone twice selects then deselects it', async ({ page }) => {
 		await dropZoneAA.click()
 		await expect(dropZoneAA).toHaveClass(/\bselected\b/)
@@ -249,8 +249,8 @@ test.describe('selected drop zone rules', () => {
 	})
 
 	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	// TEST - WILL FAIL UNTIL BUG IS FIXED
-	test('EXPECT FAIL: clicking only once selects a scene after character in hand is clicked', async ({
+	// TEST
+	test('clicking only once selects a scene after character in hand is clicked', async ({
 		page
 	}) => {
 		/* ADDRESSES BUG: 
@@ -278,8 +278,6 @@ test.describe('selected drop zone rules', () => {
 		// assert: character in table is selected
 		await expect(character).toHaveClass(/\binHand\b/)
 
-		// PASSES UP TO HERE
-
 		// click drop zone's scene's header
 		await headerSceneA.click()
 
@@ -287,7 +285,6 @@ test.describe('selected drop zone rules', () => {
 		await character.click()
 
 		// ASSERT: drop zone's scene's header need only be clicked once to be selected
-		// await headerSceneA.click() // DEBUG - this dupl click should make test pass
 		await headerSceneA.click()
 		let selectedDropZones = await arrayOfSelectedDropZones(page)
 
@@ -297,8 +294,96 @@ test.describe('selected drop zone rules', () => {
 		expect(selectedDropZones).toHaveLength(trackCount)
 		await expect_locators_have_attribute_value(selectedDropZones, `data-scene-name`, SCENE_A)
 	})
-})
 
+	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	// TEST - WILL FAIL UNTIL BUG IS FIXED
+	test('EXPECT FAIL: clicking drop zone with track selected does not replace entire selection', async ({
+		page
+	}) => {
+		/* ADDRESSES BUG:
+		repro:
+			click a track to select it
+			click a drop zone not on selected track to select it
+
+		behavior:
+			entire selection is replaced with clicked drop zone
+
+		assert:
+		  the only change to selected drop zones is in the selected drop zone with
+		  the scene of drop zone BB
+		*/
+
+		// note: trackA = Track 3 // dropZoneBB = 66-B : Track 4 = scene B : trackB
+		await headerTrackA.click()
+		// for clarity...
+		const selectedTrack = TRACK_A
+
+		// ASSERT: all of track A is selected and only track A is selected
+		const sceneCount = await page.locator('[data-scene-header]').count()
+		let selectedDropZones = await arrayOfSelectedDropZones(page)
+		// assert: there should be sceneCount drop zones selected
+		expect(selectedDropZones).toHaveLength(sceneCount)
+		await expect_locators_have_attribute_value(selectedDropZones, `data-track-name`, TRACK_A)
+
+		await dropZoneBB.click()
+		// for clarity, clickedDropZone = dropZoneBB &...
+		const sceneOfClickedDropZone = SCENE_B
+		const trackOfClickedDropZone = TRACK_B
+
+		// ASSERT: only the selection in the clicked drop zone's scene changed,
+		// and it changed to the clicked dropZone
+		// assert: still sceneCount selected drop zones
+		selectedDropZones = await arrayOfSelectedDropZones(page)
+		expect(selectedDropZones).toHaveLength(sceneCount)
+		// expect(selectedDropZones).toHaveLength(1) // DEBUG: this will allow test to pass
+
+		// if a selected `dz`s scene matches that of the clicked drop zone,
+		// assert: the dz's track matches that of the clicked drop zone
+		// else assert: the dz's track matches that of the selected track (trackA)
+		for (let selectedDz of selectedDropZones) {
+			const selectedDzScene = await selectedDz.getAttribute(`data-scene-name`)
+			const selectedDzTrack = await selectedDz.getAttribute(`data-track-name`)
+			if (selectedDzScene === sceneOfClickedDropZone) {
+				expect(selectedDzTrack === trackOfClickedDropZone)
+				continue
+			}
+			// looking at the rest of the scenes/columns
+			expect(selectedDzTrack === selectedTrack)
+		}
+	})
+
+	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	// TEST
+	test(`clicking 2 drop zones in diff scenes doesn't prevent deselecting a selected drop zone`, async ({
+		page
+	}) => {
+		/* ADDRESS BUG:
+		repro:
+			click a drop zone to select it
+			click another in a different scene to select it
+			click one of the selected drop zones
+
+		behavior:
+			drop zone is not deselected
+		
+		assert:
+			drop zone is deselected
+		*/
+
+		await dropZoneAA.click()
+		await dropZoneBB.click()
+		await dropZoneBB.click()
+
+		// assert: drop zone BB is not selected
+		await expect(dropZoneBB).not.toHaveClass(/\bselected\b/)
+	})
+
+	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	// TEST - FAILS WHILE BUG
+// 	test('clicking selected character in table toggles .chosen class', async ({ page }) => {})
+// })
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // HELPERS
 
