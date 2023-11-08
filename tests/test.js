@@ -426,10 +426,16 @@ test.describe('SELECTING DROP ZONES', () => {
 })
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// BATCH
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+test.describe(`DELETE BUTTON`, () => {
+	test(`can delete a character by selecting it first`, async ({ page }) => {})
+})
+
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // HELPERS
-
-/** @param {Page} page*/
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+/** @param {Page} page */
 async function arrayOfSelectedDropZones(page) {
 	return await page.locator(`[data-drop-zone].selected`).all()
 }
