@@ -18,10 +18,10 @@
 	 * 	   - characterInHand, characterInHand.location === '__pool__' \
 	 * clear a whole track \
 	 * 	   - chose a track \
-	 * 	   - chosenHeader.type === 'track', chosenHeader.name === trackName ???, !characterInHand.name, (who is resetting this?) \
+	 * 	   - selectedHeader.type === 'track', selectedHeader.name === trackName ???, !characterInHand.name, (who is resetting this?) \
 	 * clear a whole scene \
 	 * 	   - chose a scene	 \
-	 * 	   - chosenHeader.type === 'scene', chosenHeader.name === sceneName ???, !characterInHand.name, (need another flag for this and above?) \
+	 * 	   - selectedHeader.type === 'scene', selectedHeader.name === sceneName ???, !characterInHand.name, (need another flag for this and above?) \
 	 * clear entire table contents \
 	 * 	   - did not choose a scene, track, or character \
 	 * 	   - !characterInHand.name,
