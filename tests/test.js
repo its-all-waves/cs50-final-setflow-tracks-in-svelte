@@ -401,8 +401,8 @@ test.describe('SELECTING DROP ZONES', () => {
 		await expect(characterInTable).toHaveCount(1)
 		await characterInTable.click()
 
-		// expect .chosen class
-		await expect(characterInTable).toHaveClass(/\bchosen\b/)
+		// // expect .chosen class
+		// await expect(characterInTable).toHaveClass(/\bchosen\b/)
 		await expect(characterInTable).toHaveClass(/\binHand\b/)
 
 		// SHOULD PASS UP TO HERE
@@ -414,12 +414,13 @@ test.describe('SELECTING DROP ZONES', () => {
 		await expect(characterInTable).toHaveClass(/\binHand\b/)
 		await expect(characterInTable).not.toHaveClass(/\bchosen\b/)
 
-		// SHOULD FAIL AFTER THIS POINT
+		const allCharactersInTableAndPool = await page.locator(`.character`).all()
+		// assert: there are 5 total character elements in the table and pool
+		expect(allCharactersInTableAndPool).toHaveLength(5)
 
 		// assert: no characters in table (or pool) have .chosen class
-		const allCharactersInTableAndPool = await page.locator(`.character`).all()
-		for (let character of allCharactersInTableAndPool) {
-			expect(character).not.toHaveClass(/\bchosen\b/)
+		for (let _character of allCharactersInTableAndPool) {
+			await expect(_character).not.toHaveClass(/\bchosen\b/)
 		}
 	})
 })

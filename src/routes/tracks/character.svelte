@@ -1,6 +1,12 @@
 <script>
 	import { display } from '../../lib/util/util'
-	import { table, charactersInHand, selectedDropZones, selectedHeader } from './store'
+	import {
+		table,
+		charactersInHand,
+		selectedDropZones,
+		selectedHeader,
+		chosenCharacter
+	} from './store'
 
 	// exposed to parent as attr
 	export let name
@@ -10,27 +16,53 @@
 	function setCharacterInHand() {
 		// clicked character in table that was already chosen (and necessarily in hand)
 		if (location !== '__pool__' && chosen) {
-			// TODO: SETTING THIS REACTIVE VAR chosen FEELS WRONG, BUT...
-			chosen = false // prevents: cannot de-chosen a character
+			// de-chosen the chosen character
+			$chosenCharacter = {}
+			// console.log('100 ???')
 			return
 		}
 
-		// clicked a character in the pool
+		// clicked a character in hand in the pool
 		if (location === '__pool__' && inHand) {
 			// deselect the pool character if clicking it again, return
 			$charactersInHand = []
+			// console.log('200 ???')
 			return
 		}
 
-		// character was unselected when clicked
+		// clicked the character in hand in the table
+		if (location !== '__pool__' && inHand) {
+			// set chosen character and return
+			$chosenCharacter = {
+				name,
+				sceneName: location
+			}
+			// console.log('300 ???')
+			return
+		}
+
+		if (location !== '__pool__') {
+			$chosenCharacter = {
+				name,
+				sceneName: location
+			}
+			// console.log('400 ???')
+		}
+
+		// clicked an unselected character
 		// replace what's there with a single character's info
 		$charactersInHand = [{ name, location }]
+		// console.log('500 ???')
 
 		// prevents: unnecessary update of $selectedDropZones
-		if (!$selectedHeader.type && !$selectedDropZones.length && !$charactersInHand.length) return
+		if (!$selectedHeader.type && !$selectedDropZones.length && !$charactersInHand.length) {
+			// console.log('600 ???')
+			return
+		}
 
 		// prevents: character can be added to same scene twice
 		removeSelectedDropZonesIfConflict()
+		// console.log('700 ???')
 	}
 
 	/** Helper for setCharacterInHand()
@@ -73,15 +105,15 @@
 
 	$: inHand = $charactersInHand.length === 1 && $charactersInHand[0].name === name
 
-	$: chosen = $charactersInHand.length === 1 && isLastClickedCharacterFromTable($charactersInHand)
+	$: chosen = iAmThe($chosenCharacter)
 
-	function isLastClickedCharacterFromTable(charsInHand) {
-		return (
-			charsInHand[0].location !== '__pool__' &&
-			charsInHand[0].location === location &&
-			charsInHand[0].name === name
-		)
+	/** Determines if *this* character is the chosen one */
+	function iAmThe(_chosenCharacter) {
+		return _chosenCharacter.name === name && _chosenCharacter.sceneName === location
 	}
+
+	// DEBUG
+	$: console.log(chosen ? `chosen: ${$chosenCharacter.name} : ${$chosenCharacter.sceneName}` : ``)
 </script>
 
 <div

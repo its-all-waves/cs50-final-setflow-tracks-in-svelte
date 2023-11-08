@@ -5,7 +5,14 @@
 	import { newScene, newTrackListItem } from '../../lib/TableObjects/Scene'
 	import { newCharacter } from '../../lib/TableObjects/Character'
 
-	import { table, charactersInHand, selectedDropZones, canEdit, selectedHeader } from './store'
+	import {
+		table,
+		charactersInHand,
+		selectedDropZones,
+		canEdit,
+		selectedHeader,
+		chosenCharacter
+	} from './store'
 
 	import Table from './table.svelte'
 	import Character from './character.svelte'
@@ -128,6 +135,7 @@
 	 * Forget what's currently selected */
 	function clearAllSelections() {
 		$charactersInHand = []
+		$chosenCharacter = {}
 		$selectedDropZones = []
 		$selectedHeader = {}
 	}
@@ -219,7 +227,7 @@
 				class="table"
 				class:glow={$canEdit}
 			>
-				<Table resetUiSelectionFlags={clearAllSelections} />
+				<Table />
 			</div>
 		{/if}
 	</article>
