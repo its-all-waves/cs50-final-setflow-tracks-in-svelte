@@ -45,3 +45,9 @@ export type CharacterInHand = {
     name: string,
     location: '__pool__' | string
 }
+
+/** Always comes from the table, not the character pool. */
+export type ChosenCharacter = {} | {
+    name: string,
+    sceneName: string 
+}
