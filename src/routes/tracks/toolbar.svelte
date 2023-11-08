@@ -1,5 +1,12 @@
 <script>
-	import { table, charactersInHand, selectedDropZones, canEdit, selectedHeader } from './store'
+	import {
+		table,
+		charactersInHand,
+		selectedDropZones,
+		canEdit,
+		selectedHeader,
+		chosenCharacter
+	} from './store'
 
 	export let clearAllSelections // FUNCTION
 
@@ -32,24 +39,40 @@
 		const characterInHand = length === 1
 		const location = length > 0 && length < 2 ? $charactersInHand[0].location : undefined
 
+		if ($selectedDropZones.length) {
+			console.log('1 ???')
+			deleteContentsOfSelectedDropZones()
+		}
 		// nothing is selected
-		if (noCharacterInHand && !$selectedHeader.type) {
+		else if (noCharacterInHand && !$selectedHeader.type) {
+			// console.log('2 ???')
 			clearTable()
 		}
 		// selected a character from the TABLE
+		else if ($chosenCharacter.name) {
+			// console.log('3 ???')
+			deleteChosenCharacterFromScene()
+		}
+		// selected all instances of a character from the TABLE
+		// (to delete the instances from the table only)
+		// get here by clicking a chosen character again
 		else if (characterInHand && location !== '__pool__') {
-			deleteCharacterInHandFromScene()
+			deleteCharacterInHandFromTable()
+			// console.log('4 ???')
 		}
 		// selected a character from the POOL
 		else if (characterInHand && location === '__pool__') {
+			// console.log('5 ???')
 			deleteCharacterInHandEverywhere()
 		}
 		// selected track header
 		else if (noCharacterInHand && $selectedHeader.type === 'track') {
+			// console.log('6 ???')
 			clearTrack()
 		}
 		// selected a scene header
 		else if ($selectedHeader.type === 'scene') {
+			// console.log('7 ???')
 			clearScene()
 		}
 
@@ -88,29 +111,30 @@
 			// find the scene, clear the track
 			const { sceneName, trackName } = dropZone
 			const scene = $table.scenes.find((_) => _.name === sceneName)
-			const trackListItem = scene.trackList.find((_) => _.trackName === trackName)
-			if (!trackListItem) continue
-			trackListItem.characterNames = []
+			const index = scene.trackList.findIndex((_) => _.trackName === trackName)
+			if (index === -1) continue
+			// delete the whole track list item
+			scene.trackList.splice(index, 1)
+			console.log('DEBUG')
 		}
 		$table.scenes = $table.scenes
 	}
 
-	function deleteCharacterInHandFromScene() {
-		// get the scene the character in hand came from
-		const index = $table.scenes.findIndex((_) => _.name === $charactersInHand[0].location)
-		if (index === -1) throw new Error('How did we get here?')
-		const scene = $table.scenes[index]
+	function deleteChosenCharacterFromScene() {
+		// get the scene the chosen character came from
+		const { name, sceneName } = $chosenCharacter
+		const scene = $table.scenes.find((_) => _.name === sceneName)
 
 		// in the scene's trackList, delete the character in hand
 		for (let trackListItem of scene.trackList) {
 			const names = trackListItem.characterNames
-			const index = names.findIndex((_) => _ === $charactersInHand[0].name)
-			if (index > -1) names.splice(index, 1)
+			const index = names.findIndex((_) => _ === name)
+			if (index !== -1) names.splice(index, 1)
 		}
 		$table.scenes = $table.scenes
 	}
 
-	function deleteCharacterInHandEverywhere() {
+	function deleteCharacterInHandFromTable() {
 		// delete from table.scenes
 		for (let scene of $table.scenes) {
 			for (let trackListItem of scene.trackList) {
@@ -121,6 +145,10 @@
 			}
 		}
 		$table.scenes = $table.scenes // force ui update
+	}
+
+	function deleteCharacterInHandEverywhere() {
+		deleteCharacterInHandFromTable()
 
 		// delete from table.characters
 		const index = $table.characters.findIndex((_) => _.name === $charactersInHand[0].name)
