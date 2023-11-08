@@ -380,8 +380,39 @@ test.describe('selected drop zone rules', () => {
 
 	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	// TEST - FAILS WHILE BUG
-// 	test('clicking selected character in table toggles .chosen class', async ({ page }) => {})
-// })
+	test('clicking selected character in table toggles .chosen class', async ({ page }) => {
+		// add a character to the table
+		await character.click()
+		await dropZoneAA.click()
+		await commitButton.click()
+
+		// click the new character in the table
+		const characterInTable = page.locator(`[data-drop-zone]`).getByText(CHARACTER)
+		await expect(characterInTable).toHaveCount(1)
+		await characterInTable.click()
+
+		// expect .chosen class
+		await expect(characterInTable).toHaveClass(/\bchosen\b/)
+		await expect(characterInTable).toHaveClass(/\binHand\b/)
+
+		// SHOULD PASS UP TO HERE
+
+		// click the character in the table again
+		await characterInTable.click()
+
+		// ASSERT: no .chosen class (and yes .inHand class)
+		await expect(characterInTable).toHaveClass(/\binHand\b/)
+		await expect(characterInTable).not.toHaveClass(/\bchosen\b/)
+
+		// SHOULD FAIL AFTER THIS POINT
+
+		// assert: no characters in table (or pool) have .chosen class
+		const allCharactersInTableAndPool = await page.locator(`.character`).all()
+		for (let character of allCharactersInTableAndPool) {
+			expect(character).not.toHaveClass(`chosen`)
+		}
+	})
+})
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
