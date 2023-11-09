@@ -13,6 +13,7 @@ export const TRACK_A = 'Track_1'
 export const TRACK_B = 'Track_2'
 export const CHARACTER_A = 'Né-né'
 export const CHARACTER_B = 'Zina'
+export const CHARACTER_C = 'Yuki'
 
 // html elements, dependent on constants above
 /** @type {Locator}   */ export let commitButton
@@ -21,6 +22,7 @@ export const CHARACTER_B = 'Zina'
 /** @type {Locator}   */ export let characterPool
 /** @type {Locator}   */ export let characterA
 /** @type {Locator}   */ export let characterB
+/** @type {Locator}   */ export let characterC
 
 /** @type {Locator}   */ export let headerSceneA
 /** @type {Locator}   */ export let headerSceneB
@@ -43,6 +45,7 @@ test.beforeEach(async ({ page }) => {
 	characterPool = page.locator('.character-pool')
 	characterA = characterPool.getByText(CHARACTER_A)
 	characterB = characterPool.getByText(CHARACTER_B)
+	characterC = characterPool.getByText(CHARACTER_C)
 
 	headerTrackA = page.locator(`[data-track-header="${TRACK_A}"]`)
 	headerTrackB = page.locator(`[data-track-header="${TRACK_B}"]`)

@@ -4,7 +4,7 @@
 
 import { expect, test } from '@playwright/test'
 
-test.describe('IS THE THING THERE ON LOAD?', () => {
+test.describe('DOES THE THING LOAD?', () => {
 	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	// TEST
 	test('tracks page has expected heading', async ({ page }) => {
