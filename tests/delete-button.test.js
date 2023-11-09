@@ -27,7 +27,7 @@ import {
 test.describe(`DELETE BUTTON`, () => {
 	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	// TEST
-	test(`can delete character from table by selecting it first`, async ({ page }) => {
+	test(`can delete selected character from a scene`, async ({ page }) => {
 		// put a character in the table
 		await characterA.click()
 		await dropZoneAA.click()
@@ -51,8 +51,8 @@ test.describe(`DELETE BUTTON`, () => {
 	})
 
 	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	// TEST - FILES WHILE BUG
-	test('EXPECT FAIL: can clear contents of a selected drop zone', async ({ page }) => {
+	// TEST
+	test('can clear all characters from a selected drop zone', async ({ page }) => {
 		// put a character in the table
 		await characterA.click()
 		await dropZoneAA.click()
@@ -63,9 +63,8 @@ test.describe(`DELETE BUTTON`, () => {
 		await dropZoneAA.click()
 		await commitButton.click()
 
-		// make sure there are two characters in the drop zone
+		// assert: there are two characters in the drop zone
 		const allCharactersInTheDropZone = await dropZoneAA.locator(`.character`).all()
-		// assert: there are two characters in the table
 		expect(allCharactersInTheDropZone).toHaveLength(2)
 
 		// select the drop zone
