@@ -27,6 +27,8 @@
 	let trackCount = 4
 	let trackPrefix = 'track'
 
+	let deleteButton
+
 	/** Add tracks to the global table object */
 	function submitTracks(event) {
 		if (event.key !== 'Enter') return
@@ -108,10 +110,21 @@
 		$table.characters = characters
 	}
 
-	function commitDropZones(event) {
-		// committing is executed only by Enter key (+focus) or button click
-		if (event.type !== 'pointerup' && event.key !== 'Enter') return
+	function handleKeyPress(event) {
+		switch (event.key) {
+			case 'Enter':
+				commitDropZones()
+				break
+			case 'Delete': // fall thru
+			case 'Backspace':
+				// TODO: is there a more Sveltey way of doing this?
+				// const deleteButton = document.getElementById('btn-delete')
+				deleteButton.click()
+				break
+		}
+	}
 
+	function commitDropZones(event) {
 		// unknown case atm
 		if ($charactersInHand.length === 0) {
 			throw new Error('But how did we get here, tho?')
@@ -202,7 +215,7 @@
 	}
 
 	// DEBUG
-	// log scene 1 trackList 1 (1st trackList added)
+	// log scene 1 trackList 1 (1st trackList added, regardless of track number)
 	$: {
 		const trackName = $table?.scenes[0]?.trackList[0]?.trackName
 		const characterNames = $table?.scenes[0]?.trackList[0]?.characterNames
@@ -235,12 +248,15 @@
 	// }
 </script>
 
-<svelte:window on:keydown={$charactersInHand.length === 1 && commitDropZones} />
+<svelte:window on:keydown={$charactersInHand.length && handleKeyPress} />
 
 <div class="container">
 	<article>
 		<!-- does character in hand need to be a bind: ? -->
-		<Toolbar {clearAllSelections} />
+		<Toolbar
+			bind:deleteButton
+			{clearAllSelections}
+		/>
 		<!-- a poor-man's OR op? -->
 		{#if $table.tracks.length + $table.scenes.length > 0}
 			<div
@@ -276,7 +292,7 @@
 				type="text"
 				class=""
 				value={trackPrefix}
-				on:keypress={submitTracks}
+				on:keydown={submitTracks}
 			/>
 			<span> X </span>
 			<input
@@ -284,7 +300,7 @@
 				type="text"
 				class=""
 				value={trackCount}
-				on:keypress={submitTracks}
+				on:keydown={submitTracks}
 			/>
 		</div>
 
@@ -294,7 +310,7 @@
 				type="text"
 				class=""
 				placeholder="add a scene"
-				on:keypress={submitScene}
+				on:keydown={submitScene}
 			/>
 		</div>
 
@@ -304,7 +320,7 @@
 				type="text"
 				class=""
 				placeholder="add a character"
-				on:keypress={submitCharacter}
+				on:keydown={submitCharacter}
 			/>
 		</div>
 	</form>

@@ -8,6 +8,7 @@
 		chosenCharacter
 	} from './store'
 
+	export let deleteButton
 	export let clearAllSelections // FUNCTION
 
 	/**
@@ -146,6 +147,7 @@
 <menu>
 	<button
 		id="btn-delete"
+		bind:this={deleteButton}
 		on:click={handleTrashButtonClick}
 	>
 		<img
