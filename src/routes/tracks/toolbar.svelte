@@ -11,113 +11,59 @@
 	export let clearAllSelections // FUNCTION
 
 	/**
-	 * Goals for delete button:
-	 *
-	 * goal \
-	 * 	   - state \
-	 * 	   - info
-	 *
-	 * delete char from specific scene \
-	 * 	   - pick up char from table \
-	 * 	   - characterInHand, characterInHand.location !== '__pool__' \
-	 * delete char from entire table \
-	 * 	   - pick up char from pool \
-	 * 	   - characterInHand, characterInHand.location === '__pool__' \
-	 * clear a whole track \
-	 * 	   - chose a track \
-	 * 	   - selectedHeader.type === 'track', selectedHeader.name === trackName ???, !characterInHand.name, (who is resetting this?) \
-	 * clear a whole scene \
-	 * 	   - chose a scene	 \
-	 * 	   - selectedHeader.type === 'scene', selectedHeader.name === sceneName ???, !characterInHand.name, (need another flag for this and above?) \
-	 * clear entire table contents \
-	 * 	   - did not choose a scene, track, or character \
-	 * 	   - !characterInHand.name,
+	 * note: The ordering of the if else statement matters.
+	 *		The basic idea is that it flows from most specific condition to most
+	 *		general. Character selections are prioritized over table element
+	 *		selections.
 	 */
 	function handleTrashButtonClick() {
+		// conditions deciding the behavior of the delete button
+		const aCharacterFromTableIsChosen = $chosenCharacter.name != undefined
+		const aCharacterInHand = $charactersInHand.length === 1
 		const noCharacterInHand = $charactersInHand.length === 0
-		const characterInHand = $charactersInHand.length === 1
-		const location = $charactersInHand[0]?.location
+		const pickedUpFromPool = $charactersInHand[0]?.location === '__pool__'
+		const pickedUpFromTable =
+			$charactersInHand[0]?.location !== '__pool__' &&
+			$charactersInHand[0]?.location != undefined
+		const clickedChosenCharacterAgain = aCharacterInHand && pickedUpFromTable // yes, this looks funny, but it's correct. tried aCharacterFromTableIsChosen instead of aCharacterInHand, but that described unintended condition
+		const atLeastOneDropZoneIsSelected = $selectedDropZones.length > 0
+		const aTrackIsSelected = $selectedHeader.type === 'track'
+		const aSceneIsSelected = $selectedHeader.type === 'scene'
+		const noHeaderSelected = $selectedHeader.type == undefined
+		const nothingSelected = noCharacterInHand && noHeaderSelected
+		const clickedCharacterInPool = aCharacterInHand && pickedUpFromPool
 
-		if ($selectedDropZones.length) {
-			// console.log('1 ???')
-			deleteContentsOfSelectedDropZones()
-		}
-		// nothing is selected
-		else if (noCharacterInHand && !$selectedHeader.type) {
-			// console.log('2 ???')
-			clearTable()
-		}
-		// selected a character from the TABLE
-		else if ($chosenCharacter.name) {
-			// console.log('3 ???')
+		// TODO: ADD CONFIRM DELETE POPUP: tell user exactly what's about to happen
+
+		// a character can only be chosen from the table, not the pool
+		if (aCharacterFromTableIsChosen) {
+			// console.log('1')
 			deleteChosenCharacterFromScene()
-		}
-		// selected all instances of a character from the TABLE
-		// (to delete the instances from the table only)
-		// get here by clicking a chosen character again
-		else if (characterInHand && location !== '__pool__') {
-			deleteCharacterInHandFromTable()
-			// console.log('4 ???')
-		}
-		// selected a character from the POOL
-		else if (characterInHand && location === '__pool__') {
-			// console.log('5 ???')
+		} else if (clickedChosenCharacterAgain) {
+			// TODO: show ui feedback: all of this character in table is selected
+			// console.log('2')
+			deleteCharacterInstancesFromTable()
+		} else if (clickedCharacterInPool) {
+			// console.log('3')
 			deleteCharacterInHandEverywhere()
-		}
-		// selected track header
-		else if (noCharacterInHand && $selectedHeader.type === 'track') {
-			// console.log('6 ???')
+		} else if (atLeastOneDropZoneIsSelected) {
+			// console.log('4')
+			clearSelectedDropZones()
+		} else if (aTrackIsSelected) {
+			// console.log('5')
 			clearTrack()
-		}
-		// selected a scene header
-		else if ($selectedHeader.type === 'scene') {
-			// console.log('7 ???')
+		} else if (aSceneIsSelected) {
+			// console.log('6')
 			clearScene()
+		} else if (nothingSelected) {
+			// console.log('7')
+			clearTable()
 		}
 
 		clearAllSelections()
 	}
 
 	// DELETE FUNCTIONS 👇🏽
-
-	function clearTrack() {
-		if ($selectedHeader.type !== 'track') return
-
-		const trackName = $selectedHeader.name
-		for (let scene of $table.scenes) {
-			for (let trackListItem of scene.trackList) {
-				if (trackListItem.trackName !== trackName) continue
-				trackListItem.characterNames = []
-			}
-		}
-		$table.scenes = $table.scenes
-	}
-
-	function clearScene() {
-		if ($selectedHeader.type !== 'scene') return
-		const sceneName = $selectedHeader.name
-		for (let scene of $table.scenes) {
-			if (scene.name !== sceneName) continue
-			for (let trackListItem of scene.trackList) {
-				trackListItem.characterNames = []
-			}
-		}
-		$table.scenes = $table.scenes
-	}
-
-	function deleteContentsOfSelectedDropZones() {
-		for (let dropZone of $selectedDropZones) {
-			// find the scene, clear the track
-			const { sceneName, trackName } = dropZone
-			const scene = $table.scenes.find((_) => _.name === sceneName)
-			const index = scene.trackList.findIndex((_) => _.trackName === trackName)
-			if (index === -1) continue
-			// delete the whole track list item
-			scene.trackList.splice(index, 1)
-			// console.log('DEBUG')
-		}
-		$table.scenes = $table.scenes
-	}
 
 	function deleteChosenCharacterFromScene() {
 		// get the scene the chosen character came from
@@ -133,39 +79,67 @@
 		$table.scenes = $table.scenes
 	}
 
-	function deleteCharacterInHandFromTable() {
-		// delete from table.scenes
+	/**
+	 * delete[Selected]CharacterFromTable() \
+	 * `...Selected...` is generic for 'chosen' or just 'inHand' \
+	 */
+	function deleteCharacterInstancesFromTable() {
+		const { name } = $charactersInHand[0]
 		for (let scene of $table.scenes) {
-			for (let trackListItem of scene.trackList) {
-				const names = trackListItem.characterNames
-				if (names.length === 0) continue
-				const index = names.findIndex((_) => _ === $charactersInHand[0].name)
-				if (index > -1) names.splice(index, 1)
-			}
+			// find the track list item that has the character in its character names
+			const trackListItem = scene.trackList.find((_) => _.characterNames.includes(name))
+			if (!trackListItem) continue
+			// splice out the character from character names
+			const { characterNames } = trackListItem
+			const index = characterNames.findIndex((_) => _ === name)
+			if (index !== -1) characterNames.splice(index, 1)
 		}
-		$table.scenes = $table.scenes // force ui update
+		$table.scenes = $table.scenes
 	}
 
 	function deleteCharacterInHandEverywhere() {
-		deleteCharacterInHandFromTable()
+		deleteCharacterInstancesFromTable()
+		// delete from the character pool
+		const { name } = $charactersInHand[0]
+		$table.characters = $table.characters.filter((_) => _.name !== name)
+	}
 
-		// delete from table.characters
-		const index = $table.characters.findIndex((_) => _.name === $charactersInHand[0].name)
-		if (index === -1) return
-		$table.characters.splice(index, 1)
-		$table.characters = $table.characters // force ui update
+	function clearSelectedDropZones() {
+		for (let dropZone of $selectedDropZones) {
+			// find the scene
+			const { sceneName, trackName } = dropZone
+			const scene = $table.scenes.find((_) => _.name === sceneName)
+			const trackIndex = scene?.trackList.findIndex((_) => _.trackName === trackName)
+			if (trackIndex === -1) continue
+			// delete the whole track list item
+			scene.trackList.splice(trackIndex, 1)
+		}
+		$table.scenes = $table.scenes
+	}
+
+	function clearTrack() {
+		const name = $selectedHeader.name
+		for (let scene of $table.scenes) {
+			// from scene's track list,
+			const { trackList } = scene
+			const index = trackList.findIndex((_) => _.trackName === name)
+			if (index === -1) continue
+			// remove the track list item for the selected track
+			trackList.splice(index, 1)
+		}
+		$table.scenes = $table.scenes
+	}
+
+	function clearScene() {
+		const name = $selectedHeader.name
+		const scene = $table.scenes.find((_) => _.name === name)
+		scene.trackList = []
+		$table.scenes = $table.scenes
 	}
 
 	function clearTable() {
-		// TODO: make this not an alert(), and a choice! currently it just warns of the inevitable
-		alert('SURE YOU WANT TO CLEAR THE TABLE CONTENTS?')
-
-		for (let scene of $table.scenes) {
-			for (let trackListItem of scene.trackList) {
-				trackListItem.characterNames = []
-			}
-		}
-		$table.scenes = $table.scenes // force ui update
+		$table.scenes.forEach((_) => (_.trackList = []))
+		$table.scenes = $table.scenes
 	}
 </script>
 
@@ -217,7 +191,6 @@
 		aspect-ratio: 1 / 1;
 	}
 
-	#btn-delete.alert,
 	#edit-table.edit-mode {
 		background-color: rgba(120, 54, 54, 0.579);
 		border-color: rgb(121, 21, 21);

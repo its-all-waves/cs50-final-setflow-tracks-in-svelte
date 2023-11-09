@@ -202,10 +202,11 @@
 	}
 
 	// DEBUG
-
+	// log scene 1 trackList 1 (1st trackList added)
 	$: {
-		const trackList = $table.scenes[0]?.trackList
-		if (trackList) console.dir(trackList)
+		const trackName = $table?.scenes[0]?.trackList[0]?.trackName
+		const characterNames = $table?.scenes[0]?.trackList[0]?.characterNames
+		if (trackName) console.log(`${trackName}: ${characterNames}`)
 	}
 
 	// // log selected header
