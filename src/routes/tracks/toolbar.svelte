@@ -34,13 +34,12 @@
 	 * 	   - !characterInHand.name,
 	 */
 	function handleTrashButtonClick() {
-		const length = $charactersInHand.length
-		const noCharacterInHand = length === 0
-		const characterInHand = length === 1
-		const location = length > 0 && length < 2 ? $charactersInHand[0].location : undefined
+		const noCharacterInHand = $charactersInHand.length === 0
+		const characterInHand = $charactersInHand.length === 1
+		const location = $charactersInHand[0]?.location
 
 		if ($selectedDropZones.length) {
-			console.log('1 ???')
+			// console.log('1 ???')
 			deleteContentsOfSelectedDropZones()
 		}
 		// nothing is selected
@@ -115,7 +114,7 @@
 			if (index === -1) continue
 			// delete the whole track list item
 			scene.trackList.splice(index, 1)
-			console.log('DEBUG')
+			// console.log('DEBUG')
 		}
 		$table.scenes = $table.scenes
 	}
@@ -172,13 +171,13 @@
 
 <menu>
 	<button
-		id="clear-table"
+		id="btn-delete"
 		on:click={handleTrashButtonClick}
 	>
 		<img
 			src="button-icons/trash.fill.svg"
 			alt="Trash can"
-			title="Clear the table"
+			title="Clear the selection, else clear the table"
 		/>
 	</button>
 	<button
@@ -218,7 +217,7 @@
 		aspect-ratio: 1 / 1;
 	}
 
-	#clear-table.alert,
+	#btn-delete.alert,
 	#edit-table.edit-mode {
 		background-color: rgba(120, 54, 54, 0.579);
 		border-color: rgb(121, 21, 21);
