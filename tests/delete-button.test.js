@@ -9,18 +9,74 @@ import {
 	SCENE_B,
 	TRACK_A,
 	TRACK_B,
-	CHARACTER,
+	CHARACTER_A,
+	CHARACTER_B,
 	characterPool,
 	commitButton,
+	deleteButton,
 	headerSceneA,
 	headerSceneB,
 	headerTrackA,
 	headerTrackB,
 	dropZoneAA,
 	dropZoneBB,
-	character
+	characterA,
+	characterB
 } from './test.symbols.js'
 
 test.describe(`DELETE BUTTON`, () => {
-	test(`can delete a character by selecting it first`, async ({ page }) => {})
+	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	// TEST
+	test(`can delete character from table by selecting it first`, async ({ page }) => {
+		// put a character in the table
+		await characterA.click()
+		await dropZoneAA.click()
+		await commitButton.click()
+
+		// assert: only one character in table
+		const characterInTable = page.locator(`[data-drop-zone] .character`)
+		expect(await characterInTable.all()).toHaveLength(1)
+
+		// click the character in the table to select it
+		await characterInTable.click()
+
+		// assert: has .chosen class
+		await expect(characterInTable).toHaveClass(/\s*chosen\s*/)
+
+		// delete
+		await deleteButton.click()
+
+		// ASSERT: no more characters in the table
+		expect(await characterInTable.all()).toHaveLength(0)
+	})
+
+	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	// TEST - FILES WHILE BUG
+	test('EXPECT FAIL: can clear contents of a selected drop zone', async ({ page }) => {
+		// put a character in the table
+		await characterA.click()
+		await dropZoneAA.click()
+		await commitButton.click()
+
+		// put another character in the same drop zone
+		await characterB.click()
+		await dropZoneAA.click()
+		await commitButton.click()
+
+		// make sure there are two characters in the drop zone
+		const allCharactersInTheDropZone = await dropZoneAA.locator(`.character`).all()
+		// assert: there are two characters in the table
+		expect(allCharactersInTheDropZone).toHaveLength(2)
+
+		// select the drop zone
+		await dropZoneAA.click()
+
+		// delete
+		await deleteButton.click()
+
+		// ASSERT: no more characters in the table
+		expect(await page.locator(`[data-main-table] .character`).all()).toHaveLength(0)
+	})
+
+	test('', async ({ page }) => {})
 })

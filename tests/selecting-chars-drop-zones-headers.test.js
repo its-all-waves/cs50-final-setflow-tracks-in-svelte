@@ -9,7 +9,8 @@ import {
 	SCENE_B,
 	TRACK_A,
 	TRACK_B,
-	CHARACTER,
+	CHARACTER_A,
+	CHARACTER_B,
 	characterPool,
 	commitButton,
 	headerSceneA,
@@ -18,22 +19,22 @@ import {
 	headerTrackB,
 	dropZoneAA,
 	dropZoneBB,
-	character
+	characterA
 } from './test.symbols.js'
 
 test.describe('SELECTING CHARACTERS, DROP ZONES, HEADERS', () => {
 	// TEST
 	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	test(`can add "${CHARACTER}" to "${SCENE_A}" > "${TRACK_A}"`, async ({ page }) => {
+	test(`can add "${CHARACTER_A}" to "${SCENE_A}" > "${TRACK_A}"`, async ({ page }) => {
 		// pick up a character and put it in dropZone
-		await character.click()
+		await characterA.click()
 		await dropZoneAA.click()
 		await commitButton.click()
 
 		// check that dropZone contains CHARACTER
 		const characterInDropZone = dropZoneAA.locator('.character')
 		const innerText = await characterInDropZone.innerText()
-		expect(innerText).toBe(CHARACTER)
+		expect(innerText).toBe(CHARACTER_A)
 	})
 
 	// TEST
@@ -45,7 +46,7 @@ test.describe('SELECTING CHARACTERS, DROP ZONES, HEADERS', () => {
 		const dropZone = dropZoneAA
 
 		// grab the character, select the dropZone
-		await character.click()
+		await characterA.click()
 		await dropZone.click()
 
 		// assert: dropZone is selected after click
@@ -60,7 +61,7 @@ test.describe('SELECTING CHARACTERS, DROP ZONES, HEADERS', () => {
 		// assert: character landed in the dropZone
 		const characterInDropZone = dropZone.locator('.character')
 		const innerText = await characterInDropZone.innerText()
-		expect(innerText).toBe(CHARACTER)
+		expect(innerText).toBe(CHARACTER_A)
 
 		// select all dropZones on a track
 		await headerTrackA.click()
@@ -70,7 +71,7 @@ test.describe('SELECTING CHARACTERS, DROP ZONES, HEADERS', () => {
 		await expect_locators_have_attribute_value(selectedDropZones, `data-track-name`, TRACK)
 
 		// grab the same character from the pool
-		await character.click()
+		await characterA.click()
 
 		// FINAL ASSERTS: all on TRACK are selected except dropZone
 		// all the selected dropZones are on TRACK and don't include dropZone
@@ -165,9 +166,9 @@ test.describe('SELECTING CHARACTERS, DROP ZONES, HEADERS', () => {
 		// note: a scene must contain at least one character to be selected
 
 		// put character in each drop zone (thus each scene)
-		await character.click()
+		await characterA.click()
 		// assert: character is selected
-		await expect(character).toHaveClass(/\binHand\b/)
+		await expect(characterA).toHaveClass(/\binHand\b/)
 
 		await dropZoneAA.click()
 		// assert: drop zone is selected
@@ -239,24 +240,24 @@ test.describe('SELECTING CHARACTERS, DROP ZONES, HEADERS', () => {
 	*/
 
 		// put a character in the drop zone
-		await character.click()
+		await characterA.click()
 		await dropZoneAA.click()
 		await commitButton.click()
 
 		// assert: character is in drop zone
-		const characterInTable = dropZoneAA.getByText(CHARACTER)
+		const characterInTable = dropZoneAA.getByText(CHARACTER_A)
 		expect(await characterInTable.count()).toBe(1)
 
 		// click the character
-		await character.click()
+		await characterA.click()
 		// assert: character in table is selected
-		await expect(character).toHaveClass(/\binHand\b/)
+		await expect(characterA).toHaveClass(/\binHand\b/)
 
 		// click drop zone's scene's header
 		await headerSceneA.click()
 
 		// click character in table [again] OR character [in pool]
-		await character.click()
+		await characterA.click()
 
 		// ASSERT: drop zone's scene's header need only be clicked once to be selected
 		await headerSceneA.click()
@@ -356,12 +357,12 @@ test.describe('SELECTING CHARACTERS, DROP ZONES, HEADERS', () => {
 	// TEST - FAILS WHILE BUG
 	test('clicking selected character in table toggles .chosen class', async ({ page }) => {
 		// add a character to the table
-		await character.click()
+		await characterA.click()
 		await dropZoneAA.click()
 		await commitButton.click()
 
 		// click the new character in the table
-		const characterInTable = page.locator(`[data-drop-zone]`).getByText(CHARACTER)
+		const characterInTable = page.locator(`[data-drop-zone]`).getByText(CHARACTER_A)
 		await expect(characterInTable).toHaveCount(1)
 		await characterInTable.click()
 
