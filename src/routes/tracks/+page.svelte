@@ -147,6 +147,8 @@
 			throw new Error('No idea how we got here...')
 		}
 
+		const characterInHand = $charactersInHand[0]
+
 		for (let i = 0; i < $selectedDropZones.length; i++) {
 			const { sceneName, trackName } = $selectedDropZones[i]
 
@@ -154,11 +156,22 @@
 
 			// TODO: handle error - scene undefined
 
-			scene.trackList = scene.trackList.concat(
-				newTrackListItem(trackName, $charactersInHand[0].name)
+			// keep from duplicating a trackListItem
+			const existingTrackListItemForTrack = scene.trackList.find(
+				(_) => _.trackName === trackName
 			)
-			$table.scenes = $table.scenes
+			if (existingTrackListItemForTrack) {
+				// add to it
+				existingTrackListItemForTrack.characterNames.push(characterInHand.name)
+				continue
+			}
+
+			// add a new track list item for this track
+			scene.trackList = scene.trackList.concat(
+				newTrackListItem(trackName, characterInHand.name)
+			)
 		}
+		$table.scenes = $table.scenes
 	}
 
 	// DEBUG
@@ -189,30 +202,36 @@
 	}
 
 	// DEBUG
-	// log selected header
+
 	$: {
-		const { type, name } = $selectedHeader
-		console.log(type ? `- selected header: ${type} : ${name}` : '- no header selected')
+		const trackList = $table.scenes[0]?.trackList
+		if (trackList) console.dir(trackList)
 	}
 
-	// log selected drop zones
-	$: {
-		console.log(
-			$selectedDropZones.length === 0 ? '- no drop zones selected' : '- selected drop zones:'
-		)
-		for (let dz of $selectedDropZones) {
-			console.log('\t', dz.sceneName, ':', dz.trackName)
-		}
-	}
+	// // log selected header
+	// $: {
+	// 	const { type, name } = $selectedHeader
+	// 	console.log(type ? `- selected header: ${type} : ${name}` : '- no header selected')
+	// }
 
-	// log character in hand
-	$: {
-		console.log(
-			$charactersInHand.length
-				? `- character in hand: ${$charactersInHand[0].name}`
-				: '- no character in hand'
-		)
-	}
+	// // log selected drop zones
+	// $: {
+	// 	console.log(
+	// 		$selectedDropZones.length === 0 ? '- no drop zones selected' : '- selected drop zones:'
+	// 	)
+	// 	for (let dz of $selectedDropZones) {
+	// 		console.log('\t', dz.sceneName, ':', dz.trackName)
+	// 	}
+	// }
+
+	// // log character in hand
+	// $: {
+	// 	console.log(
+	// 		$charactersInHand.length
+	// 			? `- character in hand: ${$charactersInHand[0].name}`
+	// 			: '- no character in hand'
+	// 	)
+	// }
 </script>
 
 <svelte:window on:keydown={$charactersInHand.length === 1 && commitDropZones} />

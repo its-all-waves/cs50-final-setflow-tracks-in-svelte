@@ -113,7 +113,7 @@
 	}
 
 	// DEBUG
-	$: console.log(chosen ? `chosen: ${$chosenCharacter.name} : ${$chosenCharacter.sceneName}` : ``)
+	// $: console.log(chosen ? `chosen: ${$chosenCharacter.name} : ${$chosenCharacter.sceneName}` : ``)
 </script>
 
 <div
