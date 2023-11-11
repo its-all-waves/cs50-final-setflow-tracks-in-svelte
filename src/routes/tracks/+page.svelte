@@ -117,8 +117,6 @@
 				break
 			case 'Delete': // fall thru
 			case 'Backspace':
-				// TODO: is there a more Sveltey way of doing this?
-				// const deleteButton = document.getElementById('btn-delete')
 				deleteButton.click()
 				break
 		}
@@ -248,7 +246,7 @@
 	// }
 </script>
 
-<svelte:window on:keydown={$charactersInHand.length && handleKeyPress} />
+<svelte:window on:keydown={handleKeyPress} />
 
 <div class="container">
 	<article>
