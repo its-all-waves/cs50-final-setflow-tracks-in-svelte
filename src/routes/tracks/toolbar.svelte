@@ -26,7 +26,7 @@
 		const pickedUpFromTable =
 			$charactersInHand[0]?.location !== '__pool__' &&
 			$charactersInHand[0]?.location != undefined
-		const clickedChosenCharacterAgain = aCharacterInHand && pickedUpFromTable // yes, this looks funny, but it's correct. tried aCharacterFromTableIsChosen instead of aCharacterInHand, but that described unintended condition
+		const clickedChosenCharacterAgain = aCharacterInHand && pickedUpFromTable // yes, this looks funny, and it is a little funny. Causes bug - character is deleted everywhere if selected from pool, then 'chosen' from table. tried aCharacterFromTableIsChosen instead of aCharacterInHand, but that described unintended condition
 		const atLeastOneDropZoneIsSelected = $selectedDropZones.length > 0
 		const aTrackIsSelected = $selectedHeader.type === 'track'
 		const aSceneIsSelected = $selectedHeader.type === 'scene'
@@ -61,6 +61,8 @@
 			clearTable()
 		}
 
+		$table.scenes = $table.scenes
+
 		clearAllSelections()
 	}
 
@@ -77,7 +79,6 @@
 			const index = names.findIndex((_) => _ === name)
 			if (index !== -1) names.splice(index, 1)
 		}
-		$table.scenes = $table.scenes
 	}
 
 	/**
@@ -95,7 +96,6 @@
 			const index = characterNames.findIndex((_) => _ === name)
 			if (index !== -1) characterNames.splice(index, 1)
 		}
-		$table.scenes = $table.scenes
 	}
 
 	function deleteCharacterInHandEverywhere() {
@@ -115,11 +115,10 @@
 			// delete the whole track list item
 			scene.trackList.splice(trackIndex, 1)
 		}
-		$table.scenes = $table.scenes
 	}
 
 	function clearTrack() {
-		const name = $selectedHeader.name
+		const { name } = $selectedHeader
 		for (let scene of $table.scenes) {
 			// from scene's track list,
 			const { trackList } = scene
@@ -128,19 +127,16 @@
 			// remove the track list item for the selected track
 			trackList.splice(index, 1)
 		}
-		$table.scenes = $table.scenes
 	}
 
 	function clearScene() {
-		const name = $selectedHeader.name
+		const { name } = $selectedHeader
 		const scene = $table.scenes.find((_) => _.name === name)
 		scene.trackList = []
-		$table.scenes = $table.scenes
 	}
 
 	function clearTable() {
 		$table.scenes.forEach((_) => (_.trackList = []))
-		$table.scenes = $table.scenes
 	}
 </script>
 
