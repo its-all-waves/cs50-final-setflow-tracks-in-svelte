@@ -175,7 +175,7 @@ test('can clear the entire table', async ({ page }) => {
 
 	// delete
 	await deleteButton.click()
-	0
+
 	// ASSERT:
 	await expect_empty_table(page)
 })
