@@ -26,29 +26,16 @@
 		const clickedASelectedDropZone = $selectedDropZones.some(
 			(_) => _.sceneName === sceneName && _.trackName === trackName
 		)
-
 		if (clickedASelectedDropZone) {
-			// if clicked the selected drop zone, deselect it
-			if ($selectedDropZones.length === 1) {
-				$selectedDropZones = []
-				// console.log('1 ???')
+			// unselect the drop zone
+			const index = $selectedDropZones.findIndex(
+				(_) => _.sceneName === sceneName && _.trackName === trackName
+			)
+			if (index !== -1) {
+				$selectedDropZones.splice(index, 1)
+				$selectedDropZones = $selectedDropZones
+				// console.log('2 ???')
 				return
-			}
-
-			// if clicked a selected drop zone (with multiple selected),
-			// unselect the clicked one
-			if ($selectedDropZones.length > 1) {
-				// find the clicked drop zone to splice it out of the array
-				const index = $selectedDropZones.findIndex(
-					(_) => _.sceneName === sceneName && _.trackName === trackName
-				)
-				if (index !== -1) {
-					$selectedDropZones.splice(index, 1)
-					// TODO: force ui update?
-					$selectedDropZones = $selectedDropZones
-					// console.log('2 ???')
-					return
-				}
 			}
 		}
 
@@ -67,10 +54,12 @@
 			}
 		}
 
-		const sceneAlreadyHasASelection = $selectedDropZones.some((_) => _.sceneName === sceneName)
+		const sceneAlreadyHasASelectedDropZone = $selectedDropZones.some(
+			(_) => _.sceneName === sceneName
+		)
 
 		// replace the old selected drop zone with the new one
-		if (clickedDropZone && sceneAlreadyHasASelection) {
+		if (clickedDropZone && sceneAlreadyHasASelectedDropZone) {
 			// get index of this scene's selected drop zone to splice it out
 			const index = $selectedDropZones.findIndex((_) => _.sceneName === sceneName)
 			if (index !== -1) {
@@ -78,8 +67,8 @@
 				// console.log('4 ???')
 			}
 		}
-		// if a scene header is selected, this click on a drop zone removes the
-		// current selection from selected scene's col
+		// if a scene or track header is selected, this click on a drop zone
+		// removes the current selection from selected scene's col
 		else if ($selectedHeader.type && clickedDropZone) {
 			// TODO: why does it feel wrong to do stuff to selectedHeader here?
 			$selectedHeader = {}
