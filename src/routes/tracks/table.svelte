@@ -17,7 +17,8 @@
 	 * Adds a dropZoneInfo obj to $selectedDropZones *if* it can be added. \
 	 * Rules: A) The scene obj ref'd by `sceneName` cannot contain the same
 	 * character twice. B) If adding a drop zone for the same scene twice (in
-	 * one motion), overwrite the last one selected in this scene.
+	 * one motion), overwrite the last one selected in this scene. \
+	 * Note: The alt to `clickedDropZone` is clicked scene or track header.
 	 * @returns {void}
 	 * @param {string} sceneName
 	 * @param {string} trackName
