@@ -14,19 +14,20 @@
 	export let location // === '__pool__' || scene.name
 
 	function setCharacterInHand() {
-		// clicked character in table that was already chosen (and necessarily in hand)
+		// clicked a chosen character (necessarily in table, and necessarily in hand)
 		if (location !== '__pool__' && chosen) {
-			// de-chosen the chosen character
+			// de-chosen the chosen character and return
 			$chosenCharacter = {}
-			// console.log('100 ???')
+			console.log('100 ???')
 			return
 		}
 
 		// clicked a character in hand in the pool
 		if (location === '__pool__' && inHand) {
 			// deselect the pool character if clicking it again, return
+			$chosenCharacter = {}
 			$charactersInHand = []
-			// console.log('200 ???')
+			console.log('200 ???')
 			return
 		}
 
@@ -37,32 +38,40 @@
 				name,
 				sceneName: location
 			}
-			// console.log('300 ???')
+			console.log('300 ???')
 			return
 		}
 
+		// if clicked a character in the table
 		if (location !== '__pool__') {
 			$chosenCharacter = {
 				name,
 				sceneName: location
 			}
-			// console.log('400 ???')
+			console.log('400 ???')
+		}
+
+		// clicked a pool character with a character chosen
+		// adding cond 2 keeps prevents unnecessary reactive updates
+		if (location === '__pool__' && $chosenCharacter.name) {
+			$chosenCharacter = {}
+			console.log('800 ???')
 		}
 
 		// clicked an unselected character
 		// replace what's there with a single character's info
 		$charactersInHand = [{ name, location }]
-		// console.log('500 ???')
+		console.log('500 ???')
 
 		// prevents: unnecessary update of $selectedDropZones
 		if (!$selectedHeader.type && !$selectedDropZones.length && !$charactersInHand.length) {
-			// console.log('600 ???')
+			console.log('600 ???')
 			return
 		}
 
 		// prevents: character can be added to same scene twice
 		removeSelectedDropZonesIfConflict()
-		// console.log('700 ???')
+		console.log('700 ???')
 	}
 
 	/** Helper for setCharacterInHand()
