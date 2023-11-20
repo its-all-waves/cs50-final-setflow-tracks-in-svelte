@@ -27,8 +27,8 @@
 		const clickedASelectedDropZone = $selectedDropZones.some(
 			(_) => _.sceneName === sceneName && _.trackName === trackName
 		)
+		// if clicked selected drop zone, unselect it, return
 		if (clickedASelectedDropZone) {
-			// unselect the drop zone
 			const index = $selectedDropZones.findIndex(
 				(_) => _.sceneName === sceneName && _.trackName === trackName
 			)
