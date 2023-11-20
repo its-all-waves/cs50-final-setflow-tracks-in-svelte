@@ -60,8 +60,10 @@ const ctx = {
 	/** @type {{} | { [track: string]: { name: string } }} */
 	tracks: {},
 
-	/** @type {{} | { [scene: string]: { name: string } }} */
+	/** @type {{} | { [scene: string]: { name: string, trackList: {[trackName: string]: Set<string>}} }} */
 	scenes: {}
+
+	/* trackList = { [trackName]: Set<characterName> } */
 }
 
 // MACHINE TRANSITIONS +++++++++++++++++++++++++++++++++++++++++++++++++++++++++

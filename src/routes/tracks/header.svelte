@@ -85,7 +85,7 @@
 	data-track-header={type === 'track' ? name : undefined}
 	on:pointerup={setSelectedHeader}
 >
-	{display(name)}
+	{name}
 </th>
 
 <style>

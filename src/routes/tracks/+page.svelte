@@ -6,6 +6,10 @@
 	import { newCharacter } from '../../lib/TableObjects/Character'
 
 	import {
+		state,
+		ctx,
+
+		// to be replaced 👇🏽
 		table,
 		charactersInHand,
 		selectedDropZones,
@@ -18,10 +22,11 @@
 	import Character from './character.svelte'
 	import Toolbar from './toolbar.svelte'
 
+	// receive data obj from "server", then pass into the store
 	/**
 	 * 	@type {import('./$types').PageData} */
-	export let data // receive data obj from "server", then pass into the store
-	$table = data.table
+	export let data
+	$state = data.state
 
 	// form input defaults / placeholders
 	let trackCount = 4
@@ -29,7 +34,7 @@
 
 	let deleteButton
 
-	/** Add tracks to the global table object */
+	/** Add tracks to the state/$ object */
 	function submitTracks(event) {
 		if (event.key !== 'Enter') return
 
@@ -43,19 +48,23 @@
 		trackPrefix = trackPrefixVal
 		trackCount = trackCountVal
 
+		// const { ctx } = $state
+
 		// CREATE THE DATA STRUCTURES
 		// push new tracks to table.tracks
+		let tracks
 		for (let i = 0; i < trackCount; i++) {
 			const track = newTrack(`${trackPrefix}_${i + 1}`)
-			$table.tracks = $table.tracks.concat(track)
+			tracks.push(track)
 		}
+		$state.ctx.tracks = tracks
 
 		// clear input fields
 		trackPrefix = null
 		trackCount = null
 	}
 
-	/** Add a scene to the global table object */
+	/** Add a scene to the state/$ object */
 	function submitScene(event) {
 		if (event.key !== 'Enter') return
 
@@ -72,7 +81,7 @@
 		inputField.value = null
 	}
 
-	/** Add a character to the global table object */
+	/** Add a character to the state/$ object */
 	function submitCharacter(event) {
 		if (event.key !== 'Enter') return
 
@@ -192,33 +201,54 @@
 	 * YOU MAY ADD MORE... I THINK?
 	 */
 	function DEV_populate_table() {
-		// add X tracks
-		const NUM_TRACKS = 4
-		for (let i = 0; i < NUM_TRACKS; i++) {
-			$table.tracks[i] = newTrack('Track_' + (i + 1))
+		// enum
+		const Test = Object.freeze({
+			character_NeNe: 'Né-né',
+			character_Zina: 'Zina',
+			character_Yuki: 'Yuki',
+			character_Igor: 'Igor',
+			track_1: 'Track 1',
+			track_2: 'Track 2',
+			track_3: 'Track 3',
+			track_4: 'Track 4',
+			scene_33_A: '33-A',
+			scene_66_B: '66-B',
+			scene_101_D: '101-D',
+			scene_V_101_C: 'V-101-C'
+		})
+
+		for (const key in Test) {
+			if (!key.startsWith('character')) continue
+			const name = Test[key]
+			$state.ctx.characters[name] = { name }
 		}
 
-		// add 2 scenes
-		$table.scenes[0] = newScene('33-A')
-		$table.scenes[1] = newScene('66-B')
-		// $table.scenes[2] = newScene('101-D')
-		// $table.scenes[3] = newScene('V-101-C')
+		for (const key in Test) {
+			if (!key.startsWith('track')) continue
+			const name = Test[key]
+			$state.ctx.tracks[name] = { name }
+		}
 
-		// add characters
-		$table.characters[0] = newCharacter('Né-né')
-		$table.characters[1] = newCharacter('Zina')
-		$table.characters[2] = newCharacter('Yuki')
-		$table.characters[3] = newCharacter('Igor')
-		// $table.characters[4] = newCharacter('Alex')
+		for (const key in Test) {
+			if (!key.startsWith('scene')) continue
+			const name = Test[key]
+			$state.ctx.scenes[name] = { name, trackList: {} }
+			const { trackList } = $state.ctx.scenes[name]
+			for (const track in $state.ctx.tracks) {
+				trackList[track] = new Set()
+			}
+		}
+
+		$state = $state // why don't i need this?
 	}
 
 	// DEBUG
 	// log scene 1 trackList 1 (1st trackList added, regardless of track number)
-	$: {
-		const trackName = $table?.scenes[0]?.trackList[0]?.trackName
-		const characterNames = $table?.scenes[0]?.trackList[0]?.characterNames
-		if (trackName) console.log(`${trackName}: ${characterNames}`)
-	}
+	// $: {
+	// 	const trackName = ctx?.scenes[0]?.trackList[0]?.trackName
+	// 	const characterNames = ctx?.scenes[0]?.trackList[0]?.characterNames
+	// 	if (trackName) console.log(`${trackName}: ${characterNames}`)
+	// }
 
 	// // log selected header
 	// $: {
@@ -256,7 +286,7 @@
 			{clearAllSelections}
 		/>
 		<!-- a poor-man's OR op? -->
-		{#if $table.tracks.length + $table.scenes.length > 0}
+		{#if Object.keys({ ...$state.ctx.scenes, ...$state.ctx.tracks }).length > 0}
 			<div
 				class="table"
 				class:glow={$canEdit}
@@ -265,14 +295,15 @@
 			</div>
 		{/if}
 	</article>
-
 	<div class="character-pool">
-		{#each $table.characters as character}
-			<Character
-				name={character.name}
-				location="__pool__"
-			/>
-		{/each}
+		{#if $state.ctx.characters}
+			{#each Object.keys($state.ctx.characters) as character}
+				<Character
+					name={character}
+					location="__pool__"
+				/>
+			{/each}
+		{/if}
 		<button
 			id="btn-commit"
 			class:hidden={$charactersInHand.length === 0}

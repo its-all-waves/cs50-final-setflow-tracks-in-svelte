@@ -1,13 +1,22 @@
 <script>
 	import { newDropZoneInfo } from '../../lib/TableObjects/Table'
-	import { display } from '../../lib/util/util'
 
 	/** @typedef {import('../../lib/types').CharacterInHand} CharacterInHand */
 	/** @typedef {import('../../lib/types').Scene} Scene */
 	/** @typedef {import('../../lib/types').Table} Table */
 	/** @typedef {import('../../lib/types').SelectedHeader} SelectedHeader */
 
-	import { table, charactersInHand, selectedDropZones, canEdit, selectedHeader } from './store'
+	import {
+		state,
+		//
+		table,
+		charactersInHand,
+		selectedDropZones,
+		canEdit,
+		selectedHeader
+	} from './store'
+
+	$: ctx = $state.ctx
 
 	import Dropzone from './dropzone.svelte'
 	import Header from './header.svelte'
@@ -93,12 +102,12 @@
 	<thead>
 		<tr>
 			<th class="empty" />
-			{#if $table.scenes.length > 0}
+			{#if Object.keys(ctx.scenes).length > 0}
 				<!-- a column header per scene -->
-				{#each $table.scenes as scene}
+				{#each Object.keys(ctx.scenes) as scene}
 					<Header
 						type="scene"
-						name={scene.name}
+						name={scene}
 						{addToSelectedDropZones}
 					/>
 				{/each}
@@ -107,22 +116,22 @@
 	</thead>
 
 	<tbody>
-		{#if $table.tracks.length > 0}
+		{#if Object.keys(ctx.tracks).length > 0}
 			<!-- a row + header per track -->
-			{#each $table.tracks as track}
-				<tr data-track-row={track.name}>
+			{#each Object.keys(ctx.tracks) as track}
+				<tr data-track-row={track}>
 					<Header
 						type="track"
-						name={track.name}
+						name={track}
 						{addToSelectedDropZones}
 					/>
 					<!-- a cell (col) per scene -->
-					{#each $table.scenes as scene}
+					{#each Object.keys(ctx.scenes) as scene}
 						<td>
 							<Dropzone
 								{addToSelectedDropZones}
-								{scene}
-								trackName={track.name}
+								scene={ctx.scenes[scene]}
+								trackName={track}
 							/>
 						</td>
 					{/each}

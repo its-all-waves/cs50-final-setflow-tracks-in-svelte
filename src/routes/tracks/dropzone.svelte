@@ -21,9 +21,9 @@
 	data-track-name={trackName}
 	on:pointerup={() => addToSelectedDropZones(scene.name, trackName, true)}
 >
-	{#each scene.trackList as trackListItem}
-		{#if trackListItem.trackName === trackName}
-			{#each trackListItem.characterNames as characterName}
+	{#each Object.keys(scene.trackList) as track}
+		{#if track === trackName}
+			{#each scene.trackList[track] as characterName}
 				<Character
 					name={characterName}
 					location={scene.name}

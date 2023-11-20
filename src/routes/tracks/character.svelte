@@ -132,7 +132,7 @@
 	data-character-name={name}
 	on:pointerup={setCharacterInHand}
 >
-	{display(name)}
+	{name}
 </div>
 
 <style>
