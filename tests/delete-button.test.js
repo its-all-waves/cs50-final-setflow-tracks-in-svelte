@@ -4,14 +4,10 @@
 
 import { test, expect } from '@playwright/test'
 
+// enums to keep names consistent
+import { State, Test } from '../src/routes/tracks/machine'
+
 import {
-	SCENE_A,
-	SCENE_B,
-	TRACK_A,
-	TRACK_B,
-	CHARACTER_A,
-	CHARACTER_B,
-	CHARACTER_C,
 	commitButton,
 	deleteButton,
 	characterPool,
@@ -123,7 +119,7 @@ test.describe(`ALL DELETE BUTTON FUNCTIONS`, () => {
 
 		// assert: there are 3 characters on track
 		const charactersInTrack = await page
-			.locator(`[data-track-name="${TRACK_A}"] .character`)
+			.locator(`[data-track-name="${Test.track_1}"] .character`)
 			.all()
 		expect(charactersInTrack).toHaveLength(3)
 
@@ -148,7 +144,7 @@ test.describe(`ALL DELETE BUTTON FUNCTIONS`, () => {
 		await placeIn(dropZoneAB, characterC)
 
 		// assert: 3 characters in selected scene
-		const characterInScene = page.locator(`[data-scene-name="${SCENE_A}"] .character`)
+		const characterInScene = page.locator(`[data-scene-name="${Test.scene_33_A}"] .character`)
 		await expect(characterInScene).toHaveCount(3)
 
 		// select scene header, delete

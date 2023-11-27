@@ -4,16 +4,11 @@
 
 import { test } from '@playwright/test'
 
+import { State, Test } from '../src/routes/tracks/machine'
+
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // SETUP TESTS
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-export const SCENE_A = '33-A' // scene 1
-export const SCENE_B = '66-B' // scene 2
-export const TRACK_A = 'Track_1'
-export const TRACK_B = 'Track_2'
-export const CHARACTER_A = 'Né-né'
-export const CHARACTER_B = 'Zina'
-export const CHARACTER_C = 'Yuki'
 
 // html elements, dependent on constants above
 /** @type {Locator}   */ export let commitButton
@@ -43,26 +38,26 @@ test.beforeEach(async ({ page }) => {
 	deleteButton = page.locator('#btn-delete')
 
 	characterPool = page.locator('.character-pool')
-	characterA = characterPool.getByText(CHARACTER_A)
-	characterB = characterPool.getByText(CHARACTER_B)
-	characterC = characterPool.getByText(CHARACTER_C)
+	characterA = characterPool.getByText(Test.character_NeNe)
+	characterB = characterPool.getByText(Test.character_Zina)
+	characterC = characterPool.getByText(Test.character_Yuki)
 
-	headerTrackA = page.locator(`[data-track-header="${TRACK_A}"]`)
-	headerTrackB = page.locator(`[data-track-header="${TRACK_B}"]`)
+	headerTrackA = page.locator(`[data-track-header="${Test.track_1}"]`)
+	headerTrackB = page.locator(`[data-track-header="${Test.track_2}"]`)
 
-	headerSceneA = page.locator(`[data-scene-header="${SCENE_A}"]`)
-	headerSceneB = page.locator(`[data-scene-header="${SCENE_B}"]`)
+	headerSceneA = page.locator(`[data-scene-header="${Test.scene_33_A}"]`)
+	headerSceneB = page.locator(`[data-scene-header="${Test.scene_66_B}"]`)
 
 	dropZoneAA = page.locator(
-		`[data-drop-zone][data-scene-name="${SCENE_A}"][data-track-name="${TRACK_A}"]`
+		`[data-drop-zone][data-scene-name="${Test.scene_33_A}"][data-track-name="${Test.track_1}"]`
 	)
 	dropZoneAB = page.locator(
-		`[data-drop-zone][data-scene-name="${SCENE_A}"][data-track-name="${TRACK_B}"]`
+		`[data-drop-zone][data-scene-name="${Test.scene_33_A}"][data-track-name="${Test.track_2}"]`
 	)
 	dropZoneBA = page.locator(
-		`[data-drop-zone][data-scene-name="${SCENE_B}"][data-track-name="${TRACK_A}"]`
+		`[data-drop-zone][data-scene-name="${Test.scene_66_B}"][data-track-name="${Test.track_1}"]`
 	)
 	dropZoneBB = page.locator(
-		`[data-drop-zone][data-scene-name="${SCENE_B}"][data-track-name="${TRACK_B}"]`
+		`[data-drop-zone][data-scene-name="${Test.scene_66_B}"][data-track-name="${Test.track_2}"]`
 	)
 })

@@ -5,6 +5,7 @@
 	import { newScene, newTrackListItem } from '../../lib/TableObjects/Scene'
 	import { newCharacter } from '../../lib/TableObjects/Character'
 
+	// TODO: GET RID OF ME
 	import {
 		table,
 		charactersInHand,
@@ -13,6 +14,23 @@
 		selectedHeader,
 		chosenCharacter
 	} from './store'
+
+	import {
+		DEV_populate_table,
+		// state,
+		// send,
+		// Test,
+		// State,
+		// Msg,
+		feedback
+		// characterInHand,
+		// selectedHeader,
+		// selectedCharacters,
+		// selectedDropZones,
+		// characters,
+		// tracks,
+		// scenes
+	} from './machine'
 
 	import Table from './table.svelte'
 	import Character from './character.svelte'
@@ -191,26 +209,27 @@
 	/** *DO NOT CHANGE VALUES IN THIS FUNCTION, TESTS DEPEND ON THEM.* \
 	 * YOU MAY ADD MORE... I THINK?
 	 */
-	function DEV_populate_table() {
-		// add X tracks
-		const NUM_TRACKS = 4
-		for (let i = 0; i < NUM_TRACKS; i++) {
-			$table.tracks[i] = newTrack('Track_' + (i + 1))
-		}
+	// function DEV_populate_table() {
+	// 	// add X tracks
+	// 	const NUM_TRACKS = 4
+	// 	for (let i = 0; i < NUM_TRACKS; i++) {
+	// 		$table.tracks[i] = newTrack('Track_' + (i + 1))
+	// 	}
 
-		// add 2 scenes
-		$table.scenes[0] = newScene('33-A')
-		$table.scenes[1] = newScene('66-B')
-		// $table.scenes[2] = newScene('101-D')
-		// $table.scenes[3] = newScene('V-101-C')
+	// 	// add 2 scenes
+	// 	$table.scenes[0] = newScene('33-A')
+	// 	$table.scenes[1] = newScene('66-B')
+	// 	// $table.scenes[2] = newScene('101-D')
+	// 	// $table.scenes[3] = newScene('V-101-C')
 
-		// add characters
-		$table.characters[0] = newCharacter('Né-né')
-		$table.characters[1] = newCharacter('Zina')
-		$table.characters[2] = newCharacter('Yuki')
-		$table.characters[3] = newCharacter('Igor')
-		// $table.characters[4] = newCharacter('Alex')
-	}
+	// 	// add characters
+	// 	$table.characters[0] = newCharacter('Né-né')
+	// 	$table.characters[1] = newCharacter('Zina')
+	// 	$table.characters[2] = newCharacter('Yuki')
+	// 	$table.characters[3] = newCharacter('Igor')
+	// 	// $table.characters[4] = newCharacter('Alex')
+
+	// }
 
 	// DEBUG
 	// log scene 1 trackList 1 (1st trackList added, regardless of track number)
