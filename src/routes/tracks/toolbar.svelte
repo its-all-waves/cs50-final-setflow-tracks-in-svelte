@@ -1,31 +1,9 @@
 <script>
-	import {
-		table,
-		charactersInHand,
-		selectedDropZones,
-		canEdit,
-		selectedHeader,
-		chosenCharacter
-	} from './store'
-
-	import {
-		state,
-		send,
-		State,
-		Msg,
-		feedback
-		// characterInHand,
-		// selectedHeader,
-		// selectedCharacters,
-		// selectedDropZones,
-		// characters,
-		// tracks,
-		// scenes
-	} from './machine'
+	import { state, send, State, Msg, feedback } from './machine'
 
 	$: unlocked = $state === State.TableUnlocked
 
-	// feedback
+	// flash user feedback momentarily
 	let hidden = true
 	$: if ($feedback) {
 		hidden = false
@@ -49,13 +27,13 @@
 
 	<button
 		id="btn-lock"
-		class:unlocked={$state === State.TableUnlocked}
+		class:unlocked
 		on:click={() => send(Msg.TOGGLE_LOCK)}
 	>
 		<img
 			src={unlocked ? 'button-icons/lock.open.fill.svg' : 'button-icons/lock.fill.svg'}
-			alt={unlocked ? 'Check mark' : 'Pencil'}
-			title={unlocked ? 'Done editing' : 'Edit the table'}
+			alt={unlocked ? 'An open lock' : 'A closed lock'}
+			title={unlocked ? 'Lock the table' : 'Unlock the table'}
 		/>
 	</button>
 </menu>
@@ -95,11 +73,9 @@
 	}
 
 	#feedback {
-		/* visibility: hidden; */
 		color: goldenrod;
-		/* font-weight: bold; */
 		font-style: italic;
-		font-size: 1rem;
+		font-size: 0.7rem;
 		transition: opacity 1s cubic-bezier(0.1, 0.7, 0.1, 1);
 	}
 

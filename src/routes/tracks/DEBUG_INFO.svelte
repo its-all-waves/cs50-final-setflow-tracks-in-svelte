@@ -33,10 +33,10 @@
 	</p>
 	<ul id="selectedCharacters">
 		<span>selected characters:</span>
-		{#each $selectedCharacters as { characterId, sceneId }}
+		{#each $selectedCharacters as { id: charId, sceneId }}
 			<li>
 				<span class="highlight">
-					{$characters[characterId].name} @ {$scenes[sceneId].name}
+					{$characters[charId].name} @ {$scenes[sceneId].name}
 				</span>
 			</li>
 		{/each}

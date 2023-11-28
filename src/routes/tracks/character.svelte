@@ -1,54 +1,54 @@
 <script>
-	// import {
-	// 	table,
-	// 	charactersInHand,
-	// 	selectedDropZones,
-	// 	selectedHeader,
-	// 	chosenCharacter
-	// } from './store'
-
 	import { nanoid } from 'nanoid'
 	import { Msg, characterInHand, characters, send, selectedCharacters } from './machine'
 
 	export let isInstance
-	export let characterId
+	export let id
 	export let name
 	export let sceneId
 	export let trackId
 
-	const instanceId = isInstance ? `ins_${nanoid(9)}_${characterId}` : undefined
+	const instanceId = isInstance ? `ins_${nanoid(9)}_${id}` : undefined
 
 	$: inHand = name
 		? name === $characters[$characterInHand]?.name
-		: $characters[characterId]?.name === $characters[$characterInHand]?.name
+		: $characters[id]?.name === $characters[$characterInHand]?.name
 
-	$: selected = $selectedCharacters.has(instanceId)
-	// let selected = false
+	$: selected = isIn($selectedCharacters)
+
+	function isIn(selCharacters) {
+		// console.log('THIS IS RUNNING 2')
+		for (const selected of selCharacters) {
+			if (selected.instanceId === instanceId) return true
+		}
+		return false
+	}
 </script>
 
-<div
+<button
 	class="character"
 	class:inHand
 	class:selected
-	data-character-name={name ?? $characters[characterId].name}
-	on:click={() => {
+	data-character-name={name ?? $characters[id].name}
+	on:click|stopPropagation={() => {
+		console.log({ isInstance })
 		const msg = isInstance ? Msg.CLICK_TABLE_CHARACTER : Msg.CLICK_POOL_CHARACTER
-		send(msg, { instanceId, characterId, sceneId, trackId })
+		console.log({ msg: { instanceId, id: id, sceneId, trackId } })
+		console.log($selectedCharacters)
+		send(msg, { instanceId, id: id, sceneId, trackId })
 	}}
 >
-	{name ?? $characters[characterId].name}
-</div>
+	{name ?? $characters[id].name}
+</button>
 
 <style>
-	/* button {
-		background: none;
+	button {
+		padding: 0;
 		margin: 0;
-	} */
-
-	/* get rid of default outline after clicked */
-	/* button:focus {
+		background: none;
+		width: fit-content;
 		box-shadow: none;
-	} */
+	}
 
 	.character {
 		margin: 0.5rem 0.5rem;
@@ -113,5 +113,10 @@
 		box-shadow: 0 10px 1.5px rgba(0, 0, 0, 0.588), 0 0 30px white, inset 0 1px 1px white,
 			inset 0 -2px 3px rgba(0, 0, 0, 0.681);
 		border-color: white;
+
+		border-width: 1;
+		scale: 1.1;
+		transform: translateY(-0.3rem);
+		transition: border 0.1s, scale 0.1s, box-shadow 0.1s;
 	}
 </style>

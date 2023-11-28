@@ -6,15 +6,13 @@ import { writable, get } from 'svelte/store'
 // ENUMS +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 export const Msg = Object.freeze({
-	UNLOCK_TABLE: 'UNLOCK_TABLE',
-	LOCK_TABLE: 'LOCK_TABLE',
 	TOGGLE_LOCK: 'TOGGLE_LOCK',
 	// select from pool
 	CLICK_POOL_CHARACTER: 'CLICK_POOL_CHARACTER',
 	// select one character instance from table to delete (or rename?)
 	CLICK_TABLE_CHARACTER: 'CLICK_TABLE_CHARACTER',
 	// select drop zone(s) to drop a character or clear contents
-	CLICK_DROP_ZONE: 'CLICK_DROP_ZONE',
+	CLICK_ROP_ZONE: 'CLICK_DROP_ZONE',
 	CLICK_TRACK_HEADER: 'CLICK_TRACK_HEADER',
 	CLICK_SCENE_HEADER: 'CLICK_SCENE_HEADER',
 	// user commands
@@ -150,31 +148,31 @@ function nextState(state, msg, info) {
 					return State.TableLocked
 
 				case Msg.CLICK_POOL_CHARACTER:
-					clearSelectedCharacters()
+					if ($selectedCharacters.size > 0) clearSelectedCharacters()
 					PICK_UP_POOL_CHARACTER(info)
 					break
 
 				case Msg.CLICK_TABLE_CHARACTER:
 					// drop the character picked up from the pool if there is one
 					characterInHand.set(null) // can selected either table characters or pool character
-					clearSelectedDropZones() // can select either table characters or drop zones
+					if ($selectedDropZones.size > 0) clearSelectedDropZones() // can select either table characters or drop zones
 					SELECT_TABLE_CHARACTER_INSTANCE(info)
 					break
 
 				case Msg.CLICK_DROP_ZONE:
 					if (!guard_SELECT_DROP_ZONE(info)) break
-					clearSelectedCharacters() // can select either table characters or drop zones
+					if ($selectedCharacters.size > 0) clearSelectedCharacters() // can select either table characters or drop zones
 					SELECT_DROP_ZONE(info)
 					break
 
 				case Msg.CLICK_TRACK_HEADER:
-					clearSelectedDropZones()
+					if ($selectedDropZones.size > 0) clearSelectedDropZones()
 					SELECT_TRACK(info) // overwrites selected drop zones
 					break
 
 				case Msg.CLICK_SCENE_HEADER:
 					if (!guard_CLICK_SCENE_HEADER(info)) break
-					clearSelectedDropZones()
+					if ($selectedDropZones.size > 0) clearSelectedDropZones()
 					SELECT_SCENE(info) // overwrites selected drop zones
 					break
 
@@ -267,36 +265,35 @@ function containsCharacterInHand(trackList) {
 // ACTIONS +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 /** @param {string} character @description Put `character` in-hand... characterInHand */
-function PICK_UP_POOL_CHARACTER({ characterId }) {
-	const { name } = $characters[characterId]
+function PICK_UP_POOL_CHARACTER({ id }) {
+	const { name } = $characters[id]
 
 	// if clicked the character in hand, deselect it
-	if (characterId === $characterInHand) {
+	if (id === $characterInHand) {
 		characterInHand.set(null)
 		feedback.set(`returned ${name} to pool`)
 		return
 	}
-	characterInHand.set(characterId)
+	characterInHand.set(id)
 	feedback.set(`picked up ${name} from pool`)
 }
 
-function SELECT_TABLE_CHARACTER_INSTANCE({ instanceId, characterId, sceneId, trackId }) {
-	const character = $characters[characterId].name
+function SELECT_TABLE_CHARACTER_INSTANCE({ instanceId, id, sceneId, trackId }) {
+	const character = $characters[id].name
 	const scene = $scenes[sceneId].name
 
 	// if selected, deselect and return
 	for (const selected of $selectedCharacters) {
-		const { instanceId: id } = selected
-		if (id !== instanceId) continue
+		if (selected.instanceId !== instanceId) continue
 		$selectedCharacters.delete(selected)
-		selectedCharacters.set($selectedCharacters)
+		selectedCharacters.set($selectedCharacters) // should i be out of the loop?
 		feedback.set(`deselected ${character} in scene ${scene}`)
 		return
 	}
 
 	// clicked an unselected character, so select it
 	// TODO: do i really need to store the whole object? not just the instanceId?
-	$selectedCharacters.add({ instanceId, characterId, sceneId, trackId })
+	$selectedCharacters.add({ instanceId, id, sceneId, trackId })
 	selectedCharacters.set($selectedCharacters)
 	feedback.set(`selected ${character} in scene ${scene}`)
 }
@@ -309,7 +306,7 @@ function guard_SELECT_DROP_ZONE({ sceneId }) {
 	for (const track in trackList) {
 		if (!trackList[track].has($characterInHand)) continue
 		feedback.set(
-			`rejected drop zone selection: "${characterInHand}" is already in scene "${sceneId}"`
+			`rejected drop zone selection: "${$characters[$characterInHand].name}" is already in scene "${$scenes[sceneId].name}"`
 		)
 		return false
 	}
@@ -321,15 +318,15 @@ function SELECT_DROP_ZONE({ sceneId, trackId }) {
 	// TODO: TEST ALL OF THESE CONDITIONS
 	selectedHeader.set(null)
 
-	const scene = $scenes[sceneId]
-	const track = $tracks[trackId]
+	const scene = $scenes[sceneId].name
+	const track = $tracks[trackId].name
 
 	// if clicked selected drop zone, deselect it, return
 	for (const dz of $selectedDropZones) {
 		if (dz.sceneId !== sceneId || dz.trackId !== trackId) continue
 		$selectedDropZones.delete(dz)
 		selectedDropZones.set($selectedDropZones)
-		feedback.set(`deselected drop zone scene ${scene}, ${track}`)
+		feedback.set(`deselected drop zone at scene ${scene}, ${track}`)
 		return
 	}
 
@@ -373,7 +370,7 @@ function SELECT_TRACK({ id }) {
 	feedback.set(`selected all drop zones on ${track}`)
 }
 
-function guard_CLICK_SCENE_HEADER({ scene }) {
+function guard_CLICK_SCENE_HEADER({ id }) {
 	// can't select a scene with a character in hand
 	if ($characterInHand) {
 		feedback.set(`cannot select a scene with a character in hand`)
@@ -382,42 +379,44 @@ function guard_CLICK_SCENE_HEADER({ scene }) {
 
 	// can't select a scene if it's empty
 	let sceneIsEmpty = true
-	const { trackList } = $scenes[scene]
-	for (const track in trackList) {
-		const trackIsOccupied = trackList[track].size > 0
+	const { trackList } = $scenes[id]
+	for (const trackId in trackList) {
+		const trackIsOccupied = trackList[trackId].size > 0
 		if (trackIsOccupied) {
 			sceneIsEmpty = false
 			break
 		}
 	}
 	if (sceneIsEmpty) {
-		feedback.set(`scene ${scene} is empty, so it couldn't be selected`)
+		feedback.set(`scene ${$scenes[id].name} is empty, so it couldn't be selected`)
 		return false
 	}
 
 	return true
 }
 
-function SELECT_SCENE({ scene }) {
+function SELECT_SCENE({ id }) {
+	const { name } = $scenes[id]
+
 	// deselect if selected and return
-	if ($selectedHeader === scene) {
+	if ($selectedHeader === id) {
 		selectedHeader.set(null)
-		feedback.set(`deselected drop zones in scene ${scene}`)
+		feedback.set(`deselected drop zones in scene ${name}`)
 		return
 	}
 
 	// set the header to scene
-	selectedHeader.set(scene)
+	selectedHeader.set(id)
 
 	// select this scene's non-empty drop zones
-	const { trackList } = $scenes[scene]
-	for (const track in trackList) {
-		if (trackList[track].size === 0) continue
+	const { trackList } = $scenes[id]
+	for (const trackId in trackList) {
+		if (trackList[trackId].size === 0) continue
 		// track is not empty, so select this drop zone
-		$selectedDropZones.add({ scene, track })
+		$selectedDropZones.add({ sceneId: id, trackId })
 	}
 	selectedDropZones.set($selectedDropZones)
-	feedback.set(`selected populated drop zones in scene ${scene}`)
+	feedback.set(`selected populated drop zones in scene ${name}`)
 }
 
 /**
@@ -443,7 +442,7 @@ function COMMIT_CHARACTER_TO_TABLE() {
 		scenes.set($scenes)
 	}
 
-	feedback.set(`committed ${$characterInHand} to selected drop zones`)
+	feedback.set(`committed ${$characters[$characterInHand]} to selected drop zones`)
 }
 
 function SMART_DELETE() {
@@ -451,9 +450,9 @@ function SMART_DELETE() {
 
 	if ($selectedCharacters.size > 0) {
 		for (const selected of $selectedCharacters) {
-			const { instanceId, characterId, sceneId, trackId } = selected
+			const { instanceId, id, sceneId, trackId } = selected
 			const { trackList } = $scenes[sceneId]
-			trackList[trackId].delete(characterId)
+			trackList[trackId].delete(id)
 		}
 		scenes.set($scenes)
 		feedback.set(`cleared selected characters from table`)
@@ -481,7 +480,7 @@ function SMART_DELETE() {
 			}
 		}
 		scenes.set($scenes)
-		feedback.set(`cleared ${$characterInHand} from the table`)
+		feedback.set(`cleared ${$characters[$characterInHand]} from the table`)
 	}
 
 	// TODO: more cases: clear selected scene / track
@@ -504,7 +503,7 @@ function SMART_DELETE() {
 
 // The following three DELETE_ functions are to be called via a context menu
 function DELETE_CHARACTER({ id }) {
-	const character = $characters[id].name
+	const { name } = $characters[id]
 
 	// delete from pool
 	delete $characters[id]
@@ -521,11 +520,11 @@ function DELETE_CHARACTER({ id }) {
 	}
 	scenes.set($scenes)
 
-	feedback.set(`right click > deleted ${character}`)
+	feedback.set(`right click > deleted ${name}`)
 }
 
 function DELETE_TRACK({ id }) {
-	const track = $tracks[id].name
+	const { name } = $tracks[id]
 
 	// delete from tracks array
 	delete $tracks[id]
@@ -538,21 +537,23 @@ function DELETE_TRACK({ id }) {
 	}
 	scenes.set($scenes)
 
-	feedback.set(`right click > deleted ${track}`)
+	feedback.set(`right click > deleted ${name}`)
 }
 
 function DELETE_SCENE({ id }) {
-	const scene = $scenes[id].name
+	const { name } = $scenes[id]
 	delete $scenes[id]
 	scenes.set($scenes)
-	feedback.set(`right click > deleted scene ${scene}`)
+	feedback.set(`right click > deleted scene ${name}`)
 }
 
 function guard_RENAME({ type, id, newName }) {
-	let obj
-	if (type === 'character') obj = $characters
-	if (type === 'track') obj = $tracks
-	if (type === 'scene') obj = $scenes
+	// let obj
+	// if (type === 'character') obj = $characters
+	// if (type === 'track') obj = $tracks
+	// if (type === 'scene') obj = $scenes
+
+	const obj = type === 'character' ? $characters : type === 'track' ? $tracks : $scenes
 
 	// can't rename the character if the new name already exists
 	const oldName = obj[id].name

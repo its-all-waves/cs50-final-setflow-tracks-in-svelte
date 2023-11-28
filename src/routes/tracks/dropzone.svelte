@@ -1,21 +1,24 @@
 <script>
-	import { table, charactersInHand, selectedDropZones, canEdit, selectedHeader } from './store'
+	// import { table, charactersInHand, selectedDropZones, canEdit, selectedHeader } from './store'
 
 	import Character from './character.svelte'
-	import { characters, tracks, scenes, send, Msg } from './machine'
-	import { nanoid } from 'nanoid'
+	import { characters, tracks, scenes, send, Msg, selectedDropZones } from './machine'
 
 	export let sceneId
 	export let trackId // my thinking is that I don't want to look up the scene and track again in this component if the parent has already gotten it
 	export let scene
 	export let trackName
 
-	export let addToSelectedDropZones // function(sceneName, trackName)
-
 	// drop zone gets .selected css if it exists in selected drop zones
-	$: selected = $selectedDropZones.some(
-		(_) => _.sceneName === scene.name && _.trackName === trackName
-	)
+	$: selected = isIn($selectedDropZones)
+
+	function isIn(selDropZones) {
+		// console.log('THIS IS RUNNING')
+		for (const dz of selDropZones) {
+			if (dz.sceneId === sceneId && dz.trackId === trackId) return true
+		}
+		return false
+	}
 
 	$: trackListEntries = Object.entries(scene.trackList)
 </script>
@@ -36,7 +39,7 @@
 			{#each chars as charId}
 				<Character
 					isInstance={true}
-					characterId={charId}
+					id={charId}
 					{sceneId}
 					{trackId}
 				/>
@@ -47,8 +50,10 @@
 
 <style>
 	button {
-		background: none;
+		padding: 0;
 		margin: 0;
+		background: none;
+		transition: none;
 	}
 
 	/* get rid of default outline after clicked */

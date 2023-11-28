@@ -28,7 +28,10 @@
 		// selectedDropZones,
 		characters,
 		tracks,
-		scenes
+		scenes,
+		characterInHand,
+		send,
+		Msg
 	} from './machine'
 
 	import Table from './table.svelte'
@@ -222,12 +225,14 @@
 
 	<div class="character-pool">
 		{#each charactersEntries as [id, { name }]}
-			<Character characterId={id} />
+			<Character {id} />
 		{/each}
 		<button
 			id="btn-commit"
-			class:hidden={$charactersInHand.length === 0}
-			on:pointerup={commitDropZones}
+			class:hidden={$characterInHand == null}
+			on:click={() => {
+				send(Msg.COMMIT_CHARACTER_TO_TABLE)
+			}}
 		>
 			&#x2713
 		</button>
