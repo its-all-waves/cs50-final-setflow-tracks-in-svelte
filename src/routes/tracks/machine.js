@@ -254,9 +254,9 @@ function logAction(action) {
 
 /** @description Helper for `COMMIT_CHARACTER_TO_TABLE`. An additional filter to
  * prevent a character is duplicated in a scene. */
-function containsCharacterInHand(trackList) {
-	for (const track in trackList) {
-		if (trackList.size === 0 || !trackList[track].has($characterInHand)) continue
+function trackListContainsCharacter(trackList, charId) {
+	for (const trackId in trackList) {
+		if (trackList.size === 0 || !trackList[trackId].has(charId)) continue
 		return true
 	}
 	return false
@@ -266,6 +266,19 @@ function containsCharacterInHand(trackList) {
 
 /** @param {string} character @description Put `character` in-hand... characterInHand */
 function PICK_UP_POOL_CHARACTER({ id }) {
+	// deselect drop zones if character is already in the scene
+	let found = false
+	for (const selected of $selectedDropZones) {
+		// if scene contains character, remove from set
+		const { sceneId } = selected
+		const { trackList } = $scenes[sceneId]
+		if (trackListContainsCharacter(trackList, id)) {
+			$selectedDropZones.delete(selected)
+			found = true
+		}
+	}
+	selectedDropZones.set($selectedDropZones)
+
 	const { name } = $characters[id]
 
 	// if clicked the character in hand, deselect it
@@ -303,8 +316,8 @@ function guard_SELECT_DROP_ZONE({ sceneId }) {
 	if (!$characterInHand) return true
 
 	const { trackList } = $scenes[sceneId]
-	for (const track in trackList) {
-		if (!trackList[track].has($characterInHand)) continue
+	for (const trackId in trackList) {
+		if (!trackList[trackId].has($characterInHand)) continue
 		feedback.set(
 			`rejected drop zone selection: "${$characters[$characterInHand].name}" is already in scene "${$scenes[sceneId].name}"`
 		)
@@ -363,7 +376,7 @@ function SELECT_TRACK({ id }) {
 	// select all the drop zones in a track
 	for (const sceneId in $scenes) {
 		const { trackList } = $scenes[sceneId]
-		if (containsCharacterInHand(trackList)) continue // I THINK?
+		if (trackListContainsCharacter(trackList, $characterInHand)) continue // I THINK?
 		$selectedDropZones.add({ sceneId, trackId: id })
 		selectedDropZones.set($selectedDropZones)
 	}
@@ -431,16 +444,14 @@ function COMMIT_CHARACTER_TO_TABLE() {
 		const { sceneId, trackId } = selected
 		const { trackList } = $scenes[sceneId]
 
-		/* thought: currently, this disallows selection of a drop zone in a
-		scene containing the character in hand. if we want to overwrite the
-		selection in this scene, remove character from scene instead of
-		`continue` */
-		if (containsCharacterInHand(trackList)) continue
+		/* this prevents adding the character to the table if they're already in
+		the scene. */
+		if (trackListContainsCharacter(trackList, $characterInHand)) continue
 
 		// add character in hand to scene on track
 		trackList[trackId].add($characterInHand)
-		scenes.set($scenes)
 	}
+	scenes.set($scenes)
 
 	feedback.set(`committed ${$characters[$characterInHand].name} to selected drop zones`)
 }
@@ -599,10 +610,10 @@ export const Test = Object.freeze({
 	character_Zina: 'Zina',
 	character_Yuki: 'Yuki',
 	character_Igor: 'Igor',
-	track_1: 'Track_1',
-	track_2: 'Track_2',
-	track_3: 'Track_3',
-	track_4: 'Track_4',
+	track_1: 'Track 1',
+	track_2: 'Track 2',
+	track_3: 'Track 3',
+	track_4: 'Track 4',
 	scene_33_A: '33-A',
 	scene_66_B: '66-B',
 	scene_101_D: '101-D',

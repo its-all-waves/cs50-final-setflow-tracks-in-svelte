@@ -9,16 +9,7 @@
 
 	import {
 		DEV_populate_table,
-		// state,
-		// send,
-		// Test,
-		// State,
-		// Msg,
 		feedback,
-		// characterInHand,
-		// selectedHeader,
-		// selectedCharacters,
-		// selectedDropZones,
 		characters,
 		tracks,
 		scenes,
@@ -80,13 +71,19 @@
 		if (event.key !== 'Enter') return
 
 		const inputField = event.target
-		const name = inputField.value.replace(' ', '_')
+		// const name = inputField.value.replace(' ', '_')
+		const name = inputField.value
 
 		// TODO: sanitize input
 		if (!name) return
 
-		// create a scene, push it to scenes[]
-		$table.scenes = $table.scenes.concat(newScene(name))
+		const id = `scn_${nanoid(9)}` // do keep me tho
+		$scenes[id] = { name, trackList: {} }
+		const { trackList } = $scenes[id]
+		for (const trackId in $tracks) {
+			trackList[trackId] = new Set()
+		}
+		$scenes = $scenes
 
 		// clear the input field
 		inputField.value = null
@@ -97,13 +94,15 @@
 		if (event.key !== 'Enter') return
 
 		let inputField = event.target
-		const name = inputField.value.replace(' ', '_')
+		// const name = inputField.value.replace(' ', '_')
+		const name = inputField.value
 
 		// TODO: validate input
 		if (!name) return
 
-		// create a character, push it to characters[]
-		$table.characters = $table.characters.concat(newCharacter(name))
+		const id = `chr_${nanoid(9)}` // do keep me tho
+		$characters[id] = { name }
+		$characters = $characters
 
 		sortCharactersAtoZ()
 
@@ -111,23 +110,22 @@
 	}
 
 	function sortCharactersAtoZ() {
-		const characters = $table.characters
 		let swapCounter = -1
 		while (true) {
 			if (swapCounter === 0) break
 			swapCounter = 0
-			for (let i = 0; i < characters.length - 1; i++) {
-				const name1 = characters[i].name
-				const name2 = characters[i + 1].name
+			for (let i = 0; i < $characters.length - 1; i++) {
+				const name1 = $characters[i].name
+				const name2 = $characters[i + 1].name
 				const name1BelongsBeforeName2 = name1.localeCompare(name2) < 0
 				if (name1BelongsBeforeName2) continue
-				const temp = characters[i]
-				characters[i] = characters[i + 1]
-				characters[i + 1] = temp
+				const temp = $characters[i]
+				$characters[i] = $characters[i + 1]
+				$characters[i + 1] = temp
 				swapCounter++
 			}
 		}
-		$table.characters = characters
+		$characters = $characters
 	}
 
 	function handleKeyPress(event) {
@@ -147,7 +145,15 @@
 		}
 	}
 
-	$: charactersEntries = Object.entries($characters)
+	// keep characters for the ui
+	$: charactersEntries = Object.entries($characters).sort(([_, a], [__, b]) => {
+		if (a.name < b.name) {
+			return -1
+		} else if (b.name < a.name) {
+			return 1
+		}
+		return 0
+	})
 
 	// DEBUG
 	onMount(DEV_populate_table)
@@ -182,7 +188,7 @@
 		</button>
 	</div>
 
-	<DebugInfo />
+	<!-- <DebugInfo /> -->
 
 	<div class="inputs">
 		<div class="track-input">
