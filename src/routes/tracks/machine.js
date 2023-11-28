@@ -23,11 +23,7 @@ export const Msg = Object.freeze({
 	// context menu
 	DELETE_SCENE: 'DELETE_SCENE',
 	DELETE_TRACK: 'DELETE_TRACK',
-	RENAME: 'RENAME',
-	// inputs
-	ADD_CHARACTER: 'ADD_CHARACTER',
-	ADD_TRACKS: 'ADD_TRACKS',
-	ADD_SCENE: 'ADD_SCENES'
+	RENAME: 'RENAME'
 })
 
 export const State = Object.freeze({
@@ -176,6 +172,10 @@ function nextState(state, msg, info) {
 					SELECT_SCENE(info) // overwrites selected drop zones
 					break
 
+				case Msg.CANCEL:
+					resetSelections()
+					break
+
 				case Msg.COMMIT_CHARACTER_TO_TABLE:
 					if (!guard_COMMIT_CHARACTER_TO_TABLE()) break
 					COMMIT_CHARACTER_TO_TABLE()
@@ -208,7 +208,6 @@ function nextState(state, msg, info) {
 					if (!guard_RENAME(info)) break
 					RENAME(info)
 					break
-
 				default:
 					break
 			}
@@ -246,6 +245,7 @@ function resetSelections() {
 
 	selectedHeader.set(null)
 	clearSelectedDropZones()
+	// debugger
 }
 
 function logAction(action) {
@@ -442,7 +442,7 @@ function COMMIT_CHARACTER_TO_TABLE() {
 		scenes.set($scenes)
 	}
 
-	feedback.set(`committed ${$characters[$characterInHand]} to selected drop zones`)
+	feedback.set(`committed ${$characters[$characterInHand].name} to selected drop zones`)
 }
 
 function SMART_DELETE() {
@@ -480,7 +480,7 @@ function SMART_DELETE() {
 			}
 		}
 		scenes.set($scenes)
-		feedback.set(`cleared ${$characters[$characterInHand]} from the table`)
+		feedback.set(`cleared ${$characters[$characterInHand].name} from the table`)
 	}
 
 	// TODO: more cases: clear selected scene / track

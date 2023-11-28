@@ -16,7 +16,7 @@
 <menu>
 	<button
 		id="btn-delete"
-		on:click={() => send(Msg.SMART_DELETE)}
+		on:pointerup={() => send(Msg.SMART_DELETE)}
 	>
 		<img
 			src="button-icons/trash.fill.svg"
@@ -28,7 +28,7 @@
 	<button
 		id="btn-lock"
 		class:unlocked
-		on:click={() => send(Msg.TOGGLE_LOCK)}
+		on:pointerup={() => send(Msg.TOGGLE_LOCK)}
 	>
 		<img
 			src={unlocked ? 'button-icons/lock.open.fill.svg' : 'button-icons/lock.fill.svg'}

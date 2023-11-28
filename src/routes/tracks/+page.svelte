@@ -5,14 +5,7 @@
 	import { newCharacter } from '../../lib/TableObjects/Character'
 
 	// TODO: GET RID OF ME
-	import {
-		table,
-		charactersInHand,
-		selectedDropZones,
-		canEdit,
-		selectedHeader,
-		chosenCharacter
-	} from './store'
+	import { table } from './store'
 
 	import {
 		DEV_populate_table,
@@ -44,11 +37,12 @@
 
 	/**
 	 * 	@type {import('./$types').PageData} */
-	export let data // receive data obj from "server", then pass into the store
-	$table = data.table
+	export let data
 
 	/** Add tracks to the global table object */
 	function submitTracks(event) {
+		const MAX_TRACK_COUNT = 256
+
 		if (event.key !== 'Enter') return
 
 		let label = document.querySelector("input[name='track-prefix']").value
@@ -57,6 +51,14 @@
 		// TODO: sanitize inputs
 		// must have 2 valid track inputs to proceed
 		if (!label || !count) return
+
+		if ($tracks.size + count > 256) {
+			const oldCount = count
+			count = MAX_TRACK_COUNT - $tracks.size
+			feedback.set(
+				`Reached maximum track count of ${MAX_TRACK_COUNT}. Added ${count} tracks instead of ${oldCount}.`
+			)
+		}
 
 		// TODO: if label already exists in tracks, keep counting
 		// e.g. if "Track 1" - "Track 5" exist, this adds "Track 6"+
@@ -130,77 +132,19 @@
 
 	function handleKeyPress(event) {
 		switch (event.key) {
+			case 'Escape':
+				send(Msg.CANCEL)
+				break
 			case 'Enter':
-				commitDropZones()
+				event.preventDefault()
+				event.stopPropagation()
+				send(Msg.COMMIT_CHARACTER_TO_TABLE)
 				break
 			case 'Delete': // fall thru
 			case 'Backspace':
-				deleteButton.click()
+				send(Msg.SMART_DELETE)
 				break
 		}
-	}
-
-	function commitDropZones(event) {
-		// unknown case atm
-		if ($charactersInHand.length === 0) {
-			throw new Error('But how did we get here, tho?')
-		}
-
-		// currently the only valid case
-		else if ($charactersInHand.length === 1) {
-			// one character in hand and have not selected a track or scene
-			addCharacterInHandToSelectedScenes()
-		}
-
-		// characters in hand > 1
-		else {
-			throw new Error("We haven't a need for this case yet...")
-		}
-
-		clearAllSelections()
-	}
-
-	/** Helper for commitDropZones() \
-	 * Forget what's currently selected */
-	function clearAllSelections() {
-		$charactersInHand = []
-		$chosenCharacter = {}
-		$selectedDropZones = []
-		$selectedHeader = {}
-	}
-
-	/** Helper for commitDropZones() \
-	 * put the CHARACTER on this TRACK, in this SCENE */
-	function addCharacterInHandToSelectedScenes() {
-		if ($charactersInHand.length !== 1) {
-			throw new Error('No idea how we got here...')
-		}
-
-		const characterInHand = $charactersInHand[0]
-
-		for (let i = 0; i < $selectedDropZones.length; i++) {
-			const { sceneName, trackName } = $selectedDropZones[i]
-
-			const scene = $table.scenes.find((_) => _.name === sceneName)
-
-			// TODO: handle error - scene undefined
-
-			// keep from duplicating a trackListItem
-			const existingTrackListItemForTrack = scene.trackList.find(
-				(_) => _.trackName === trackName
-			)
-			if (existingTrackListItemForTrack) {
-				// add to it
-				existingTrackListItemForTrack.characterNames.push(characterInHand.name)
-				continue
-			}
-
-			// add a new track list item for this track
-			scene.trackList = scene.trackList.concat(
-				newTrackListItem(trackName, characterInHand.name)
-			)
-		}
-		$table.scenes = $table.scenes
 	}
 
 	$: charactersEntries = Object.entries($characters)
@@ -209,7 +153,7 @@
 	onMount(DEV_populate_table)
 </script>
 
-<svelte:window on:keydown={handleKeyPress} />
+<svelte:window on:keydown|passive={handleKeyPress} />
 
 <main class="container">
 	<article>
@@ -230,7 +174,7 @@
 		<button
 			id="btn-commit"
 			class:hidden={$characterInHand == null}
-			on:click={() => {
+			on:pointerup={() => {
 				send(Msg.COMMIT_CHARACTER_TO_TABLE)
 			}}
 		>
@@ -240,22 +184,20 @@
 
 	<DebugInfo />
 
-	<!-- <form class="inputs">
+	<div class="inputs">
 		<div class="track-input">
 			<input
 				autofocus
 				name="track-prefix"
 				type="text"
-				class=""
-				value={trackPrefix}
+				value={'input'}
 				on:keydown={submitTracks}
 			/>
 			<span> X </span>
 			<input
 				name="track-count"
 				type="text"
-				class=""
-				value={trackCount}
+				value={4}
 				on:keydown={submitTracks}
 			/>
 		</div>
@@ -264,7 +206,6 @@
 			<input
 				name="scene-name"
 				type="text"
-				class=""
 				placeholder="add a scene"
 				on:keydown={submitScene}
 			/>
@@ -274,12 +215,11 @@
 			<input
 				name="actor-name"
 				type="text"
-				class=""
 				placeholder="add a character"
 				on:keydown={submitCharacter}
 			/>
 		</div>
-	</form> -->
+	</div>
 </main>
 
 <style>

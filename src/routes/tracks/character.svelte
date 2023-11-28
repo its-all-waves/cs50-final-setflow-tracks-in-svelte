@@ -30,7 +30,7 @@
 	class:inHand
 	class:selected
 	data-character-name={name ?? $characters[id].name}
-	on:click|stopPropagation={() => {
+	on:pointerup|preventDefault|stopPropagation={() => {
 		console.log({ isInstance })
 		const msg = isInstance ? Msg.CLICK_TABLE_CHARACTER : Msg.CLICK_POOL_CHARACTER
 		console.log({ msg: { instanceId, id: id, sceneId, trackId } })
