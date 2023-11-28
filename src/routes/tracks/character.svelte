@@ -1,141 +1,55 @@
 <script>
-	import { display } from '../../lib/util/util'
-	import {
-		table,
-		charactersInHand,
-		selectedDropZones,
-		selectedHeader,
-		chosenCharacter
-	} from './store'
+	// import {
+	// 	table,
+	// 	charactersInHand,
+	// 	selectedDropZones,
+	// 	selectedHeader,
+	// 	chosenCharacter
+	// } from './store'
 
-	// exposed to parent as attr
+	import { nanoid } from 'nanoid'
+	import { Msg, characterInHand, characters, send, selectedCharacters } from './machine'
+
+	export let isInstance
+	export let characterId
 	export let name
-	/** @type {'__pool__' | string} */
-	export let location // === '__pool__' || scene.name
+	export let sceneId
+	export let trackId
 
-	function setCharacterInHand() {
-		// clicked a chosen character (necessarily in table, and necessarily in hand)
-		if (location !== '__pool__' && chosen) {
-			// de-chosen the chosen character and return
-			$chosenCharacter = {}
-			console.log('100 ???')
-			return
-		}
+	const instanceId = isInstance ? `ins_${nanoid(9)}_${characterId}` : undefined
 
-		// clicked a character in hand in the pool
-		if (location === '__pool__' && inHand) {
-			// deselect the pool character if clicking it again, return
-			$chosenCharacter = {}
-			$charactersInHand = []
-			console.log('200 ???')
-			return
-		}
+	$: inHand = name
+		? name === $characters[$characterInHand]?.name
+		: $characters[characterId]?.name === $characters[$characterInHand]?.name
 
-		// clicked the character in hand in the table
-		if (location !== '__pool__' && inHand) {
-			// set chosen character and return
-			$chosenCharacter = {
-				name,
-				sceneName: location
-			}
-			console.log('300 ???')
-			return
-		}
-
-		// if clicked a character in the table
-		if (location !== '__pool__') {
-			$chosenCharacter = {
-				name,
-				sceneName: location
-			}
-			console.log('400 ???')
-		}
-
-		// clicked a pool character with a character chosen
-		// adding cond 2 keeps prevents unnecessary reactive updates
-		if (location === '__pool__' && $chosenCharacter.name) {
-			$chosenCharacter = {}
-			console.log('800 ???')
-		}
-
-		// clicked an unselected character
-		// replace what's there with a single character's info
-		$charactersInHand = [{ name, location }]
-		console.log('500 ???')
-
-		// prevents: unnecessary update of $selectedDropZones
-		if (!$selectedHeader.type && !$selectedDropZones.length && !$charactersInHand.length) {
-			console.log('600 ???')
-			return
-		}
-
-		// prevents: character can be added to same scene twice
-		removeSelectedDropZonesIfConflict()
-		console.log('700 ???')
-	}
-
-	/** Helper for setCharacterInHand()
-	 * If the character in hand is in this scene, remove this drop zone from
-	 * selected drop zones
-	 */
-	function removeSelectedDropZonesIfConflict() {
-		const charInHand = $charactersInHand[0].name
-
-		if (wholeSceneIsSelected) {
-			$selectedDropZones = []
-			return
-		}
-
-		const copyOfSelectedDropZones = [...$selectedDropZones]
-		for (let dropZone of copyOfSelectedDropZones) {
-			// get the scene this dropZone refers to
-			const scene = $table.scenes.find((_) => _.name === dropZone.sceneName)
-			if (!scene) continue
-
-			const sceneContainsCharacterInHand = scene.trackList.some((_) =>
-				_.characterNames.includes(charInHand)
-			)
-
-			if (!sceneContainsCharacterInHand) continue
-
-			const index = $selectedDropZones.indexOf(dropZone)
-			if (index === -1) throw new Error('heh?')
-			$selectedDropZones.splice(index, 1)
-		}
-		$selectedDropZones = $selectedDropZones
-	}
-
-	$: wholeSceneIsSelected = isWholeSceneSelected($selectedDropZones, $selectedHeader)
-
-	function isWholeSceneSelected(_selectedDropZones, _selectedHeader) {
-		if (_selectedHeader.type !== 'scene') return
-		return _selectedDropZones.every((_) => _.sceneName === _selectedHeader.name)
-	}
-
-	$: inHand = $charactersInHand.length === 1 && $charactersInHand[0].name === name
-
-	$: chosen = iAmThe($chosenCharacter)
-
-	/** Determines if *this* character is the chosen one */
-	function iAmThe(_chosenCharacter) {
-		return _chosenCharacter.name === name && _chosenCharacter.sceneName === location
-	}
-
-	// DEBUG
-	// $: console.log(chosen ? `chosen: ${$chosenCharacter.name} : ${$chosenCharacter.sceneName}` : ``)
+	$: selected = $selectedCharacters.has(instanceId)
+	// let selected = false
 </script>
 
 <div
 	class="character"
 	class:inHand
-	class:chosen
-	data-character-name={name}
-	on:pointerup={setCharacterInHand}
+	class:selected
+	data-character-name={name ?? $characters[characterId].name}
+	on:click={() => {
+		const msg = isInstance ? Msg.CLICK_TABLE_CHARACTER : Msg.CLICK_POOL_CHARACTER
+		send(msg, { instanceId, characterId, sceneId, trackId })
+	}}
 >
-	{display(name)}
+	{name ?? $characters[characterId].name}
 </div>
 
 <style>
+	/* button {
+		background: none;
+		margin: 0;
+	} */
+
+	/* get rid of default outline after clicked */
+	/* button:focus {
+		box-shadow: none;
+	} */
+
 	.character {
 		margin: 0.5rem 0.5rem;
 		padding: 0.2rem 1rem;
@@ -195,7 +109,7 @@
 		transition: border 0.1s, scale 0.1s, box-shadow 0.1s;
 	}
 
-	.chosen {
+	.selected {
 		box-shadow: 0 10px 1.5px rgba(0, 0, 0, 0.588), 0 0 30px white, inset 0 1px 1px white,
 			inset 0 -2px 3px rgba(0, 0, 0, 0.681);
 		border-color: white;

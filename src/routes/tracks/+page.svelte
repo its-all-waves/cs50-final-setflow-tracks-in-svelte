@@ -1,7 +1,6 @@
 <script>
 	import { onMount } from 'svelte'
 
-	import { newTrack } from '../../lib/TableObjects/Track'
 	import { newScene, newTrackListItem } from '../../lib/TableObjects/Scene'
 	import { newCharacter } from '../../lib/TableObjects/Character'
 
@@ -22,55 +21,53 @@
 		// Test,
 		// State,
 		// Msg,
-		feedback
+		feedback,
 		// characterInHand,
 		// selectedHeader,
 		// selectedCharacters,
 		// selectedDropZones,
-		// characters,
-		// tracks,
-		// scenes
+		characters,
+		tracks,
+		scenes
 	} from './machine'
 
 	import Table from './table.svelte'
 	import Character from './character.svelte'
 	import Toolbar from './toolbar.svelte'
 
+	import DEBUG_INFO from './DEBUG_INFO.svelte'
+	import DebugInfo from './DEBUG_INFO.svelte'
+	import { nanoid } from 'nanoid'
+
 	/**
 	 * 	@type {import('./$types').PageData} */
 	export let data // receive data obj from "server", then pass into the store
 	$table = data.table
 
-	// form input defaults / placeholders
-	let trackCount = 4
-	let trackPrefix = 'track'
-
-	let deleteButton
-
 	/** Add tracks to the global table object */
 	function submitTracks(event) {
 		if (event.key !== 'Enter') return
 
-		let trackPrefixVal = document.querySelector("input[name='track-prefix']").value
-		let trackCountVal = document.querySelector("input[name='track-count']").value
+		let label = document.querySelector("input[name='track-prefix']").value
+		let count = document.querySelector("input[name='track-count']").value
 
 		// TODO: sanitize inputs
 		// must have 2 valid track inputs to proceed
-		if (!trackPrefixVal || !trackCountVal) return
+		if (!label || !count) return
 
-		trackPrefix = trackPrefixVal
-		trackCount = trackCountVal
+		// TODO: if label already exists in tracks, keep counting
+		// e.g. if "Track 1" - "Track 5" exist, this adds "Track 6"+
 
-		// CREATE THE DATA STRUCTURES
-		// push new tracks to table.tracks
-		for (let i = 0; i < trackCount; i++) {
-			const track = newTrack(`${trackPrefix}_${i + 1}`)
-			$table.tracks = $table.tracks.concat(track)
+		for (let i = 0; i < count; i++) {
+			const name = `${label}_${i + 1}`
+			const id = `trk_${nanoid(9)}`
+			$tracks[id] = { name }
 		}
+		$tracks = $tracks
 
 		// clear input fields
-		trackPrefix = null
-		trackCount = null
+		label = null
+		count = null
 	}
 
 	/** Add a scene to the global table object */
@@ -203,94 +200,29 @@
 		$table.scenes = $table.scenes
 	}
 
+	$: charactersEntries = Object.entries($characters)
+
 	// DEBUG
 	onMount(DEV_populate_table)
-
-	/** *DO NOT CHANGE VALUES IN THIS FUNCTION, TESTS DEPEND ON THEM.* \
-	 * YOU MAY ADD MORE... I THINK?
-	 */
-	// function DEV_populate_table() {
-	// 	// add X tracks
-	// 	const NUM_TRACKS = 4
-	// 	for (let i = 0; i < NUM_TRACKS; i++) {
-	// 		$table.tracks[i] = newTrack('Track_' + (i + 1))
-	// 	}
-
-	// 	// add 2 scenes
-	// 	$table.scenes[0] = newScene('33-A')
-	// 	$table.scenes[1] = newScene('66-B')
-	// 	// $table.scenes[2] = newScene('101-D')
-	// 	// $table.scenes[3] = newScene('V-101-C')
-
-	// 	// add characters
-	// 	$table.characters[0] = newCharacter('Né-né')
-	// 	$table.characters[1] = newCharacter('Zina')
-	// 	$table.characters[2] = newCharacter('Yuki')
-	// 	$table.characters[3] = newCharacter('Igor')
-	// 	// $table.characters[4] = newCharacter('Alex')
-
-	// }
-
-	// DEBUG
-	// log scene 1 trackList 1 (1st trackList added, regardless of track number)
-	$: {
-		const trackName = $table?.scenes[0]?.trackList[0]?.trackName
-		const characterNames = $table?.scenes[0]?.trackList[0]?.characterNames
-		if (trackName) console.log(`${trackName}: ${characterNames}`)
-	}
-
-	// // log selected header
-	// $: {
-	// 	const { type, name } = $selectedHeader
-	// 	console.log(type ? `- selected header: ${type} : ${name}` : '- no header selected')
-	// }
-
-	// // log selected drop zones
-	// $: {
-	// 	console.log(
-	// 		$selectedDropZones.length === 0 ? '- no drop zones selected' : '- selected drop zones:'
-	// 	)
-	// 	for (let dz of $selectedDropZones) {
-	// 		console.log('\t', dz.sceneName, ':', dz.trackName)
-	// 	}
-	// }
-
-	// // log character in hand
-	// $: {
-	// 	console.log(
-	// 		$charactersInHand.length
-	// 			? `- character in hand: ${$charactersInHand[0].name}`
-	// 			: '- no character in hand'
-	// 	)
-	// }
 </script>
 
 <svelte:window on:keydown={handleKeyPress} />
 
-<div class="container">
+<main class="container">
 	<article>
 		<!-- does character in hand need to be a bind: ? -->
-		<Toolbar
-			bind:deleteButton
-			{clearAllSelections}
-		/>
+		<Toolbar />
 		<!-- a poor-man's OR op? -->
-		{#if $table.tracks.length + $table.scenes.length > 0}
-			<div
-				class="table"
-				class:glow={$canEdit}
-			>
+		{#if Object.keys($tracks).length + Object.keys($scenes).length > 0}
+			<div class="table">
 				<Table />
 			</div>
 		{/if}
 	</article>
 
 	<div class="character-pool">
-		{#each $table.characters as character}
-			<Character
-				name={character.name}
-				location="__pool__"
-			/>
+		{#each charactersEntries as [id, { name }]}
+			<Character characterId={id} />
 		{/each}
 		<button
 			id="btn-commit"
@@ -301,7 +233,9 @@
 		</button>
 	</div>
 
-	<form class="inputs">
+	<DebugInfo />
+
+	<!-- <form class="inputs">
 		<div class="track-input">
 			<input
 				autofocus
@@ -340,8 +274,8 @@
 				on:keydown={submitCharacter}
 			/>
 		</div>
-	</form>
-</div>
+	</form> -->
+</main>
 
 <style>
 	/* should be end selector ($=, not *=), but would not work */

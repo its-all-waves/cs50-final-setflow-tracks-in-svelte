@@ -1,18 +1,18 @@
 //@ts-check
-import { nanoid, NANO_ID_LENGTH } from '../util/util'
+import { nanoid } from 'nanoid'
 
-/** @typedef {import('../types').Track} Track */
+// /** @typedef {import('../types').Track} Track */
 
-/**
- * @returns {Track}
- * @param {string} name
- */
-export function newTrack(name) {
-	/** @type {string} */
-	const id = nanoid(NANO_ID_LENGTH)
+// /**
+//  * @returns {Track}
+//  * @param {string} name
+//  */
+// export function newTrack(name) {
+// 	/** @type {string} */
+// 	const id = nanoid(NANO_ID_LENGTH)
 
-	return {
-		id,
-		name
-	}
-}
+// 	return {
+// 		id,
+// 		name
+// 	}
+// }

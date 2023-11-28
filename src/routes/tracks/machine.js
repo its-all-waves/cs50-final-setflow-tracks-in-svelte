@@ -25,7 +25,11 @@ export const Msg = Object.freeze({
 	// context menu
 	DELETE_SCENE: 'DELETE_SCENE',
 	DELETE_TRACK: 'DELETE_TRACK',
-	RENAME: 'RENAME'
+	RENAME: 'RENAME',
+	// inputs
+	ADD_CHARACTER: 'ADD_CHARACTER',
+	ADD_TRACKS: 'ADD_TRACKS',
+	ADD_SCENE: 'ADD_SCENES'
 })
 
 export const State = Object.freeze({
@@ -263,16 +267,16 @@ function containsCharacterInHand(trackList) {
 // ACTIONS +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 /** @param {string} character @description Put `character` in-hand... characterInHand */
-function PICK_UP_POOL_CHARACTER({ id }) {
-	const { name } = $characters[id]
+function PICK_UP_POOL_CHARACTER({ characterId }) {
+	const { name } = $characters[characterId]
 
 	// if clicked the character in hand, deselect it
-	if (id === $characterInHand) {
+	if (characterId === $characterInHand) {
 		characterInHand.set(null)
 		feedback.set(`returned ${name} to pool`)
 		return
 	}
-	characterInHand.set(id)
+	characterInHand.set(characterId)
 	feedback.set(`picked up ${name} from pool`)
 }
 
@@ -346,24 +350,24 @@ function SELECT_DROP_ZONE({ sceneId, trackId }) {
 	feedback.set(`selected drop zone at scene ${scene}, ${track}`)
 }
 
-function SELECT_TRACK({ trackId }) {
-	const track = $tracks[trackId].name
+function SELECT_TRACK({ id }) {
+	const track = $tracks[id].name
 
 	// deselect and return if selected
-	if ($selectedHeader === trackId) {
+	if ($selectedHeader === id) {
 		selectedHeader.set(null)
 		feedback.set(`deselected drop zones on ${track}`)
 		return
 	}
 
 	// clicked an unselected track, so select it
-	selectedHeader.set(trackId)
+	selectedHeader.set(id)
 
 	// select all the drop zones in a track
 	for (const sceneId in $scenes) {
 		const { trackList } = $scenes[sceneId]
 		if (containsCharacterInHand(trackList)) continue // I THINK?
-		$selectedDropZones.add({ sceneId, trackId })
+		$selectedDropZones.add({ sceneId, trackId: id })
 		selectedDropZones.set($selectedDropZones)
 	}
 	feedback.set(`selected all drop zones on ${track}`)
