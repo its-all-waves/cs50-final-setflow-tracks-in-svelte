@@ -38,7 +38,7 @@ test.describe(`ALL DELETE BUTTON FUNCTIONS`, () => {
 		await characterInTable.click()
 
 		// assert: has .chosen class
-		await expect(characterInTable).toHaveClass(/\s*chosen\s*/)
+		await expect(characterInTable).toHaveClass(/\s*selected\s*/)
 
 		// delete
 		await deleteButton.click()

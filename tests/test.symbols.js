@@ -11,24 +11,24 @@ import { State, Test } from '../src/routes/tracks/machine'
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 // html elements, dependent on constants above
-/** @type {Locator}   */ export let commitButton
-/** @type {Locator}   */ export let deleteButton
+/** @type {Locator} */ export let commitButton
+/** @type {Locator} */ export let deleteButton
 
-/** @type {Locator}   */ export let characterPool
-/** @type {Locator}   */ export let characterA
-/** @type {Locator}   */ export let characterB
-/** @type {Locator}   */ export let characterC
+/** @type {Locator} */ export let characterPool
+/** @type {Locator} */ export let characterA
+/** @type {Locator} */ export let characterB
+/** @type {Locator} */ export let characterC
 
-/** @type {Locator}   */ export let headerSceneA
-/** @type {Locator}   */ export let headerSceneB
+/** @type {Locator} */ export let headerSceneA
+/** @type {Locator} */ export let headerSceneB
 
-/** @type {Locator}   */ export let headerTrackA
-/** @type {Locator}   */ export let headerTrackB
+/** @type {Locator} */ export let headerTrackA
+/** @type {Locator} */ export let headerTrackB
 
-/** @type {Locator}   */ export let dropZoneAA
-/** @type {Locator}   */ export let dropZoneAB
-/** @type {Locator}   */ export let dropZoneBA
-/** @type {Locator}   */ export let dropZoneBB
+/** @type {Locator} */ export let dropZoneAA
+/** @type {Locator} */ export let dropZoneAB
+/** @type {Locator} */ export let dropZoneBA
+/** @type {Locator} */ export let dropZoneBB
 
 // get all the elements for whoever imports me
 test.beforeEach(async ({ page }) => {

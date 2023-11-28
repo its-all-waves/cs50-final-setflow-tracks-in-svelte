@@ -11,7 +11,6 @@
 	<thead>
 		<tr>
 			<th class="empty" />
-			<!-- {#if sceneEntries.length > 0} -->
 			<!-- a column header per scene -->
 			{#each scenesEntries as [id, { name }]}
 				<th data-scene-header={name}>
@@ -24,12 +23,10 @@
 					</button>
 				</th>
 			{/each}
-			<!-- {/if} -->
 		</tr>
 	</thead>
 
 	<tbody>
-		<!-- {#if tracksEntries.length > 0} -->
 		<!-- a row + header per track -->
 		{#each tracksEntries as [trackId, { name: trackName }]}
 			<tr data-track-row={trackName}>
@@ -54,7 +51,6 @@
 				{/each}
 			</tr>
 		{/each}
-		<!-- {/if} -->
 	</tbody>
 </table>
 

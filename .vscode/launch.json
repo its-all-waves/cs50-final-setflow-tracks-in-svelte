@@ -11,7 +11,12 @@
             "name": "Launch Chrome against localhost",
             "url": "http://localhost:5173/tracks",
             // "url": "http://localhost:8080",
-            "webRoot": "${workspaceFolder}"
+            "webRoot": "${workspaceFolder}",
+            "smartStep": true,
+            "skipFiles": [
+                "<node_internals>/**",
+                "node_modules/**"
+            ]
         }
     ]
 }
