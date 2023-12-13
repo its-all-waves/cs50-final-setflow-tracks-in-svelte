@@ -10,6 +10,15 @@
 
 	const instanceId = isInstance ? `ins_${nanoid(9)}_${id}` : undefined
 
+	const optionsArray = [
+		{
+			name: 'rename',
+			fn: () => {
+				// open the rename dialog
+			}
+		}
+	]
+
 	$: inHand = name
 		? name === $characters[$characterInHand]?.name
 		: $characters[id]?.name === $characters[$characterInHand]?.name
@@ -26,16 +35,17 @@
 </script>
 
 <button
+	id={isInstance ? instanceId : id}
 	class="character"
 	class:inHand
 	class:selected
 	data-character-name={name ?? $characters[id].name}
-	on:pointerup|preventDefault|stopPropagation={() => {
+	on:click|preventDefault={() => {
 		console.log({ isInstance })
 		const msg = isInstance ? Msg.CLICK_TABLE_CHARACTER : Msg.CLICK_POOL_CHARACTER
-		console.log({ msg: { instanceId, id: id, sceneId, trackId } })
-		console.log($selectedCharacters)
-		send(msg, { instanceId, id: id, sceneId, trackId })
+		// console.log({ msg: { instanceId, id, sceneId, trackId } })
+		// console.log($selectedCharacters)
+		send(msg, { instanceId, id, sceneId, trackId })
 	}}
 >
 	{name ?? $characters[id].name}

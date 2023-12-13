@@ -1,11 +1,22 @@
 <script>
+	/*
+	The renaming process
+	    - right click shows context menu, puts event target in a store --
+	    contextMenuTarget
+		- 
+
+		- modal pops up -- "Rename <Type>" with a text box
+		- final step -- send(Msg.RENAME, {type, id, newName})
+
+
+
+
+	The deleting process
+		- modal pops up -- "Are you sure you want to delete <Name>?"
+		- 
+	 */
+
 	import { onMount } from 'svelte'
-
-	import { newScene, newTrackListItem } from '../../lib/TableObjects/Scene'
-	import { newCharacter } from '../../lib/TableObjects/Character'
-
-	// TODO: GET RID OF ME
-	import { table } from './store'
 
 	import {
 		DEV_populate_table,
@@ -15,16 +26,17 @@
 		scenes,
 		characterInHand,
 		send,
-		Msg
+		Msg,
+		selectedDropZones,
+		selectedCharacters
 	} from './machine'
 
 	import Table from './table.svelte'
 	import Character from './character.svelte'
 	import Toolbar from './toolbar.svelte'
 
-	import DEBUG_INFO from './DEBUG_INFO.svelte'
-	import DebugInfo from './DEBUG_INFO.svelte'
 	import { nanoid } from 'nanoid'
+	import ContextMenu from './contextMenu.svelte'
 
 	/**
 	 * 	@type {import('./$types').PageData} */
@@ -71,8 +83,8 @@
 		if (event.key !== 'Enter') return
 
 		const inputField = event.target
-		// const name = inputField.value.replace(' ', '_')
-		const name = inputField.value
+		const name = inputField.value.replace(' ', '_')
+		// const name = inputField.value
 
 		// TODO: sanitize input
 		if (!name) return
@@ -94,8 +106,8 @@
 		if (event.key !== 'Enter') return
 
 		let inputField = event.target
-		// const name = inputField.value.replace(' ', '_')
-		const name = inputField.value
+		const name = inputField.value.replace(' ', '_')
+		// const name = inputField.value
 
 		// TODO: validate input
 		if (!name) return
@@ -157,9 +169,49 @@
 
 	// DEBUG
 	onMount(DEV_populate_table)
+
+	//
+
+	//
+
+	// context menu ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	let showContextMenu = false
+	let contextMenuPosition = { left: 0, top: 0 }
+	let contextMenuTarget
+
+	function handleContextMenu(e) {
+		if (!e.target.matches('.character') && !e.target.matches('.header')) return
+		e.preventDefault()
+		contextMenuPosition.left = e.pageX
+		contextMenuPosition.top = e.pageY
+		contextMenuTarget = e.target // that which was right-clicked
+		showContextMenu = true
+	}
+
+	function handleContextMenuClickRename(e) {
+		e.stopPropagation()
+		window.dispatchEvent(new CustomEvent('launch-modal-rename', e.detail))
+		lastEventDetail = e.detail
+	}
+
+	function handleContextMenuClickDelete(e) {
+		e.stopPropagation()
+		window.dispatchEvent(new CustomEvent('launch-modal-delete', e.detail))
+		lastEventDetail = e.detail
+	}
 </script>
 
-<svelte:window on:keydown|passive={handleKeyPress} />
+<svelte:window
+	on:keydown|passive={handleKeyPress}
+	on:contextmenu={() => (showContextMenu = false)}
+	on:contextmenu={handleContextMenu}
+	on:click={(e) => {
+		if (showContextMenu) {
+			e.stopPropagation()
+			showContextMenu = false
+		}
+	}}
+/>
 
 <main class="container">
 	<article>
@@ -226,6 +278,13 @@
 			/>
 		</div>
 	</div>
+
+	{#if showContextMenu}
+		<ContextMenu
+			position={contextMenuPosition}
+			target={contextMenuTarget}
+		/>
+	{/if}
 </main>
 
 <style>
