@@ -1,21 +1,4 @@
 <script>
-	/*
-	The renaming process
-	    - right click shows context menu, puts event target in a store --
-	    contextMenuTarget
-		- 
-
-		- modal pops up -- "Rename <Type>" with a text box
-		- final step -- send(Msg.RENAME, {type, id, newName})
-
-
-
-
-	The deleting process
-		- modal pops up -- "Are you sure you want to delete <Name>?"
-		- 
-	 */
-
 	import { onMount } from 'svelte'
 
 	import {
@@ -37,6 +20,8 @@
 
 	import { nanoid } from 'nanoid'
 	import ContextMenu from './contextMenu.svelte'
+	import ModalDelete from './modalDelete.svelte'
+	import ModalRename from './modalRename.svelte'
 
 	/**
 	 * 	@type {import('./$types').PageData} */
@@ -140,7 +125,7 @@
 		$characters = $characters
 	}
 
-	function handleKeyPress(event) {
+	function handleKeyboardShortcut(event) {
 		switch (event.key) {
 			case 'Escape':
 				send(Msg.CANCEL)
@@ -167,13 +152,6 @@
 		return 0
 	})
 
-	// DEBUG
-	onMount(DEV_populate_table)
-
-	//
-
-	//
-
 	// context menu ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	let showContextMenu = false
 	let contextMenuPosition = { left: 0, top: 0 }
@@ -181,6 +159,7 @@
 
 	function handleContextMenu(e) {
 		if (!e.target.matches('.character') && !e.target.matches('.header')) return
+		e.stopPropagation()
 		e.preventDefault()
 		contextMenuPosition.left = e.pageX
 		contextMenuPosition.top = e.pageY
@@ -199,18 +178,57 @@
 		window.dispatchEvent(new CustomEvent('launch-modal-delete', e.detail))
 		lastEventDetail = e.detail
 	}
+
+	// modals ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	/** @description is e.detail from oncontextmenu; gets passed into the modal */
+	let lastEventDetail // may end up applying to more than just rename modal
+
+	// rename modal ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	let modalRename
+
+	function handleLaunchModalRename(e) {
+		e.stopPropagation()
+		modalRename.showModal()
+	}
+
+	function handleSubmitModalRename(e) {
+		e.stopPropagation()
+		send(Msg.RENAME, e.detail)
+	}
+
+	// delete modal ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	let modalDelete
+
+	function handleLaunchModalDelete(e) {
+		e.stopPropagation()
+		modalDelete.showModal()
+	}
+
+	function handleSubmitModalDelete(e) {
+		e.stopPropagation()
+		send(Msg.DELETE_CHARACTER, { id: e.detail.id })
+	}
+
+	// DEBUG +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	onMount(DEV_populate_table)
 </script>
 
 <svelte:window
-	on:keydown|passive={handleKeyPress}
-	on:contextmenu={() => (showContextMenu = false)}
+	on:contextmenu={/* must appear before handleContextMenu */ () => (showContextMenu = false)}
 	on:contextmenu={handleContextMenu}
+	on:contextmenu-click-rename={handleContextMenuClickRename}
+	on:launch-modal-rename={handleLaunchModalRename}
+	on:submit-modal-rename={handleSubmitModalRename}
+	on:contextmenu-click-delete={handleContextMenuClickDelete}
+	on:launch-modal-delete={handleLaunchModalDelete}
+	on:submit-modal-delete={handleSubmitModalDelete}
 	on:click={(e) => {
 		if (showContextMenu) {
 			e.stopPropagation()
 			showContextMenu = false
 		}
 	}}
+	on:keydown={handleKeyboardShortcut}
 />
 
 <main class="container">
@@ -278,14 +296,25 @@
 			/>
 		</div>
 	</div>
-
-	{#if showContextMenu}
-		<ContextMenu
-			position={contextMenuPosition}
-			target={contextMenuTarget}
-		/>
-	{/if}
 </main>
+
+{#if showContextMenu}
+	<ContextMenu
+		position={contextMenuPosition}
+		target={contextMenuTarget}
+	/>
+{/if}
+
+<!-- HTML dialog as a modal (hidden until .showModal() is called) -->
+<ModalRename
+	bind:node={modalRename}
+	detail={lastEventDetail}
+/>
+
+<ModalDelete
+	bind:node={modalDelete}
+	detail={lastEventDetail}
+/>
 
 <style>
 	/* should be end selector ($=, not *=), but would not work */

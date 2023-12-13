@@ -1,4 +1,6 @@
 <script>
+	import { characters } from './machine'
+
 	export let position
 	export let target
 	let node
@@ -93,15 +95,18 @@
 	$: options = contextMenus[menuType]
 </script>
 
-<ul
-	class="context-menu"
-	bind:this={node}
->
-	<h1>{target.id}</h1>
-	{#each options as { option, fn }}
-		<li on:pointerup={fn}>{option}</li>
-	{/each}
-</ul>
+<menu>
+	<ul
+		class="context-menu"
+		bind:this={node}
+	>
+		<h1>{$characters[target.id].name}</h1>
+
+		{#each options as { option, fn }}
+			<li on:pointerup={fn}>{option}</li>
+		{/each}
+	</ul>
+</menu>
 
 <style>
 	ul {
