@@ -11,6 +11,7 @@
 	class="modal"
 	bind:this={node}
 	on:keydown={(e) => {
+		e.stopPropagation()
 		if (e.key !== 'Enter' && e.key !== 'Escape') return
 		if (e.key === 'Enter') {
 			node.dispatchEvent(
