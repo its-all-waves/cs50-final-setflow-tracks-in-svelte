@@ -28,7 +28,7 @@
 	data-drop-zone
 	data-scene-name={scene.name}
 	data-track-name={trackName}
-	on:pointerup|preventDefault={() =>
+	on:click|preventDefault={() =>
 		send(Msg.CLICK_DROP_ZONE, {
 			sceneId,
 			trackId

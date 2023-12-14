@@ -25,20 +25,24 @@
 	}
 </script>
 
-<button
-	{id}
-	{instanceId}
-	class="character"
-	class:inHand
-	class:selected
-	data-character-name={name ?? $characters[id].name}
-	on:click|preventDefault={() => {
-		const msg = isInstance ? Msg.CLICK_TABLE_CHARACTER : Msg.CLICK_POOL_CHARACTER
-		send(msg, { instanceId, id, sceneId, trackId })
-	}}
->
-	{name ?? $characters[id].name}
-</button>
+{#if $characters[id]}
+	<!-- solves a problem I don't understand that breaks the
+ui after deleting a character -->
+	<button
+		{id}
+		{instanceId}
+		class="character"
+		class:inHand
+		class:selected
+		data-character-name={name ?? $characters[id].name}
+		on:click|preventDefault={() => {
+			const msg = isInstance ? Msg.CLICK_TABLE_CHARACTER : Msg.CLICK_POOL_CHARACTER
+			send(msg, { instanceId, id, sceneId, trackId })
+		}}
+	>
+		{$characters[id].name}
+	</button>
+{/if}
 
 <style>
 	button {
