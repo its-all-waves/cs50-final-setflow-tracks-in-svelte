@@ -25,7 +25,7 @@
 >
 	<form method="dialog">
 		<!-- <p>Delete {$characters[detail?.id]?.name}?</p> -->
-		<p>Delete {name}?</p>
+		<p>Delete {name} everywhere?</p>
 
 		<button
 			type="button"

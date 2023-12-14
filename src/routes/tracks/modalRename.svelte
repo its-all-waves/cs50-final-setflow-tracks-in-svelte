@@ -13,8 +13,25 @@
 	class="modal"
 	bind:this={node}
 	on:keydown={(e) => {
-		if (e.key !== 'Escape') return
+		e.stopPropagation()
+		if (e.key !== 'Escape' && e.key !== 'Enter') return
+		if (e.key === 'Enter') {
+			if (!newName) {
+				node.close()
+				return
+			}
+			node.dispatchEvent(
+				new CustomEvent('submit-modal-rename', {
+					bubbles: true,
+					detail: {
+						...detail,
+						newName
+					}
+				})
+			)
+		}
 		newName = ''
+		node.close()
 	}}
 >
 	<form method="dialog">
@@ -48,6 +65,7 @@
 					})
 				)
 				newName = ''
+				node.close()
 			}}
 		>
 			Confirm
