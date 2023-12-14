@@ -30,12 +30,11 @@
 ui after deleting a character -->
 	<button
 		{id}
-		{instanceId}
 		class="character"
 		class:inHand
 		class:selected
 		data-character-name={name ?? $characters[id].name}
-		on:click|preventDefault={() => {
+		on:click|preventDefault|stopPropagation={() => {
 			const msg = isInstance ? Msg.CLICK_TABLE_CHARACTER : Msg.CLICK_POOL_CHARACTER
 			send(msg, { instanceId, id, sceneId, trackId })
 		}}
