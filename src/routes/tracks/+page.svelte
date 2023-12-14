@@ -173,7 +173,7 @@
 		lastEventDetail = e.detail
 	}
 
-	function handleContextMenuClickDelete(e) {
+	function handleContextmenuClickDelete(e) {
 		e.stopPropagation()
 		window.dispatchEvent(new CustomEvent('launch-modal-delete', e.detail))
 		lastEventDetail = e.detail
@@ -219,7 +219,7 @@
 	on:contextmenu-click-rename={handleContextMenuClickRename}
 	on:launch-modal-rename={handleLaunchModalRename}
 	on:submit-modal-rename={handleSubmitModalRename}
-	on:contextmenu-click-delete={handleContextMenuClickDelete}
+	on:contextmenu-click-delete={handleContextmenuClickDelete}
 	on:launch-modal-delete={handleLaunchModalDelete}
 	on:submit-modal-delete={handleSubmitModalDelete}
 	on:click={(e) => {

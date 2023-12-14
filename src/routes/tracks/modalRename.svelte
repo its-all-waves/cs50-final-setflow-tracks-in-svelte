@@ -6,6 +6,15 @@
 	let newName = ''
 
 	$: name = detail?.type === 'character' ? $characters[detail?.id]?.name : '<scene | track>'
+
+	// reactive bc newName will change when set
+	$: submitModalRename = new CustomEvent('submit-modal-rename', {
+		bubbles: true,
+		detail: {
+			...detail,
+			newName
+		}
+	})
 </script>
 
 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
@@ -20,15 +29,7 @@
 				node.close()
 				return
 			}
-			node.dispatchEvent(
-				new CustomEvent('submit-modal-rename', {
-					bubbles: true,
-					detail: {
-						...detail,
-						newName
-					}
-				})
-			)
+			node.dispatchEvent(submitModalRename)
 		}
 		newName = ''
 		node.close()
@@ -55,15 +56,7 @@
 			type="submit"
 			on:click={() => {
 				if (!newName) return
-				node.dispatchEvent(
-					new CustomEvent('submit-modal-rename', {
-						bubbles: true,
-						detail: {
-							...detail,
-							newName
-						}
-					})
-				)
+				node.dispatchEvent(submitModalRename)
 				newName = ''
 				node.close()
 			}}
