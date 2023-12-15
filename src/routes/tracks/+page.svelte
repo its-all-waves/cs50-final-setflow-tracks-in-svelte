@@ -13,7 +13,8 @@
 		send,
 		Msg,
 		selectedDropZones,
-		selectedCharacters
+		selectedCharacters,
+		lastEventDetail
 	} from './machine'
 
 	import Table from './table.svelte'
@@ -22,6 +23,7 @@
 	import ContextMenu from './contextMenu.svelte'
 	import ModalDelete from './modalDelete.svelte'
 	import ModalRename from './modalRename.svelte'
+	import ModalClear from './modalClear.svelte'
 
 	/**
 	 * 	@type {import('./$types').PageData} */
@@ -137,7 +139,7 @@
 				break
 			case 'Delete': // fall thru
 			case 'Backspace':
-				send(Msg.SMART_DELETE)
+				window.dispatchEvent(new CustomEvent('launch-modal-clear'))
 				break
 		}
 	}
@@ -176,18 +178,14 @@
 	function handleContextmenuClickRename(e) {
 		e.stopPropagation()
 		window.dispatchEvent(new CustomEvent('launch-modal-rename', e.detail))
-		lastEventDetail = e.detail
+		$lastEventDetail = e.detail
 	}
 
 	function handleContextmenuClickDelete(e) {
 		e.stopPropagation()
 		window.dispatchEvent(new CustomEvent('launch-modal-delete', e.detail))
-		lastEventDetail = e.detail
+		$lastEventDetail = e.detail
 	}
-
-	// modals ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	/** @description is e.detail from oncontextmenu; gets passed into the modal */
-	let lastEventDetail // may end up applying to more than just rename modal
 
 	// rename modal ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	let modalRename
@@ -195,11 +193,13 @@
 	function handleLaunchModalRename(e) {
 		e.stopPropagation()
 		modalRename.showModal()
+		$lastEventDetail = null
 	}
 
 	function handleSubmitModalRename(e) {
 		e.stopPropagation()
 		send(Msg.RENAME, e.detail)
+		$lastEventDetail = null
 	}
 
 	// delete modal ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -208,6 +208,7 @@
 	function handleLaunchModalDelete(e) {
 		e.stopPropagation()
 		modalDelete.showModal()
+		$lastEventDetail = null
 	}
 
 	function handleSubmitModalDelete(e) {
@@ -222,6 +223,20 @@
 				? Msg.DELETE_SCENE
 				: undefined
 		send(msg, { id })
+		$lastEventDetail = null // pretty sure i can remove this everywhere and make this var local to page.svelte again
+	}
+
+	// modal clear +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	let modalClear
+
+	function handleLaunchModalClear(e) {
+		e.stopPropagation()
+		modalClear.showModal()
+	}
+
+	function handleSubmitModalClear(e) {
+		e.stopPropagation()
+		send(Msg.SMART_CLEAR)
 	}
 
 	// DEBUG +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -236,6 +251,8 @@
 	on:contextmenu-click-delete={handleContextmenuClickDelete}
 	on:launch-modal-delete={handleLaunchModalDelete}
 	on:submit-modal-delete={handleSubmitModalDelete}
+	on:launch-modal-clear={handleLaunchModalClear}
+	on:submit-modal-clear={handleSubmitModalClear}
 	on:click|capture={(e) => {
 		/* capture & if showContextMenu prevent click outside 
 		of context menu from doing anything else -- next click 
@@ -262,7 +279,13 @@
 
 	<div class="character-pool">
 		{#each charactersEntries as [id, { name }]}
-			<Character {id} />
+			<Character
+				{id}
+				isInstance={false}
+				{name}
+				sceneId={undefined}
+				trackId={undefined}
+			/>
 		{/each}
 		<button
 			id="btn-commit"
@@ -325,13 +348,15 @@
 <!-- HTML dialog as a modal (hidden until .showModal() is called) -->
 <ModalRename
 	bind:node={modalRename}
-	detail={lastEventDetail}
+	detail={$lastEventDetail}
 />
 
 <ModalDelete
 	bind:node={modalDelete}
-	detail={lastEventDetail}
+	detail={$lastEventDetail}
 />
+
+<ModalClear bind:node={modalClear} />
 
 <style>
 	/* should be end selector ($=, not *=), but would not work */

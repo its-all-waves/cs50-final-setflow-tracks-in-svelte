@@ -1,5 +1,5 @@
 <script>
-	import { state, send, State, Msg, feedback } from './machine'
+	import { state, send, State, Msg, feedback, lastEventDetail } from './machine'
 
 	$: unlocked = $state === State.TableUnlocked
 
@@ -14,9 +14,12 @@
 </script>
 
 <menu>
+	<!-- on:pointerup={() => send(Msg.SMART_DELETE)} -->
 	<button
 		id="btn-delete"
-		on:pointerup={() => send(Msg.SMART_DELETE)}
+		on:click={() => {
+			window.dispatchEvent(new CustomEvent('launch-modal-clear'))
+		}}
 	>
 		<img
 			src="button-icons/trash.fill.svg"

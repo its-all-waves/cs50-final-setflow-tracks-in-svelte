@@ -17,7 +17,7 @@ export const Msg = Object.freeze({
 	CLICK_SCENE_HEADER: 'CLICK_SCENE_HEADER',
 	// user commands
 	COMMIT_CHARACTER_TO_TABLE: 'COMMIT_CHARACTER_TO_TABLE',
-	SMART_DELETE: 'DELETE',
+	SMART_CLEAR: 'SMART_CLEAR',
 	CANCEL: 'CANCEL', // TODO: impl me
 	DELETE_CHARACTER: 'DELETE_CHARACTER',
 	// context menu
@@ -110,6 +110,14 @@ export const scenes = writable(
 let $scenes
 scenes.subscribe(($) => ($scenes = $))
 
+/** @description is e.detail from oncontextmenu; gets passed into the modal */
+export const lastEventDetail = writable(
+	/** @type {object} */
+	null
+)
+let $lastEventDetail
+lastEventDetail.subscribe(($) => ($lastEventDetail = $))
+
 // MAIN FUNCTION (PRIVATE) +++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 // TODO: if a lot is repeated here, can it be DRYer by switching on the message?
@@ -182,7 +190,7 @@ function nextState(state, msg, info) {
 					resetSelections()
 					break
 
-				case Msg.SMART_DELETE:
+				case Msg.SMART_CLEAR:
 					SMART_DELETE()
 					resetSelections()
 					break

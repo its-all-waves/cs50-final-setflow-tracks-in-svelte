@@ -39,7 +39,7 @@ ui after deleting a character -->
 			send(msg, { instanceId, id, sceneId, trackId })
 		}}
 	>
-		{$characters[id].name}
+		{name}
 	</button>
 {/if}
 
@@ -102,7 +102,7 @@ ui after deleting a character -->
 
 	.inHand {
 		/* border-color: goldenrod; */
-		border-width: 1;
+		/* border-width: 1; */
 		scale: 1.25;
 		/* scale: 1.25; */
 		transform: translateY(-0.3rem);
@@ -116,7 +116,7 @@ ui after deleting a character -->
 			inset 0 -2px 3px rgba(0, 0, 0, 0.681);
 		border-color: white;
 
-		border-width: 1;
+		/* border-width: 1; */
 		scale: 1.1;
 		transform: translateY(-0.3rem);
 		transition: border 0.1s, scale 0.1s, box-shadow 0.1s;

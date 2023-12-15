@@ -42,6 +42,7 @@
 					id={charId}
 					{sceneId}
 					{trackId}
+					name={$characters[charId].name}
 				/>
 			{/each}
 		{/if}
