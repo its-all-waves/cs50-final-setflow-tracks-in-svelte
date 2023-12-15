@@ -1,4 +1,6 @@
 <script>
+	import { nanoid } from 'nanoid'
+
 	import { onMount } from 'svelte'
 
 	import {
@@ -17,8 +19,6 @@
 	import Table from './table.svelte'
 	import Character from './character.svelte'
 	import Toolbar from './toolbar.svelte'
-
-	import { nanoid } from 'nanoid'
 	import ContextMenu from './contextMenu.svelte'
 	import ModalDelete from './modalDelete.svelte'
 	import ModalRename from './modalRename.svelte'
@@ -153,9 +153,10 @@
 	})
 
 	// context menu ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	let showContextMenu = false
-	let contextMenuMousePos = { x: 0, y: 0 }
-	let contextMenuTarget
+	let showContextmenu = false
+	let contextmenuMousePos = { x: 0, y: 0 }
+	/** that which was right-clicked */
+	let contextmenuTarget
 
 	function handleContextMenu(e) {
 		if (
@@ -167,13 +168,12 @@
 		}
 		e.stopPropagation()
 		e.preventDefault()
-		contextMenuMousePos.x = e.pageX
-		contextMenuMousePos.y = e.pageY
-		contextMenuTarget = e.target // that which was right-clicked
-		showContextMenu = true
+		contextmenuMousePos = { x: e.pageX, y: e.pageY }
+		contextmenuTarget = e.target
+		showContextmenu = true
 	}
 
-	function handleContextMenuClickRename(e) {
+	function handleContextmenuClickRename(e) {
 		e.stopPropagation()
 		window.dispatchEvent(new CustomEvent('launch-modal-rename', e.detail))
 		lastEventDetail = e.detail
@@ -230,7 +230,7 @@
 
 <svelte:window
 	on:contextmenu={handleContextMenu}
-	on:contextmenu-click-rename={handleContextMenuClickRename}
+	on:contextmenu-click-rename={handleContextmenuClickRename}
 	on:launch-modal-rename={handleLaunchModalRename}
 	on:submit-modal-rename={handleSubmitModalRename}
 	on:contextmenu-click-delete={handleContextmenuClickDelete}
@@ -240,9 +240,9 @@
 		/* capture & if showContextMenu prevent click outside 
 		of context menu from doing anything else -- next click 
 		can interact with other things */
-		if (showContextMenu) {
+		if (showContextmenu) {
 			e.stopPropagation()
-			showContextMenu = false
+			showContextmenu = false
 		}
 	}}
 	on:keydown={handleKeyboardShortcut}
@@ -315,10 +315,10 @@
 	</div>
 </main>
 
-{#if showContextMenu}
+{#if showContextmenu}
 	<ContextMenu
-		mousePosition={contextMenuMousePos}
-		menuTarget={contextMenuTarget}
+		mousePosition={contextmenuMousePos}
+		menuTarget={contextmenuTarget}
 	/>
 {/if}
 
