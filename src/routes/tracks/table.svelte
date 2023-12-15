@@ -15,7 +15,9 @@
 			{#each scenesEntries as [id, { name }]}
 				<th data-scene-header={name}>
 					<button
-						on:pointerup={() => {
+						class="scene"
+						{id}
+						on:click={() => {
 							send(Msg.CLICK_SCENE_HEADER, { id })
 						}}
 					>
@@ -32,7 +34,9 @@
 			<tr data-track-row={trackName}>
 				<th data-track-header={trackName}>
 					<button
-						on:pointerup={() => {
+						class="track"
+						id={trackId}
+						on:click={() => {
 							send(Msg.CLICK_TRACK_HEADER, { id: trackId })
 						}}
 						>{trackName}

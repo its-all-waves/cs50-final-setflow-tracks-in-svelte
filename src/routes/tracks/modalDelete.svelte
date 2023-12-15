@@ -1,9 +1,16 @@
 <script>
-	import { characters } from './machine'
+	import { characters, scenes, tracks } from './machine'
 	export let node
 	export let detail
 
-	$: name = detail?.type === 'character' ? $characters[detail?.id]?.name : '<scene | track>'
+	$: name =
+		detail?.type === 'character'
+			? $characters[detail?.id]?.name
+			: detail?.type === 'track'
+			? $tracks[detail?.id]?.name
+			: detail?.type === 'scene'
+			? $scenes[detail?.id]?.name
+			: undefined
 </script>
 
 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
@@ -26,7 +33,7 @@
 >
 	<form method="dialog">
 		<!-- <p>Delete {$characters[detail?.id]?.name}?</p> -->
-		<p>Delete {name} everywhere?</p>
+		<p>Delete {name} {detail?.type === 'character' ? 'everywhere' : ''}?</p>
 
 		<button
 			type="button"

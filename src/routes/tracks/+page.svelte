@@ -158,7 +158,12 @@
 	let contextMenuTarget
 
 	function handleContextMenu(e) {
-		if (!e.target.matches('.character') && !e.target.matches('.header')) return
+		if (
+			!e.target.matches('.character') &&
+			!e.target.matches('.track') &&
+			!e.target.matches('.scene')
+		)
+			return
 		e.stopPropagation()
 		e.preventDefault()
 		contextMenuPosition.left = e.pageX
@@ -206,7 +211,16 @@
 
 	function handleSubmitModalDelete(e) {
 		e.stopPropagation()
-		send(Msg.DELETE_CHARACTER, { id: e.detail.id })
+		const { type, id } = e.detail
+		const msg =
+			type === 'character'
+				? Msg.DELETE_CHARACTER
+				: type === 'track'
+				? Msg.DELETE_TRACK
+				: type === 'scene'
+				? Msg.DELETE_SCENE
+				: undefined
+		send(msg, { id })
 	}
 
 	// DEBUG +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -222,7 +236,8 @@
 	on:contextmenu-click-delete={handleContextmenuClickDelete}
 	on:launch-modal-delete={handleLaunchModalDelete}
 	on:submit-modal-delete={handleSubmitModalDelete}
-	on:click={(e) => {
+	on:click|capture={(e) => {
+		/* capture & if showContextMenu prevent click outside of context menu from doing anything else -- next click can interact with other things */
 		if (showContextMenu) {
 			e.stopPropagation()
 			showContextMenu = false
@@ -301,7 +316,7 @@
 {#if showContextMenu}
 	<ContextMenu
 		position={contextMenuPosition}
-		target={contextMenuTarget}
+		menuTarget={contextMenuTarget}
 	/>
 {/if}
 

@@ -1,11 +1,31 @@
 <script>
-	import { characters } from './machine'
+	import { characters, scenes, tracks } from './machine'
 
 	export let position
-	export let target
+	export let menuTarget
 	let node
 
-	$: menuType = target.matches('.character') ? 'character' : 'header'
+	$: type = menuTarget.matches('.character')
+		? 'character'
+		: menuTarget.matches('.track')
+		? 'track'
+		: 'scene'
+
+	$: renameEvent = new CustomEvent('contextmenu-click-rename', {
+		bubbles: true,
+		detail: {
+			type,
+			id: menuTarget.id
+		}
+	})
+
+	$: deleteEvent = new CustomEvent('contextmenu-click-delete', {
+		bubbles: true,
+		detail: {
+			type,
+			id: menuTarget.id
+		}
+	})
 
 	// adjust my position if partially offscreen
 	$: if (node) {
@@ -13,9 +33,7 @@
 
 		const viewport = window.visualViewport
 		const viewportRight = viewport.pageLeft + viewport.offsetLeft + viewport.width
-		// const viewportRight = viewport.pageLeft + viewport.width
 		const viewportBottom = viewport.pageTop + viewport.offsetTop + viewport.height
-		// const viewportBottom = viewport.pageTop + viewport.height
 
 		const boundsRight = position.left + dimensions.width
 		const boundsBottom = position.top + dimensions.height
@@ -33,66 +51,45 @@
 		character: [
 			{
 				option: 'rename',
-				fn: () => {
-					node.dispatchEvent(
-						new CustomEvent('contextmenu-click-rename', {
-							bubbles: true,
-							detail: {
-								type: 'character',
-								id: target.id
-							}
-						})
-					)
-				}
+				fn: () => node.dispatchEvent(renameEvent)
 			},
 			{
 				option: 'delete',
-				fn: () => {
-					node.dispatchEvent(
-						new CustomEvent('contextmenu-click-delete', {
-							bubbles: true,
-							detail: {
-								type: 'character',
-								id: target.id
-							}
-						})
-					)
-				}
+				fn: () => node.dispatchEvent(deleteEvent)
 			}
 		],
-		header: [
+		track: [
 			{
 				option: 'rename',
-				fn: () => {
-					node.dispatchEvent(
-						new CustomEvent('contextmenu-click-rename', {
-							bubbles: true,
-							detail: {
-								type: 'header',
-								id: target.id
-							}
-						})
-					)
-				}
+				fn: () => node.dispatchEvent(renameEvent)
 			},
 			{
 				option: 'delete',
-				fn: () => {
-					node.dispatchEvent(
-						new CustomEvent('contextmenu-click-delete', {
-							bubbles: true,
-							detail: {
-								type: 'header',
-								id: target.id
-							}
-						})
-					)
-				}
+				fn: () => node.dispatchEvent(deleteEvent)
+			}
+		],
+		scene: [
+			{
+				option: 'rename',
+				fn: () => node.dispatchEvent(renameEvent)
+			},
+			{
+				option: 'delete',
+				fn: () => node.dispatchEvent(deleteEvent)
 			}
 		]
 	}
 
-	$: options = contextMenus[menuType]
+	$: options = contextMenus[type]
+
+	$: name =
+		type === 'character'
+			? $characters[menuTarget.id]?.name
+			: type === 'track'
+			? $tracks[menuTarget.id]?.name
+			: type === 'scene'
+			? $scenes[menuTarget.id]?.name
+			: undefined
 </script>
 
 <menu>
@@ -100,7 +97,7 @@
 		class="context-menu"
 		bind:this={node}
 	>
-		<h1>{$characters[target.id].name}</h1>
+		<h1>{name}</h1>
 
 		{#each options as { option, fn }}
 			<li on:pointerup={fn}>{option}</li>

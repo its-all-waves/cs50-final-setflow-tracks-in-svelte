@@ -1,11 +1,18 @@
 <script>
-	import { characters } from './machine'
+	import { characters, tracks, scenes } from './machine'
 
 	export let node
 	export let detail
 	let newName = ''
 
-	$: name = detail?.type === 'character' ? $characters[detail?.id]?.name : '<scene | track>'
+	$: name =
+		detail?.type === 'character'
+			? $characters[detail?.id]?.name
+			: detail?.type === 'track'
+			? $tracks[detail?.id]?.name
+			: detail?.type === 'scene'
+			? $scenes[detail?.id]?.name
+			: undefined
 
 	// reactive bc newName will change when set
 	$: submitModalRename = new CustomEvent('submit-modal-rename', {
