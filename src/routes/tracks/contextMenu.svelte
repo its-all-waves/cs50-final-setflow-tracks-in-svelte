@@ -9,23 +9,23 @@
 		? 'character'
 		: menuTarget.matches('.track')
 		? 'track'
-		: 'scene'
+		: menuTarget.matches('.scene')
+		? 'scene'
+		: undefined
 
-	$: renameEvent = new CustomEvent('contextmenu-click-rename', {
-		bubbles: true,
-		detail: {
-			type,
-			id: menuTarget.id
-		}
-	})
+	$: newContextEvent = (eventName) => {
+		return new CustomEvent(eventName, {
+			bubbles: true,
+			detail: {
+				type,
+				id: menuTarget.id
+			}
+		})
+	}
 
-	$: deleteEvent = new CustomEvent('contextmenu-click-delete', {
-		bubbles: true,
-		detail: {
-			type,
-			id: menuTarget.id
-		}
-	})
+	$: renameEvent = newContextEvent('contextmenu-click-rename')
+
+	$: deleteEvent = newContextEvent('contextmenu-click-delete')
 
 	// adjust my position if partially offscreen
 	$: if (node) {
