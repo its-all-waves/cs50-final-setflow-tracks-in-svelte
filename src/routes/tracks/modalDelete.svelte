@@ -31,44 +31,67 @@
 		node.close()
 	}}
 >
-	<form method="dialog">
-		<!-- <p>Delete {$characters[detail?.id]?.name}?</p> -->
-		<p>Delete {name} {detail?.type === 'character' ? 'everywhere' : ''}?</p>
-
-		<button
-			type="button"
-			on:click={() => {
-				node.close()
-			}}
-		>
-			Cancel
-		</button>
-
-		<button
-			type="submit"
-			on:click={() => {
-				node.dispatchEvent(
-					new CustomEvent('submit-modal-delete', {
-						bubbles: true,
-						detail
-					})
-				)
-			}}
-		>
-			Confirm
-		</button>
-	</form>
+	<article>
+		<header>
+			<h1>Delete {name} {detail?.type === 'character' ? 'everywhere' : ''}</h1>
+		</header>
+		<form method="dialog">
+			<button
+				type="button"
+				class="secondary outline"
+				on:click={() => {
+					node.close()
+				}}
+			>
+				Cancel
+			</button>
+			<button
+				type="submit"
+				class="outline red"
+				on:click={() => {
+					node.dispatchEvent(
+						new CustomEvent('submit-modal-delete', {
+							bubbles: true,
+							detail
+						})
+					)
+				}}
+			>
+				Delete
+			</button>
+		</form>
+	</article>
 </dialog>
 
 <style>
 	dialog {
-		width: 300px;
-		height: 300px;
 		border: 1px solid gray;
-		background: black;
+		background: rgba(0, 0, 0, 0.511);
+		backdrop-filter: blur(4.25px);
+	}
+	/* 
+	::backdrop {
+		background: rgba(0, 0, 0, 1);
+	} */
+
+	article {
+		padding-bottom: 0;
 	}
 
-	::backdrop {
-		background: rgba(0, 0, 0, 0.485);
+	header {
+		margin-bottom: 1.5rem;
+	}
+
+	h1 {
+		text-align: center;
+		font-size: 1rem;
+		padding: 0;
+		margin: 0;
+		width: 24ch;
+	}
+
+	.red {
+		border-color: #791515;
+		color: #791515;
 	}
 </style>
