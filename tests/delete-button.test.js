@@ -181,12 +181,12 @@ test('can clear the entire table', async ({ page }) => {
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 /**
  * @returns {Promise<void>}
- * @param {Locator} destinationToClick
+ * @param {Locator} destination
  * @param {Locator} character \
  * `location = dropZone | headerTrack | headerScene` */
-async function placeIn(destinationToClick, character) {
+async function placeIn(destination, character) {
 	await character.click()
-	await destinationToClick.click()
+	await destination.click()
 	await commitButton.click()
 }
 

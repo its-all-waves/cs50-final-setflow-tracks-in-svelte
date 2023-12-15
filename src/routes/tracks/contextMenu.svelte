@@ -111,12 +111,7 @@
 		height: fit-content;
 		width: 12ch;
 		background: #141e26;
-
-		/* box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.19), 0px 6px 6px rgba(0, 0, 0, 0.23);
-		transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); */
-
 		box-shadow: 0px 6px 6px rgba(0, 0, 0, 0.5), 0px 6px 12px rgba(0, 0, 0, 0.5);
-		transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 	}
 
 	ul {
@@ -124,17 +119,12 @@
 		padding: 0.1rem;
 	}
 
-	/* ul,
-	h1 {
-		border: 0.5px solid rgb(94, 94, 94);
-	} */
+	ul {
+		border: 1px solid #534594;
+	}
 
 	h1 {
 		border: 0.5px solid goldenrod;
-	}
-
-	ul {
-		border: 1px solid #534594;
 	}
 
 	ul,
@@ -147,12 +137,11 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		/* line-height: 1.3rem; */
-		height: 1.3rem;
 		background: none;
 		list-style: none;
 		margin: 0.3rem;
-		padding: 1rem;
+		padding: 0.1rem;
+		font-size: 0.9rem;
 	}
 
 	li:hover {
