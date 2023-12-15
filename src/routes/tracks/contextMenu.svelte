@@ -1,8 +1,8 @@
 <script>
 	import { characters, scenes, tracks } from './machine'
 
-	export let position
-	export let menuTarget
+	export let mousePosition
+	export let menuTarget // that which was right-clicked
 	let node
 
 	$: type = menuTarget.matches('.character')
@@ -13,7 +13,7 @@
 		? 'scene'
 		: undefined
 
-	$: newContextEvent = (eventName) => {
+	$: newContextMenuEvent = (eventName) => {
 		return new CustomEvent(eventName, {
 			bubbles: true,
 			detail: {
@@ -23,52 +23,32 @@
 		})
 	}
 
-	$: renameEvent = newContextEvent('contextmenu-click-rename')
-
-	$: deleteEvent = newContextEvent('contextmenu-click-delete')
+	$: renameEvent = newContextMenuEvent('contextmenu-click-rename')
+	$: deleteEvent = newContextMenuEvent('contextmenu-click-delete')
 
 	// adjust my position if partially offscreen
-	$: if (node) {
-		const dimensions = node.getBoundingClientRect()
+	$: if (node) setPosition(node, mousePosition)
+
+	function setPosition(node, mousePosition) {
+		const menuDimensions = node.getBoundingClientRect()
 
 		const viewport = window.visualViewport
-		const viewportRight = viewport.pageLeft + viewport.offsetLeft + viewport.width
-		const viewportBottom = viewport.pageTop + viewport.offsetTop + viewport.height
+		const viewportRight = viewport.pageLeft + viewport.width + viewport.offsetLeft
+		const viewportBottom = viewport.pageTop + viewport.height + viewport.offsetTop
 
-		const boundsRight = position.left + dimensions.width
-		const boundsBottom = position.top + dimensions.height
+		let { x, y } = mousePosition
+		const menuBoundsRight = x + menuDimensions.width
+		const menuBoundsBottom = y + menuDimensions.height
 
-		const adjustedLeft =
-			boundsRight > viewportRight ? position.left - dimensions.width : position.left
-		const adjustedTop =
-			boundsBottom > viewportBottom ? position.top - dimensions.height : position.top
+		if (menuBoundsRight > viewportRight) x -= menuDimensions.width
+		if (menuBoundsBottom > viewportBottom) y -= menuDimensions.height
 
-		node.style.left = parseInt(adjustedLeft) + 'px'
-		node.style.top = parseInt(adjustedTop) + 'px'
+		node.style.left = parseInt(x) + 'px'
+		node.style.top = parseInt(y) + 'px'
 	}
 
-	let contextMenus = {
+	const contextMenus = {
 		character: [
-			{
-				option: 'rename',
-				fn: () => node.dispatchEvent(renameEvent)
-			},
-			{
-				option: 'delete',
-				fn: () => node.dispatchEvent(deleteEvent)
-			}
-		],
-		track: [
-			{
-				option: 'rename',
-				fn: () => node.dispatchEvent(renameEvent)
-			},
-			{
-				option: 'delete',
-				fn: () => node.dispatchEvent(deleteEvent)
-			}
-		],
-		scene: [
 			{
 				option: 'rename',
 				fn: () => node.dispatchEvent(renameEvent)
@@ -79,8 +59,11 @@
 			}
 		]
 	}
+	// chars, tracks, scenes all have the same functionality for now
+	contextMenus.track = [...contextMenus.character]
+	contextMenus.scene = [...contextMenus.character]
 
-	$: options = contextMenus[type]
+	$: presentedOptions = contextMenus[type]
 
 	$: name =
 		type === 'character'
@@ -99,7 +82,7 @@
 	>
 		<h1>{name}</h1>
 
-		{#each options as { option, fn }}
+		{#each presentedOptions as { option, fn }}
 			<li on:pointerup={fn}>{option}</li>
 		{/each}
 	</ul>
@@ -112,19 +95,9 @@
 		width: 12ch;
 		background: #141e26;
 		box-shadow: 0px 6px 6px rgba(0, 0, 0, 0.5), 0px 6px 12px rgba(0, 0, 0, 0.5);
-	}
-
-	ul {
+		border: 1px solid #534594;
 		margin: 0;
 		padding: 0.1rem;
-	}
-
-	ul {
-		border: 1px solid #534594;
-	}
-
-	h1 {
-		border: 0.5px solid goldenrod;
 	}
 
 	ul,
@@ -153,5 +126,6 @@
 		text-align: center;
 		margin: 0.3rem;
 		margin-bottom: 0.4rem;
+		border: 0.5px solid goldenrod;
 	}
 </style>

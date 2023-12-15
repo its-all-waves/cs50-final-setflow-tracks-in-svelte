@@ -154,7 +154,7 @@
 
 	// context menu ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	let showContextMenu = false
-	let contextMenuPosition = { left: 0, top: 0 }
+	let contextMenuMousePos = { x: 0, y: 0 }
 	let contextMenuTarget
 
 	function handleContextMenu(e) {
@@ -162,12 +162,13 @@
 			!e.target.matches('.character') &&
 			!e.target.matches('.track') &&
 			!e.target.matches('.scene')
-		)
+		) {
 			return
+		}
 		e.stopPropagation()
 		e.preventDefault()
-		contextMenuPosition.left = e.pageX
-		contextMenuPosition.top = e.pageY
+		contextMenuMousePos.x = e.pageX
+		contextMenuMousePos.y = e.pageY
 		contextMenuTarget = e.target // that which was right-clicked
 		showContextMenu = true
 	}
@@ -228,7 +229,6 @@
 </script>
 
 <svelte:window
-	on:contextmenu={/* must appear before handleContextMenu */ () => (showContextMenu = false)}
 	on:contextmenu={handleContextMenu}
 	on:contextmenu-click-rename={handleContextMenuClickRename}
 	on:launch-modal-rename={handleLaunchModalRename}
@@ -237,7 +237,9 @@
 	on:launch-modal-delete={handleLaunchModalDelete}
 	on:submit-modal-delete={handleSubmitModalDelete}
 	on:click|capture={(e) => {
-		/* capture & if showContextMenu prevent click outside of context menu from doing anything else -- next click can interact with other things */
+		/* capture & if showContextMenu prevent click outside 
+		of context menu from doing anything else -- next click 
+		can interact with other things */
 		if (showContextMenu) {
 			e.stopPropagation()
 			showContextMenu = false
@@ -315,7 +317,7 @@
 
 {#if showContextMenu}
 	<ContextMenu
-		position={contextMenuPosition}
+		mousePosition={contextMenuMousePos}
 		menuTarget={contextMenuTarget}
 	/>
 {/if}
