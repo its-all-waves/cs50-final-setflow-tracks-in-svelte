@@ -1,6 +1,4 @@
 <script>
-	import { nanoid } from 'nanoid'
-
 	import { onMount } from 'svelte'
 
 	import {
@@ -29,102 +27,37 @@
 	 * 	@type {import('./$types').PageData} */
 	export let data
 
-	/** Add tracks to the global table object */
-	function submitTracks(event) {
-		const MAX_TRACK_COUNT = 256
-
-		if (event.key !== 'Enter') return
-
-		let label = document.querySelector("input[name='track-prefix']").value
-		let count = document.querySelector("input[name='track-count']").value
-
+	let inputTrackLabel = 'Track'
+	let inputTrackCount = 4
+	function handleSubmitTracks(e) {
+		if (e.key !== 'Enter') return
+		e.stopPropagation()
 		// TODO: sanitize inputs
-		// must have 2 valid track inputs to proceed
-		if (!label || !count) return
-
-		if ($tracks.size + count > 256) {
-			const oldCount = count
-			count = MAX_TRACK_COUNT - $tracks.size
-			feedback.set(
-				`Reached maximum track count of ${MAX_TRACK_COUNT}. Added ${count} tracks instead of ${oldCount}.`
-			)
-		}
-
-		// TODO: if label already exists in tracks, keep counting
-		// e.g. if "Track 1" - "Track 5" exist, this adds "Track 6"+
-
-		for (let i = 0; i < count; i++) {
-			const name = `${label}_${i + 1}`
-			const id = `trk_${nanoid(9)}`
-			$tracks[id] = { name }
-		}
-		$tracks = $tracks
-
-		// clear input fields
-		label = null
-		count = null
+		if (!inputTrackLabel) return
+		const label = inputTrackLabel.trim()
+		const count = parseInt(inputTrackCount)
+		send(Msg.ADD_TRACKS, { label, count })
+		inputTrackLabel = null
+		inputTrackCount = null
 	}
 
-	/** Add a scene to the global table object */
-	function submitScene(event) {
-		if (event.key !== 'Enter') return
-
-		const inputField = event.target
-		const name = inputField.value.replace(' ', '_')
-		// const name = inputField.value
-
+	let inputSceneName
+	function handleSubmitScene(e) {
+		if (e.key !== 'Enter') return
 		// TODO: sanitize input
-		if (!name) return
-
-		const id = `scn_${nanoid(9)}` // do keep me tho
-		$scenes[id] = { name, trackList: {} }
-		const { trackList } = $scenes[id]
-		for (const trackId in $tracks) {
-			trackList[trackId] = new Set()
-		}
-		$scenes = $scenes
-
-		// clear the input field
-		inputField.value = null
+		if (!inputSceneName) return
+		const name = inputSceneName.trim()
+		send(Msg.ADD_SCENE, { name })
+		inputSceneName = null
 	}
 
-	/** Add a character to the global table object */
-	function submitCharacter(event) {
-		if (event.key !== 'Enter') return
-
-		let inputField = event.target
-		const name = inputField.value.replace(' ', '_')
-		// const name = inputField.value
-
+	let inputCharacterName
+	function handleSubmitCharacter(e) {
+		if (e.key !== 'Enter') return
 		// TODO: validate input
-		if (!name) return
-
-		const id = `chr_${nanoid(9)}` // do keep me tho
-		$characters[id] = { name }
-		$characters = $characters
-
-		sortCharactersAtoZ()
-
-		inputField.value = null
-	}
-
-	function sortCharactersAtoZ() {
-		let swapCounter = -1
-		while (true) {
-			if (swapCounter === 0) break
-			swapCounter = 0
-			for (let i = 0; i < $characters.length - 1; i++) {
-				const name1 = $characters[i].name
-				const name2 = $characters[i + 1].name
-				const name1BelongsBeforeName2 = name1.localeCompare(name2) < 0
-				if (name1BelongsBeforeName2) continue
-				const temp = $characters[i]
-				$characters[i] = $characters[i + 1]
-				$characters[i + 1] = temp
-				swapCounter++
-			}
-		}
-		$characters = $characters
+		if (!inputCharacterName) return
+		send(Msg.ADD_CHARACTER, { name: inputCharacterName })
+		inputCharacterName = null
 	}
 
 	function handleKeyboardShortcut(event) {
@@ -300,42 +233,44 @@
 
 	<!-- <DebugInfo /> -->
 
-	<div class="inputs">
+	<form class="inputs">
 		<div class="track-input">
 			<input
+				bind:value={inputTrackLabel}
 				autofocus
-				name="track-prefix"
+				name="track-label"
 				type="text"
-				value={'input'}
-				on:keydown={submitTracks}
+				on:keydown={handleSubmitTracks}
 			/>
 			<span> X </span>
 			<input
+				bind:value={inputTrackCount}
 				name="track-count"
 				type="text"
-				value={4}
-				on:keydown={submitTracks}
+				on:keydown={handleSubmitTracks}
 			/>
 		</div>
 
 		<div class="scene-input">
 			<input
+				bind:value={inputSceneName}
 				name="scene-name"
 				type="text"
 				placeholder="add a scene"
-				on:keydown={submitScene}
+				on:keydown={handleSubmitScene}
 			/>
 		</div>
 
 		<div class="actor-input">
 			<input
+				bind:value={inputCharacterName}
 				name="actor-name"
 				type="text"
 				placeholder="add a character"
-				on:keydown={submitCharacter}
+				on:keydown={handleSubmitCharacter}
 			/>
 		</div>
-	</div>
+	</form>
 </main>
 
 {#if showContextmenu}

@@ -23,7 +23,11 @@ export const Msg = Object.freeze({
 	// context menu
 	DELETE_SCENE: 'DELETE_SCENE',
 	DELETE_TRACK: 'DELETE_TRACK',
-	RENAME: 'RENAME'
+	RENAME: 'RENAME',
+	// character, track, scene submissions
+	ADD_TRACKS: 'ADD_TRACKS',
+	ADD_SCENE: 'ADD_SCENE',
+	ADD_CHARACTER: 'ADD_CHARACTER'
 })
 
 export const State = Object.freeze({
@@ -215,6 +219,18 @@ function nextState(state, msg, info) {
 				case Msg.RENAME:
 					if (!guard_RENAME(info)) break
 					RENAME(info)
+					break
+				case Msg.ADD_TRACKS:
+					if (!guard_ADD_TRACKS(info)) break
+					ADD_TRACKS(info)
+					break
+				case Msg.ADD_SCENE:
+					if (!guard_ADD_SCENE(info)) break
+					ADD_SCENE(info)
+					break
+				case Msg.ADD_CHARACTER:
+					if (!guard_ADD_CHARACTER(info)) break
+					ADD_CHARACTER(info)
 					break
 				default:
 					break
@@ -567,17 +583,9 @@ function DELETE_SCENE({ id }) {
 }
 
 function guard_RENAME({ type, id, newName }) {
-	// let obj
-	// if (type === 'character') obj = $characters
-	// if (type === 'track') obj = $tracks
-	// if (type === 'scene') obj = $scenes
-
 	const obj = type === 'character' ? $characters : type === 'track' ? $tracks : $scenes
-
-	// can't rename the character if the new name already exists
 	const oldName = obj[id].name
-	for (const id in obj) {
-		if (obj[id].name !== newName) continue
+	if (nameIsAlreadyIn(obj, newName)) {
 		feedback.set(`couldn't rename ${oldName} to ${newName} as the latter already exists`)
 		return false
 	}
@@ -608,6 +616,113 @@ function RENAME({ type, id, newName }) {
 		default:
 			throw new Error('How did we get here?')
 	}
+}
+
+function guard_ADD_TRACKS() {
+	return true
+}
+
+const MAX_TRACK_COUNT = 256
+let numberOfTracks = 0
+/** Add tracks to the global table object */
+function ADD_TRACKS({ label, count }) {
+	// add a track name without a number
+	if (!count) {
+	}
+
+	// limit number of added tracks if total tracks would exceed max
+	const numTracks = Object.keys($tracks).length
+	if (numTracks + count > MAX_TRACK_COUNT) {
+		const oldCount = count
+		count = MAX_TRACK_COUNT - numTracks
+		feedback.set(
+			`Reached maximum track count of ${MAX_TRACK_COUNT}. Added ${count} tracks instead of ${oldCount}.`
+		)
+	}
+
+	let start = greatestValueOfTrackWith(label) ?? 0
+	const end = start + count
+	for (let i = start; i < end; i++) {
+		const name = `${label} ${i + 1}`
+		const id = `trk_${nanoid(9)}`
+		numberOfTracks += 1
+		$tracks[id] = { number: numberOfTracks, name }
+	}
+	tracks.set($tracks)
+}
+
+function guard_ADD_SCENE({ name }) {
+	// cannot add a scene if name matches an existing name
+	if (nameIsAlreadyIn($scenes, name)) return false
+	return true
+}
+
+/** Add a scene to the global table object */
+function ADD_SCENE({ name }) {
+	const id = `scn_${nanoid(9)}` // do keep me tho
+	$scenes[id] = { name, trackList: {} }
+	const { trackList } = $scenes[id]
+	for (const trackId in $tracks) {
+		trackList[trackId] = new Set()
+	}
+	scenes.set($scenes)
+}
+
+function guard_ADD_CHARACTER({ name }) {
+	// cannot add a character if name matches an existing name
+	if (nameIsAlreadyIn($characters, name)) return false
+	return true
+}
+
+/** Add a character to the global table object */
+function ADD_CHARACTER({ name }) {
+	const id = `chr_${nanoid(9)}` // do keep me tho
+	$characters[id] = { name }
+	characters.set($characters)
+
+	sortCharactersAtoZ()
+}
+
+// HELPERS +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+function nameIsAlreadyIn(dict, newName) {
+	for (const id in dict) {
+		if (dict[id].name.toLowerCase() === newName.toLowerCase()) return true
+	}
+	return false
+}
+
+/** @returns {number?} */
+function greatestValueOfTrackWith(label) {
+	label = label.toLowerCase()
+	let max = null
+	for (const id in $tracks) {
+		const name = $tracks[id].name.toLowerCase()
+		const thisLabel = name.replaceAll(/[0-9]/g, '').trimEnd()
+		if (thisLabel !== label) continue
+		//get the number from the NAME
+		const thisLabelNumber = parseInt(name.replaceAll(/[^0-9]/g, '').trimStart())
+		if (thisLabelNumber > max) max = thisLabelNumber
+	}
+	return max
+}
+
+function sortCharactersAtoZ() {
+	let swapCounter = -1
+	while (true) {
+		if (swapCounter === 0) break
+		swapCounter = 0
+		for (let i = 0; i < $characters.length - 1; i++) {
+			const name1 = $characters[i].name
+			const name2 = $characters[i + 1].name
+			const name1BelongsBeforeName2 = name1.localeCompare(name2) < 0
+			if (name1BelongsBeforeName2) continue
+			const temp = $characters[i]
+			$characters[i] = $characters[i + 1]
+			$characters[i + 1] = temp
+			swapCounter++
+		}
+	}
+	characters.set($characters)
 }
 
 // DEBUG +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
