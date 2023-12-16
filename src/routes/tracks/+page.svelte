@@ -79,9 +79,11 @@
 
 	// keep characters for the ui
 	$: charactersEntries = Object.entries($characters).sort(([_, a], [__, b]) => {
-		if (a.name < b.name) {
+		const aName = a.name.toLowerCase()
+		const bName = b.name.toLowerCase()
+		if (aName < bName) {
 			return -1
-		} else if (b.name < a.name) {
+		} else if (bName < aName) {
 			return 1
 		}
 		return 0

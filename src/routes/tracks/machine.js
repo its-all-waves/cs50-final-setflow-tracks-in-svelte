@@ -585,7 +585,7 @@ function DELETE_SCENE({ id }) {
 function guard_RENAME({ type, id, newName }) {
 	const obj = type === 'character' ? $characters : type === 'track' ? $tracks : $scenes
 	const oldName = obj[id].name
-	if (nameIsAlreadyIn(obj, newName)) {
+	if (nameIsAlreadyIn(obj, id, newName)) {
 		feedback.set(`couldn't rename ${oldName} to ${newName} as the latter already exists`)
 		return false
 	}
@@ -679,14 +679,13 @@ function ADD_CHARACTER({ name }) {
 	const id = `chr_${nanoid(9)}` // do keep me tho
 	$characters[id] = { name }
 	characters.set($characters)
-
-	sortCharactersAtoZ()
 }
 
 // HELPERS +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-function nameIsAlreadyIn(dict, newName) {
-	for (const id in dict) {
-		if (dict[id].name.toLowerCase() === newName.toLowerCase()) return true
+function nameIsAlreadyIn(dict, id, newName) {
+	for (const _id in dict) {
+		if (_id === id) continue // allows changing case
+		if (dict[_id].name.toLowerCase() === newName.toLowerCase()) return true
 	}
 	return false
 }
@@ -704,25 +703,6 @@ function greatestValueOfTrackWith(label) {
 		if (thisLabelNumber > max) max = thisLabelNumber
 	}
 	return max
-}
-
-function sortCharactersAtoZ() {
-	let swapCounter = -1
-	while (true) {
-		if (swapCounter === 0) break
-		swapCounter = 0
-		for (let i = 0; i < $characters.length - 1; i++) {
-			const name1 = $characters[i].name
-			const name2 = $characters[i + 1].name
-			const name1BelongsBeforeName2 = name1.localeCompare(name2) < 0
-			if (name1BelongsBeforeName2) continue
-			const temp = $characters[i]
-			$characters[i] = $characters[i + 1]
-			$characters[i + 1] = temp
-			swapCounter++
-		}
-	}
-	characters.set($characters)
 }
 
 // DEBUG +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
