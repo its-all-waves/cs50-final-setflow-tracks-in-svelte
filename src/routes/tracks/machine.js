@@ -618,7 +618,11 @@ function RENAME({ type, id, newName }) {
 	}
 }
 
-function guard_ADD_TRACKS() {
+function guard_ADD_TRACKS({ label, count }) {
+	if (!count && nameIsAlreadyIn($tracks, null, label)) {
+		feedback.set(`could not add track "${label}" as it already exists`)
+		return false
+	}
 	return true
 }
 
@@ -628,6 +632,9 @@ let numberOfTracks = 0
 function ADD_TRACKS({ label, count }) {
 	// add a track name without a number
 	if (!count) {
+		const id = `trk_${nanoid(9)}`
+		numberOfTracks += 1
+		$tracks[id] = { number: numberOfTracks, name: label }
 	}
 
 	// limit number of added tracks if total tracks would exceed max
@@ -648,6 +655,7 @@ function ADD_TRACKS({ label, count }) {
 		numberOfTracks += 1
 		$tracks[id] = { number: numberOfTracks, name }
 	}
+
 	tracks.set($tracks)
 }
 
@@ -684,7 +692,7 @@ function ADD_CHARACTER({ name }) {
 // HELPERS +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 function nameIsAlreadyIn(dict, id, newName) {
 	for (const _id in dict) {
-		if (_id === id) continue // allows changing case
+		if (id && _id === id) continue // allows changing case
 		if (dict[_id].name.toLowerCase() === newName.toLowerCase()) return true
 	}
 	return false
@@ -738,7 +746,8 @@ export function DEV_populate_table() {
 		if (!key.startsWith('track') || key.endsWith('id')) continue
 		const name = Test[key]
 		const id = `trk_${nanoid(9)}` // do keep me tho
-		newTracks[id] = { name }
+		numberOfTracks++
+		newTracks[id] = { number: numberOfTracks, name }
 	}
 	tracks.set(newTracks)
 

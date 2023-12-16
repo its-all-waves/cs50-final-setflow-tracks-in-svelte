@@ -30,7 +30,7 @@
 
 	<tbody>
 		<!-- a row + header per track -->
-		{#each tracksEntries as [trackId, { name: trackName }]}
+		{#each tracksEntries as [trackId, { number: trackNumber, name: trackName }]}
 			<tr data-track-row={trackName}>
 				<th data-track-header={trackName}>
 					<button
@@ -39,7 +39,7 @@
 						on:click={() => {
 							send(Msg.CLICK_TRACK_HEADER, { id: trackId })
 						}}
-						>{trackName}
+						>{`${trackNumber}: ${trackName}`}
 					</button>
 				</th>
 				<!-- a cell (col) per scene -->
