@@ -27,6 +27,8 @@
 	 * 	@type {import('./$types').PageData} */
 	export let data
 
+	// user settings +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 	let inputTrackLabel = 'Track'
 	let inputTrackCount = 4
 	function handleSubmitTracks(e) {
@@ -62,18 +64,19 @@
 		inputCharacterName = null
 	}
 
-	function handleKeyboardShortcut(event) {
-		switch (event.key) {
+	function handleKeyboardShortcut(e) {
+		switch (e.key) {
 			case 'Escape':
 				send(Msg.CANCEL)
 				break
 			case 'Enter':
-				event.preventDefault()
-				event.stopPropagation()
+				e.preventDefault()
+				e.stopPropagation()
 				send(Msg.COMMIT_CHARACTER_TO_TABLE)
 				break
 			case 'Delete': // fall thru
 			case 'Backspace':
+				if (!e.metaKey && !e.ctrlKey) return
 				window.dispatchEvent(new CustomEvent('launch-modal-clear'))
 				break
 		}

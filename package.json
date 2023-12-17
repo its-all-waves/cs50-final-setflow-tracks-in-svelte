@@ -27,6 +27,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@picocss/pico": "^1.5.10",
 		"nanoid": "^5.0.1"
 	}
 }

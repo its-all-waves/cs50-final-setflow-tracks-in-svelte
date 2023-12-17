@@ -96,10 +96,6 @@
 		scale: 1.15;
 	}
 
-	table.read-only {
-		pointer-events: none;
-	}
-
 	/* header stuff */
 	th {
 		margin: 0;
