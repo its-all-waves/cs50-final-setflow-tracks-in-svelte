@@ -180,7 +180,7 @@
 	}
 
 	// DEBUG +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	onMount(DEV_populate_table)
+	// onMount(DEV_populate_table)
 </script>
 
 <svelte:window

@@ -27,7 +27,8 @@ export const Msg = Object.freeze({
 	// character, track, scene submissions
 	ADD_TRACKS: 'ADD_TRACKS',
 	ADD_SCENE: 'ADD_SCENE',
-	ADD_CHARACTER: 'ADD_CHARACTER'
+	ADD_CHARACTER: 'ADD_CHARACTER',
+	SYNC_SCENES_WITH_TRACKS: 'SYNC_SCENES_WITH_TRACKS'
 })
 
 export const State = Object.freeze({
@@ -223,6 +224,10 @@ function nextState(state, msg, info) {
 				case Msg.ADD_TRACKS:
 					if (!guard_ADD_TRACKS(info)) break
 					ADD_TRACKS(info)
+					send(Msg.SYNC_SCENES_WITH_TRACKS)
+					break
+				case Msg.SYNC_SCENES_WITH_TRACKS:
+					SYNC_SCENES_WITH_TRACKS()
 					break
 				case Msg.ADD_SCENE:
 					if (!guard_ADD_SCENE(info)) break
@@ -626,6 +631,16 @@ function guard_ADD_TRACKS({ label, count }) {
 	return true
 }
 
+/** @description Adds newly created tracks to each scene's trackList */
+function SYNC_SCENES_WITH_TRACKS() {
+	for (const sceneId in $scenes) {
+		const { trackList } = $scenes[sceneId]
+		for (const trackId in $tracks) {
+			if (!trackList[trackId]) trackList[trackId] = new Set()
+		}
+	}
+}
+
 const MAX_TRACK_COUNT = 256
 let numberOfTracks = 0
 /** Add tracks to the global table object */
@@ -654,6 +669,7 @@ function ADD_TRACKS({ label, count }) {
 		const id = `trk_${nanoid(9)}`
 		numberOfTracks += 1
 		$tracks[id] = { number: numberOfTracks, name }
+		feedback.set(`added "${name}" to tracks`)
 	}
 
 	tracks.set($tracks)
