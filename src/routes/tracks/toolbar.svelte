@@ -96,4 +96,8 @@
 		opacity: 0;
 		visibility: visible;
 	}
+
+	label[for='show-track-numbers'] {
+		margin: auto auto;
+	}
 </style>
