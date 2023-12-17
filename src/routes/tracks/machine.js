@@ -26,9 +26,10 @@ export const Msg = Object.freeze({
 	RENAME: 'RENAME',
 	// character, track, scene submissions
 	ADD_TRACKS: 'ADD_TRACKS',
+	ADD_NEW_TRACKS_TO_SCENES: 'ADD_NEW_TRACKS_TO_SCENES',
 	ADD_SCENE: 'ADD_SCENE',
-	ADD_CHARACTER: 'ADD_CHARACTER',
-	SYNC_SCENES_WITH_TRACKS: 'SYNC_SCENES_WITH_TRACKS'
+	ADD_TRACKS_TO_NEW_SCENE: 'ADD_TRACKS_TO_NEW_SCENE',
+	ADD_CHARACTER: 'ADD_CHARACTER'
 })
 
 export const State = Object.freeze({
@@ -224,14 +225,18 @@ function nextState(state, msg, info) {
 				case Msg.ADD_TRACKS:
 					if (!guard_ADD_TRACKS(info)) break
 					ADD_TRACKS(info)
-					send(Msg.SYNC_SCENES_WITH_TRACKS)
+					send(Msg.ADD_NEW_TRACKS_TO_SCENES)
 					break
-				case Msg.SYNC_SCENES_WITH_TRACKS:
-					SYNC_SCENES_WITH_TRACKS()
+				case Msg.ADD_NEW_TRACKS_TO_SCENES:
+					ADD_NEW_TRACKS_TO_SCENES()
 					break
 				case Msg.ADD_SCENE:
 					if (!guard_ADD_SCENE(info)) break
-					ADD_SCENE(info)
+					const id = ADD_SCENE(info)
+					send(Msg.ADD_TRACKS_TO_NEW_SCENE, { id })
+					break
+				case Msg.ADD_TRACKS_TO_NEW_SCENE:
+					ADD_TRACKS_TO_NEW_SCENE(info)
 					break
 				case Msg.ADD_CHARACTER:
 					if (!guard_ADD_CHARACTER(info)) break
@@ -631,8 +636,8 @@ function guard_ADD_TRACKS({ label, count }) {
 	return true
 }
 
-/** @description Adds newly created tracks to each scene's trackList */
-function SYNC_SCENES_WITH_TRACKS() {
+/** Adds newly created tracks to each scene's trackList */
+function ADD_NEW_TRACKS_TO_SCENES() {
 	for (const sceneId in $scenes) {
 		const { trackList } = $scenes[sceneId]
 		for (const trackId in $tracks) {
@@ -643,6 +648,7 @@ function SYNC_SCENES_WITH_TRACKS() {
 
 const MAX_TRACK_COUNT = 256
 let numberOfTracks = 0
+
 /** Add tracks to the global table object */
 function ADD_TRACKS({ label, count }) {
 	// add a track name without a number
@@ -684,16 +690,23 @@ function guard_ADD_SCENE({ name }) {
 	return true
 }
 
-/** Add a scene to the global table object */
+/** Returns the new scene's id
+ */
 function ADD_SCENE({ name }) {
 	const id = `scn_${nanoid(9)}` // do keep me tho
 	$scenes[id] = { name, trackList: {} }
-	const { trackList } = $scenes[id]
-	for (const trackId in $tracks) {
-		trackList[trackId] = new Set()
-	}
 	scenes.set($scenes)
 	feedback.set(`added "${name}" to scenes`)
+	return id
+}
+
+function ADD_TRACKS_TO_NEW_SCENE({ id }) {
+	// ensure newly added scene has all tracks
+	const { trackList } = $scenes[id]
+	for (const trackId in $tracks) {
+		if (!trackList[trackId]) trackList[trackId] = new Set()
+	}
+	scenes.set($scenes)
 }
 
 function guard_ADD_CHARACTER({ name }) {
@@ -747,6 +760,7 @@ export const Test = Object.freeze({
 	character_Zina: 'Zina',
 	character_Yuki: 'Yuki',
 	character_Igor: 'Igor',
+	track: 'Track',
 	track_1: 'Track 1',
 	track_2: 'Track 2',
 	track_3: 'Track 3',
@@ -758,35 +772,17 @@ export const Test = Object.freeze({
 })
 
 export function DEV_populate_table() {
-	const newChars = {}
 	for (const key in Test) {
 		if (!key.startsWith('character') || key.endsWith('id')) continue
-		const name = Test[key]
-		const id = `chr_${nanoid(9)}` // do keep me tho
-		newChars[id] = { name }
+		send(Msg.ADD_CHARACTER, { name: Test[key] })
 	}
-	characters.set(newChars)
 
-	const newTracks = {}
-	for (const key in Test) {
-		if (!key.startsWith('track') || key.endsWith('id')) continue
-		const name = Test[key]
-		const id = `trk_${nanoid(9)}` // do keep me tho
-		numberOfTracks++
-		newTracks[id] = { number: numberOfTracks, name }
-	}
-	tracks.set(newTracks)
+	const TEST_TRACK_COUNT = 4
+	send(Msg.ADD_TRACKS, { label: Test.track, count: TEST_TRACK_COUNT })
 
 	const newScenes = {}
 	for (const key in Test) {
 		if (!key.startsWith('scene') || key.endsWith('id')) continue
-		const name = Test[key]
-		const id = `scn_${nanoid(9)}` // do keep me tho
-		newScenes[id] = { name, trackList: {} }
-		const { trackList } = newScenes[id]
-		for (const trackId in $tracks) {
-			trackList[trackId] = new Set()
-		}
+		send(Msg.ADD_SCENE, { name: Test[key] })
 	}
-	scenes.set(newScenes)
 }
