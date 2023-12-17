@@ -44,6 +44,7 @@
 	let inputSceneName
 	function handleSubmitScene(e) {
 		if (e.key !== 'Enter') return
+		e.stopPropagation()
 		// TODO: sanitize input
 		if (!inputSceneName) return
 		const name = inputSceneName.trim()
@@ -54,6 +55,7 @@
 	let inputCharacterName
 	function handleSubmitCharacter(e) {
 		if (e.key !== 'Enter') return
+		e.stopPropagation()
 		// TODO: validate input
 		if (!inputCharacterName) return
 		send(Msg.ADD_CHARACTER, { name: inputCharacterName })

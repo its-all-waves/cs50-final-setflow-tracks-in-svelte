@@ -1,6 +1,8 @@
 <script>
 	import { state, send, State, Msg, feedback, lastEventDetail } from './machine'
 
+	import { showTrackNumbers } from './settings'
+
 	$: unlocked = $state === State.TableUnlocked
 
 	// flash user feedback momentarily
@@ -28,6 +30,14 @@
 		/>
 	</button>
 
+	<label for="show-track-numbers">
+		<input
+			name="show-track-numbers"
+			type="checkbox"
+			bind:checked={$showTrackNumbers}
+		/>
+		Show track numbers
+	</label>
 	<button
 		id="btn-lock"
 		class:unlocked

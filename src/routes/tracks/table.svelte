@@ -1,5 +1,6 @@
 <script>
 	import { Msg, send, tracks, scenes } from './machine'
+	import { showTrackNumbers } from './settings'
 
 	import Dropzone from './dropzone.svelte'
 
@@ -39,7 +40,8 @@
 						on:click={() => {
 							send(Msg.CLICK_TRACK_HEADER, { id: trackId })
 						}}
-						>{`${trackNumber}: ${trackName}`}
+					>
+						{($showTrackNumbers ? trackNumber + '. ' : '') + trackName}
 					</button>
 				</th>
 				<!-- a cell (col) per scene -->

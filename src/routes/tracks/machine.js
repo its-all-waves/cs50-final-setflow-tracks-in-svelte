@@ -661,7 +661,10 @@ function ADD_TRACKS({ label, count }) {
 
 function guard_ADD_SCENE({ name }) {
 	// cannot add a scene if name matches an existing name
-	if (nameIsAlreadyIn($scenes, name)) return false
+	if (nameIsAlreadyIn($scenes, null, name)) {
+		feedback.set(`couldn't add scene "${name}" as it already exists`)
+		return false
+	}
 	return true
 }
 
@@ -674,12 +677,18 @@ function ADD_SCENE({ name }) {
 		trackList[trackId] = new Set()
 	}
 	scenes.set($scenes)
+	feedback.set(`added "${name}" to scenes`)
 }
 
 function guard_ADD_CHARACTER({ name }) {
 	// cannot add a character if name matches an existing name
-	if (nameIsAlreadyIn($characters, name)) return false
+	if (nameIsAlreadyIn($characters, null, name)) {
+		feedback.set(`couldn't add character "${name}" as it already exists`)
+		return false
+	}
 	return true
+
+	// TODO: WHERE IS THE FEEDBACK FOR THIS AND ADD SCENE?
 }
 
 /** Add a character to the global table object */
@@ -687,6 +696,7 @@ function ADD_CHARACTER({ name }) {
 	const id = `chr_${nanoid(9)}` // do keep me tho
 	$characters[id] = { name }
 	characters.set($characters)
+	feedback.set(`added "${name}" to characters`)
 }
 
 // HELPERS +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
