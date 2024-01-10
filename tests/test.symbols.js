@@ -6,6 +6,8 @@ import { test } from '@playwright/test'
 
 import { State, Test } from '../src/routes/tracks/machine'
 
+export { _page as page }
+
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // SETUP TESTS
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -13,6 +15,7 @@ import { State, Test } from '../src/routes/tracks/machine'
 // html elements, dependent on constants above
 /** @type {Locator} */ export let commitButton
 /** @type {Locator} */ export let deleteButton
+/** @type {Locator} */ export let clearButton
 
 /** @type {Locator} */ export let characterPool
 /** @type {Locator} */ export let characterA
@@ -30,12 +33,15 @@ import { State, Test } from '../src/routes/tracks/machine'
 /** @type {Locator} */ export let dropZoneBA
 /** @type {Locator} */ export let dropZoneBB
 
+let _page
+
 // get all the elements for whoever imports me
 test.beforeEach(async ({ page }) => {
 	await page.goto('/tracks')
 
 	commitButton = page.locator('#btn-commit')
 	deleteButton = page.locator('#btn-delete')
+	clearButton = page.locator('#btn-clear')
 
 	characterPool = page.locator('.character-pool')
 	characterA = characterPool.getByText(Test.character_NeNe)

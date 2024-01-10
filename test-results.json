@@ -61,48 +61,7 @@
       "file": "delete-button.test.js",
       "column": 0,
       "line": 0,
-      "specs": [
-        {
-          "title": "can clear the entire table",
-          "ok": false,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 6,
-                  "status": "failed",
-                  "duration": 27,
-                  "error": {
-                    "message": "Error: browserType.connect: Target page, context or browser has been closed\nBrowser logs:\n\n╔════════════════════════════════════════════════════════════════════════════════════════════════╗\n║ Looks like you launched a headed browser without having a XServer running.                     ║\n║ Set either 'headless: true' or use 'xvfb-run <your-playwright-app>' before running Playwright. ║\n║                                                                                                ║\n║ <3 Playwright Team                                                                             ║\n╚════════════════════════════════════════════════════════════════════════════════════════════════╝",
-                    "stack": "Error: browserType.connect: Target page, context or browser has been closed\nBrowser logs:\n\n╔════════════════════════════════════════════════════════════════════════════════════════════════╗\n║ Looks like you launched a headed browser without having a XServer running.                     ║\n║ Set either 'headless: true' or use 'xvfb-run <your-playwright-app>' before running Playwright. ║\n║                                                                                                ║\n║ <3 Playwright Team                                                                             ║\n╚════════════════════════════════════════════════════════════════════════════════════════════════╝\n"
-                  },
-                  "errors": [
-                    {
-                      "message": "Error: browserType.connect: Target page, context or browser has been closed\nBrowser logs:\n\n╔════════════════════════════════════════════════════════════════════════════════════════════════╗\n║ Looks like you launched a headed browser without having a XServer running.                     ║\n║ Set either 'headless: true' or use 'xvfb-run <your-playwright-app>' before running Playwright. ║\n║                                                                                                ║\n║ <3 Playwright Team                                                                             ║\n╚════════════════════════════════════════════════════════════════════════════════════════════════╝\n\n\n"
-                    }
-                  ],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2023-11-30T15:14:49.520Z",
-                  "attachments": []
-                }
-              ],
-              "status": "unexpected"
-            }
-          ],
-          "id": "098af5527d45ba336d95-382ae3a28925d2ee43dd",
-          "file": "delete-button.test.js",
-          "line": 154,
-          "column": 1
-        }
-      ],
+      "specs": [],
       "suites": [
         {
           "title": "ALL DELETE BUTTON FUNCTIONS",
@@ -125,7 +84,7 @@
                     {
                       "workerIndex": 0,
                       "status": "failed",
-                      "duration": 30,
+                      "duration": 22,
                       "error": {
                         "message": "Error: browserType.connect: Target page, context or browser has been closed\nBrowser logs:\n\n╔════════════════════════════════════════════════════════════════════════════════════════════════╗\n║ Looks like you launched a headed browser without having a XServer running.                     ║\n║ Set either 'headless: true' or use 'xvfb-run <your-playwright-app>' before running Playwright. ║\n║                                                                                                ║\n║ <3 Playwright Team                                                                             ║\n╚════════════════════════════════════════════════════════════════════════════════════════════════╝",
                         "stack": "Error: browserType.connect: Target page, context or browser has been closed\nBrowser logs:\n\n╔════════════════════════════════════════════════════════════════════════════════════════════════╗\n║ Looks like you launched a headed browser without having a XServer running.                     ║\n║ Set either 'headless: true' or use 'xvfb-run <your-playwright-app>' before running Playwright. ║\n║                                                                                                ║\n║ <3 Playwright Team                                                                             ║\n╚════════════════════════════════════════════════════════════════════════════════════════════════╝\n"
@@ -138,7 +97,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2023-11-30T15:14:46.170Z",
+                      "startTime": "2024-01-09T17:07:57.369Z",
                       "attachments": []
                     }
                   ],
@@ -178,7 +137,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2023-11-30T15:14:46.736Z",
+                      "startTime": "2024-01-09T17:07:57.939Z",
                       "attachments": []
                     }
                   ],
@@ -205,7 +164,7 @@
                     {
                       "workerIndex": 2,
                       "status": "failed",
-                      "duration": 26,
+                      "duration": 35,
                       "error": {
                         "message": "Error: browserType.connect: Target page, context or browser has been closed\nBrowser logs:\n\n╔════════════════════════════════════════════════════════════════════════════════════════════════╗\n║ Looks like you launched a headed browser without having a XServer running.                     ║\n║ Set either 'headless: true' or use 'xvfb-run <your-playwright-app>' before running Playwright. ║\n║                                                                                                ║\n║ <3 Playwright Team                                                                             ║\n╚════════════════════════════════════════════════════════════════════════════════════════════════╝",
                         "stack": "Error: browserType.connect: Target page, context or browser has been closed\nBrowser logs:\n\n╔════════════════════════════════════════════════════════════════════════════════════════════════╗\n║ Looks like you launched a headed browser without having a XServer running.                     ║\n║ Set either 'headless: true' or use 'xvfb-run <your-playwright-app>' before running Playwright. ║\n║                                                                                                ║\n║ <3 Playwright Team                                                                             ║\n╚════════════════════════════════════════════════════════════════════════════════════════════════╝\n"
@@ -218,7 +177,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2023-11-30T15:14:47.286Z",
+                      "startTime": "2024-01-09T17:07:58.511Z",
                       "attachments": []
                     }
                   ],
@@ -245,7 +204,7 @@
                     {
                       "workerIndex": 3,
                       "status": "failed",
-                      "duration": 23,
+                      "duration": 27,
                       "error": {
                         "message": "Error: browserType.connect: Target page, context or browser has been closed\nBrowser logs:\n\n╔════════════════════════════════════════════════════════════════════════════════════════════════╗\n║ Looks like you launched a headed browser without having a XServer running.                     ║\n║ Set either 'headless: true' or use 'xvfb-run <your-playwright-app>' before running Playwright. ║\n║                                                                                                ║\n║ <3 Playwright Team                                                                             ║\n╚════════════════════════════════════════════════════════════════════════════════════════════════╝",
                         "stack": "Error: browserType.connect: Target page, context or browser has been closed\nBrowser logs:\n\n╔════════════════════════════════════════════════════════════════════════════════════════════════╗\n║ Looks like you launched a headed browser without having a XServer running.                     ║\n║ Set either 'headless: true' or use 'xvfb-run <your-playwright-app>' before running Playwright. ║\n║                                                                                                ║\n║ <3 Playwright Team                                                                             ║\n╚════════════════════════════════════════════════════════════════════════════════════════════════╝\n"
@@ -258,7 +217,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2023-11-30T15:14:47.851Z",
+                      "startTime": "2024-01-09T17:07:59.083Z",
                       "attachments": []
                     }
                   ],
@@ -285,7 +244,7 @@
                     {
                       "workerIndex": 4,
                       "status": "failed",
-                      "duration": 27,
+                      "duration": 26,
                       "error": {
                         "message": "Error: browserType.connect: Target page, context or browser has been closed\nBrowser logs:\n\n╔════════════════════════════════════════════════════════════════════════════════════════════════╗\n║ Looks like you launched a headed browser without having a XServer running.                     ║\n║ Set either 'headless: true' or use 'xvfb-run <your-playwright-app>' before running Playwright. ║\n║                                                                                                ║\n║ <3 Playwright Team                                                                             ║\n╚════════════════════════════════════════════════════════════════════════════════════════════════╝",
                         "stack": "Error: browserType.connect: Target page, context or browser has been closed\nBrowser logs:\n\n╔════════════════════════════════════════════════════════════════════════════════════════════════╗\n║ Looks like you launched a headed browser without having a XServer running.                     ║\n║ Set either 'headless: true' or use 'xvfb-run <your-playwright-app>' before running Playwright. ║\n║                                                                                                ║\n║ <3 Playwright Team                                                                             ║\n╚════════════════════════════════════════════════════════════════════════════════════════════════╝\n"
@@ -298,7 +257,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2023-11-30T15:14:48.416Z",
+                      "startTime": "2024-01-09T17:07:59.637Z",
                       "attachments": []
                     }
                   ],
@@ -325,7 +284,7 @@
                     {
                       "workerIndex": 5,
                       "status": "failed",
-                      "duration": 27,
+                      "duration": 29,
                       "error": {
                         "message": "Error: browserType.connect: Target page, context or browser has been closed\nBrowser logs:\n\n╔════════════════════════════════════════════════════════════════════════════════════════════════╗\n║ Looks like you launched a headed browser without having a XServer running.                     ║\n║ Set either 'headless: true' or use 'xvfb-run <your-playwright-app>' before running Playwright. ║\n║                                                                                                ║\n║ <3 Playwright Team                                                                             ║\n╚════════════════════════════════════════════════════════════════════════════════════════════════╝",
                         "stack": "Error: browserType.connect: Target page, context or browser has been closed\nBrowser logs:\n\n╔════════════════════════════════════════════════════════════════════════════════════════════════╗\n║ Looks like you launched a headed browser without having a XServer running.                     ║\n║ Set either 'headless: true' or use 'xvfb-run <your-playwright-app>' before running Playwright. ║\n║                                                                                                ║\n║ <3 Playwright Team                                                                             ║\n╚════════════════════════════════════════════════════════════════════════════════════════════════╝\n"
@@ -338,7 +297,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2023-11-30T15:14:48.962Z",
+                      "startTime": "2024-01-09T17:08:00.195Z",
                       "attachments": []
                     }
                   ],
@@ -357,11 +316,11 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2023-11-30T15:14:41.764Z",
-    "duration": 7892.597,
+    "startTime": "2024-01-09T17:07:53.010Z",
+    "duration": 7325.031,
     "expected": 0,
     "skipped": 0,
-    "unexpected": 7,
+    "unexpected": 6,
     "flaky": 0
   }
 }

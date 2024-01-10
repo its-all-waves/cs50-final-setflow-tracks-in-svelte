@@ -1,0 +1,52 @@
+{
+	"$scenes": {
+		"scn_xOBr8XzaQ": {
+			"name": "33-A",
+			"trackList": {
+				"trk_ki_3UY3sT": {},
+				"trk_DQwxo01a1": {},
+				"trk_9AJgNRv8t": {},
+				"trk_geG-K3Hxg": {}
+			}
+		},
+		"scn_QPbzYLqeO": {
+			"name": "66-B",
+			"trackList": {
+				"trk_ki_3UY3sT": {},
+				"trk_DQwxo01a1": {},
+				"trk_9AJgNRv8t": {},
+				"trk_geG-K3Hxg": {}
+			}
+		},
+		"scn_OAJyvt_h4": {
+			"name": "101-D",
+			"trackList": {
+				"trk_ki_3UY3sT": {},
+				"trk_DQwxo01a1": {},
+				"trk_9AJgNRv8t": {},
+				"trk_geG-K3Hxg": {}
+			}
+		},
+		"scn_e6iMdk1u1": {
+			"name": "V-101-C",
+			"trackList": {
+				"trk_ki_3UY3sT": {},
+				"trk_DQwxo01a1": {},
+				"trk_9AJgNRv8t": {},
+				"trk_geG-K3Hxg": {}
+			}
+		}
+	},
+	"$tracks": {
+		"trk_ki_3UY3sT": { "number": 1, "name": "Track 1" },
+		"trk_DQwxo01a1": { "number": 2, "name": "Track 2" },
+		"trk_9AJgNRv8t": { "number": 3, "name": "Track 3" },
+		"trk_geG-K3Hxg": { "number": 4, "name": "Track 4" }
+	},
+	"$characters": {
+		"chr_bAgy3YLN2": { "name": "Né-né" },
+		"chr_7YEibsDtv": { "name": "Zina" },
+		"chr_0Fy8Rcdfw": { "name": "Yuki" },
+		"chr_YUSkmYRYm": { "name": "Igor" }
+	}
+}

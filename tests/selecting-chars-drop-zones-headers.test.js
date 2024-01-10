@@ -4,13 +4,31 @@
 
 import { test, expect } from '@playwright/test'
 
+import { State, Test } from '../src/routes/tracks/machine'
+
+const {
+	character_NeNe,
+	character_Zina,
+	character_Yuki,
+	character_Igor,
+	track,
+	track_1,
+	track_2,
+	track_3,
+	track_4,
+	scene_33_A,
+	scene_66_B,
+	scene_101_D,
+	scene_V_101_C
+} = Test
+
 import {
-	SCENE_A,
-	SCENE_B,
-	TRACK_A,
-	TRACK_B,
-	CHARACTER_A,
-	CHARACTER_B,
+	// scene_33_A,
+	// scene_66_B,
+	// track_1,
+	// track_2,
+	// character_NeNe,
+	// CHARACTER_B,
 	characterPool,
 	commitButton,
 	headerSceneA,
@@ -25,7 +43,7 @@ import {
 test.describe('SELECTING CHARACTERS, DROP ZONES, HEADERS', () => {
 	// TEST
 	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	test(`can add "${CHARACTER_A}" to "${SCENE_A}" > "${TRACK_A}"`, async ({ page }) => {
+	test(`can add "${character_NeNe}" to "${scene_33_A}" > "${track_1}"`, async ({ page }) => {
 		// pick up a character and put it in dropZone
 		await characterA.click()
 		await dropZoneAA.click()
@@ -34,7 +52,7 @@ test.describe('SELECTING CHARACTERS, DROP ZONES, HEADERS', () => {
 		// check that dropZone contains CHARACTER
 		const characterInDropZone = dropZoneAA.locator('.character')
 		const innerText = await characterInDropZone.innerText()
-		expect(innerText).toBe(CHARACTER_A)
+		expect(innerText).toBe(character_NeNe)
 	})
 
 	// TEST
@@ -42,7 +60,7 @@ test.describe('SELECTING CHARACTERS, DROP ZONES, HEADERS', () => {
 	test(`a selected drop zone deselects when grabbing a dupl character from pool`, async ({
 		page
 	}) => {
-		const TRACK = TRACK_A
+		const TRACK = track_1
 		const dropZone = dropZoneAA
 
 		// grab the character, select the dropZone
@@ -61,7 +79,7 @@ test.describe('SELECTING CHARACTERS, DROP ZONES, HEADERS', () => {
 		// assert: character landed in the dropZone
 		const characterInDropZone = dropZone.locator('.character')
 		const innerText = await characterInDropZone.innerText()
-		expect(innerText).toBe(CHARACTER_A)
+		expect(innerText).toBe(character_NeNe)
 
 		// select all dropZones on a track
 		await headerTrackA.click()
@@ -99,7 +117,7 @@ test.describe('SELECTING CHARACTERS, DROP ZONES, HEADERS', () => {
 	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	// TEST
 	test('clicking a track header twice selects then deselects it', async ({ page }) => {
-		const TRACK = TRACK_A
+		const TRACK = track_1
 		const headerTrack = headerTrackA
 
 		// select TRACK header
@@ -135,7 +153,7 @@ test.describe('SELECTING CHARACTERS, DROP ZONES, HEADERS', () => {
 		expect(selectedDropZones.length).toBeGreaterThan(0)
 
 		// assert: every selected drop zone is on TRACK A
-		await expect_locators_have_attribute_value(selectedDropZones, `data-track-name`, TRACK_A)
+		await expect_locators_have_attribute_value(selectedDropZones, `data-track-name`, track_1)
 
 		// click the track header again to clear the selection
 		await headerTrackB.click()
@@ -147,7 +165,7 @@ test.describe('SELECTING CHARACTERS, DROP ZONES, HEADERS', () => {
 		expect(selectedDropZones.length).toBeGreaterThan(0)
 
 		// assert: every selected drop zone is on TRACK B
-		await expect_locators_have_attribute_value(selectedDropZones, `data-track-name`, TRACK_B)
+		await expect_locators_have_attribute_value(selectedDropZones, `data-track-name`, track_2)
 	})
 
 	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -185,13 +203,13 @@ test.describe('SELECTING CHARACTERS, DROP ZONES, HEADERS', () => {
 
 		// assert: scene is selected
 		let selectedDropZones = await arrayOfSelectedDropZones(page)
-		await expect_locators_have_attribute_value(selectedDropZones, `data-scene-name`, SCENE_A)
+		await expect_locators_have_attribute_value(selectedDropZones, `data-scene-name`, scene_33_A)
 
 		await headerTrackA.click()
 
 		// assert: only TRACK A is selected
 		selectedDropZones = await arrayOfSelectedDropZones(page)
-		await expect_locators_have_attribute_value(selectedDropZones, `data-track-name`, TRACK_A)
+		await expect_locators_have_attribute_value(selectedDropZones, `data-track-name`, track_1)
 	})
 
 	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -202,15 +220,15 @@ test.describe('SELECTING CHARACTERS, DROP ZONES, HEADERS', () => {
 		await dropZoneAA.click()
 
 		const dropZoneAB = page.locator(
-			`[data-drop-zone][data-scene-name="${SCENE_A}"][data-track-name="${TRACK_B}"]`
+			`[data-drop-zone][data-scene-name="${scene_33_A}"][data-track-name="${track_2}"]`
 		)
 		await dropZoneAB.click()
 
 		// assert: only drop zone AB is selected
 		let selectedDropZones = await arrayOfSelectedDropZones(page)
 		expect(selectedDropZones).toHaveLength(1)
-		await expect_locators_have_attribute_value(selectedDropZones, `data-scene-name`, SCENE_A)
-		await expect_locators_have_attribute_value(selectedDropZones, `data-track-name`, TRACK_B)
+		await expect_locators_have_attribute_value(selectedDropZones, `data-scene-name`, scene_33_A)
+		await expect_locators_have_attribute_value(selectedDropZones, `data-track-name`, track_2)
 	})
 
 	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -235,8 +253,11 @@ test.describe('SELECTING CHARACTERS, DROP ZONES, HEADERS', () => {
 		- click drop zone's scene's header (nothing should select)
 		- click the character again to deselect
 		- click the drop zone's scene's header again to select the scene
-	behavior:
+	buggy behavior:
 		- scene header must be clicked twice to be selected
+	correct behavior:
+		- since selecting a scene header only selects the occupied drop zones in
+		  the scene, there should be only one drop zone selected
 	*/
 
 		// put a character in the drop zone
@@ -245,7 +266,7 @@ test.describe('SELECTING CHARACTERS, DROP ZONES, HEADERS', () => {
 		await commitButton.click()
 
 		// assert: character is in drop zone
-		const characterInTable = dropZoneAA.getByText(CHARACTER_A)
+		const characterInTable = dropZoneAA.getByText(character_NeNe)
 		expect(await characterInTable.count()).toBe(1)
 
 		// click the character
@@ -266,8 +287,8 @@ test.describe('SELECTING CHARACTERS, DROP ZONES, HEADERS', () => {
 		// assert: all selected drop zones are in selected scene & no others selected
 		// if we have one selection per track, and all on selected scene, success!
 		const trackCount = await page.locator(`[data-track-header]`).count()
-		expect(selectedDropZones).toHaveLength(trackCount)
-		await expect_locators_have_attribute_value(selectedDropZones, `data-scene-name`, SCENE_A)
+		expect(selectedDropZones).toHaveLength(1)
+		await expect_locators_have_attribute_value(selectedDropZones, `data-scene-name`, scene_33_A)
 	})
 
 	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -291,19 +312,19 @@ test.describe('SELECTING CHARACTERS, DROP ZONES, HEADERS', () => {
 		// note: trackA = Track 3 // dropZoneBB = 66-B : Track 4 = scene B : trackB
 		await headerTrackA.click()
 		// for clarity...
-		const selectedTrack = TRACK_A
+		const selectedTrack = track_1
 
 		// ASSERT: all of track A is selected and only track A is selected
 		const sceneCount = await page.locator('[data-scene-header]').count()
 		let selectedDropZones = await arrayOfSelectedDropZones(page)
 		// assert: there should be sceneCount drop zones selected
 		expect(selectedDropZones).toHaveLength(sceneCount)
-		await expect_locators_have_attribute_value(selectedDropZones, `data-track-name`, TRACK_A)
+		await expect_locators_have_attribute_value(selectedDropZones, `data-track-name`, track_1)
 
 		await dropZoneBB.click()
 		// for clarity, clickedDropZone = dropZoneBB &...
-		const sceneOfClickedDropZone = SCENE_B
-		const trackOfClickedDropZone = TRACK_B
+		const sceneOfClickedDropZone = scene_66_B
+		const trackOfClickedDropZone = track_2
 
 		// ASSERT: only the selection in the clicked drop zone's scene changed,
 		// and it changed to the clicked dropZone
@@ -355,27 +376,25 @@ test.describe('SELECTING CHARACTERS, DROP ZONES, HEADERS', () => {
 
 	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	// TEST - FAILS WHILE BUG
-	test('clicking selected character in table toggles .chosen class', async ({ page }) => {
+	test('clicking selected character in table toggles .selected class', async ({ page }) => {
 		// add a character to the table
 		await characterA.click()
 		await dropZoneAA.click()
 		await commitButton.click()
 
 		// click the new character in the table
-		const characterInTable = page.locator(`[data-drop-zone]`).getByText(CHARACTER_A)
+		const characterInTable = page.locator(`[data-drop-zone]`).getByText(character_NeNe)
 		await expect(characterInTable).toHaveCount(1)
 		await characterInTable.click()
 
 		// // expect .chosen class
-		// await expect(characterInTable).toHaveClass(/\bchosen\b/)
-		await expect(characterInTable).toHaveClass(/\binHand\b/)
+		await expect(characterInTable).toHaveClass(/\bselected\b/)
 
 		// click the character in the table again
 		await characterInTable.click()
 
 		// ASSERT: no .chosen class (and yes .inHand class)
-		await expect(characterInTable).toHaveClass(/\binHand\b/)
-		await expect(characterInTable).not.toHaveClass(/\bchosen\b/)
+		await expect(characterInTable).not.toHaveClass(/\bselected\b/)
 
 		const allCharactersInTableAndPool = await page.locator(`.character`).all()
 		// assert: there are 5 total character elements in the table and pool

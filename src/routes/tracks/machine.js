@@ -1,7 +1,7 @@
 //@ts-nocheck
 
 import { nanoid } from 'nanoid'
-import { writable, get } from 'svelte/store'
+import { writable, get, derived } from 'svelte/store'
 
 // ENUMS +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -124,6 +124,24 @@ export const lastEventDetail = writable(
 let $lastEventDetail
 lastEventDetail.subscribe(($) => ($lastEventDetail = $))
 
+// SAVED STATE FOR LOCAL AND SERVER ++++++++++++++++++++++++++++++++++++++++++++
+// export const savedState = derived([scenes, tracks, characters], () => {
+// 	return { $scenes, $tracks, $characters }
+// })
+// export const savedState = writable(new Object())
+export const savedState = derived(
+	[scenes, tracks, characters],
+	([$scenes, $tracks, $characters]) => {
+		return {
+			$scenes,
+			$tracks,
+			$characters
+		}
+	}
+)
+let $savedState
+savedState.subscribe(($) => ($savedState = $))
+// savedState.set({ $scenes, $tracks, $characters })
 // MAIN FUNCTION (PRIVATE) +++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 // TODO: if a lot is repeated here, can it be DRYer by switching on the message?
@@ -222,26 +240,32 @@ function nextState(state, msg, info) {
 					if (!guard_RENAME(info)) break
 					RENAME(info)
 					break
+
 				case Msg.ADD_TRACKS:
 					if (!guard_ADD_TRACKS(info)) break
 					ADD_TRACKS(info)
 					send(Msg.ADD_NEW_TRACKS_TO_SCENES)
 					break
+
 				case Msg.ADD_NEW_TRACKS_TO_SCENES:
 					ADD_NEW_TRACKS_TO_SCENES()
 					break
+
 				case Msg.ADD_SCENE:
 					if (!guard_ADD_SCENE(info)) break
 					const id = ADD_SCENE(info)
 					send(Msg.ADD_TRACKS_TO_NEW_SCENE, { id })
 					break
+
 				case Msg.ADD_TRACKS_TO_NEW_SCENE:
 					ADD_TRACKS_TO_NEW_SCENE(info)
 					break
+
 				case Msg.ADD_CHARACTER:
 					if (!guard_ADD_CHARACTER(info)) break
 					ADD_CHARACTER(info)
 					break
+
 				default:
 					break
 			}
@@ -252,7 +276,11 @@ function nextState(state, msg, info) {
 
 	if (invalidEvent) {
 		feedback.set(`event ${msg} is invalid for current state ${state}`)
+		return state
 	}
+
+	localStorage.setItem('savedState', JSON.stringify($savedState))
+
 	return state // unchanged
 }
 
@@ -484,8 +512,25 @@ function COMMIT_CHARACTER_TO_TABLE() {
 
 		// add character in hand to scene on track
 		trackList[trackId].add($characterInHand)
+
+		console.log('debug')
+
+		// // add character in hand to scene on track
+		// const updatedTrackList = new Set([...trackList[trackId], $characterInHand])
+
+		// // update the scenes store
+		// scenes.update(($scenes) => {
+		// 	return { ...$scenes, [sceneId]: { ...$scenes[sceneId], trackList: updatedTrackList } }
+		// })
 	}
 	scenes.set($scenes)
+	// update the scenes store
+	// scenes.set({ ...$scenes })
+	// scenes.update(($scenes) => {
+	// 	return { ...$scenes }
+	// })
+
+	console.log('debug')
 
 	feedback.set(`committed ${$characters[$characterInHand].name} to selected drop zones`)
 }
@@ -780,7 +825,6 @@ export function DEV_populate_table() {
 	const TEST_TRACK_COUNT = 4
 	send(Msg.ADD_TRACKS, { label: Test.track, count: TEST_TRACK_COUNT })
 
-	const newScenes = {}
 	for (const key in Test) {
 		if (!key.startsWith('scene') || key.endsWith('id')) continue
 		send(Msg.ADD_SCENE, { name: Test[key] })

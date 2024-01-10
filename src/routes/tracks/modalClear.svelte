@@ -41,6 +41,7 @@
 				Cancel
 			</button>
 			<button
+				id="btn-clear"
 				type="submit"
 				class="outline red"
 				on:click={() => window.dispatchEvent(eventSmartClear)}

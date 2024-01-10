@@ -12,7 +12,8 @@
 		Msg,
 		selectedDropZones,
 		selectedCharacters,
-		lastEventDetail
+		lastEventDetail,
+		savedState
 	} from './machine'
 
 	import Table from './table.svelte'
@@ -23,9 +24,9 @@
 	import ModalRename from './modalRename.svelte'
 	import ModalClear from './modalClear.svelte'
 
-	/**
-	 * 	@type {import('./$types').PageData} */
-	export let data
+	// /**
+	//  * 	@type {import('./$types').PageData} */
+	// export let data
 
 	// user settings +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -180,7 +181,16 @@
 	}
 
 	// DEBUG +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	onMount(DEV_populate_table)
+	onMount(() => {
+		DEV_populate_table()
+		// $savedState = JSON.parse(localStorage.getItem('savedState'))
+		// if (!$savedState) return
+		// $scenes = $savedState.$scenes
+		// $tracks = $savedState.$tracks
+		// $characters = $savedState.$characters
+
+		console.log('DEBUG')
+	})
 </script>
 
 <svelte:window
