@@ -124,24 +124,6 @@ export const lastEventDetail = writable(
 let $lastEventDetail
 lastEventDetail.subscribe(($) => ($lastEventDetail = $))
 
-// SAVED STATE FOR LOCAL AND SERVER ++++++++++++++++++++++++++++++++++++++++++++
-// export const savedState = derived([scenes, tracks, characters], () => {
-// 	return { $scenes, $tracks, $characters }
-// })
-// export const savedState = writable(new Object())
-export const savedState = derived(
-	[scenes, tracks, characters],
-	([$scenes, $tracks, $characters]) => {
-		return {
-			$scenes,
-			$tracks,
-			$characters
-		}
-	}
-)
-let $savedState
-savedState.subscribe(($) => ($savedState = $))
-// savedState.set({ $scenes, $tracks, $characters })
 // MAIN FUNCTION (PRIVATE) +++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 // TODO: if a lot is repeated here, can it be DRYer by switching on the message?
@@ -278,8 +260,6 @@ function nextState(state, msg, info) {
 		feedback.set(`event ${msg} is invalid for current state ${state}`)
 		return state
 	}
-
-	localStorage.setItem('savedState', JSON.stringify($savedState))
 
 	return state // unchanged
 }
