@@ -15,6 +15,7 @@ import { writable } from 'svelte/store'
 /** @type {Writable<Table>} */
 export const table = writable(new Object())
 
+// TODO: SYNC SCENES, CHARACTERS, TRACKS WITH DB!!!
 /** @type {Writable<CharacterInHand[]>} */
 export const charactersInHand = writable(new Array())
 
