@@ -4,9 +4,10 @@
 	let email = ''
 	let password = ''
 	let confirmPass = ''
-	let error = false
 	let register = false
 	let authenticating = false
+	let error = false
+	let errorMessage = ''
 
 	async function handleAuthenticate() {
 		if (authenticating) return
@@ -16,16 +17,32 @@
 			return
 		}
 
+		error = false
+		errorMessage = ''
 		authenticating = true
 
 		try {
-			if (!register) {
-				await authHandlers.login(email, password)
-			} else {
-				await authHandlers.signup(email, password)
+			!register
+				? await authHandlers.login(email, password)
+				: await authHandlers.signup(email, password)
+		} catch (err) {
+			error = true
+
+			switch (err.code) {
+				case 'auth/invalid-email':
+					errorMessage = 'A valid email address is required.'
+					break
+				case 'auth/invalid-credential':
+					errorMessage = 'Invalid email or password.'
+					break
+				case 'auth/too-many-requests':
+					errorMessage = 'Too many failed attempts. Reset password or try again later.'
+					break
+				default:
+					errorMessage = 'An unknown error ocurred.'
 			}
-		} catch (error) {
-			console.log('There was an auth error:', error)
+
+			console.log('There was an auth error:', err.code)
 			authenticating = false
 		}
 	}
@@ -40,7 +57,7 @@
 		<h1>{register ? 'Register' : 'Login'}</h1>
 
 		{#if error}
-			<p class="error">The Information you have entered is incorrect.</p>
+			<p class="error">{errorMessage}</p>
 		{/if}
 
 		<label>
