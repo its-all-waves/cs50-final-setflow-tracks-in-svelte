@@ -39,14 +39,15 @@
 			$userDocRef = doc(db, 'users', user.uid)
 			const userSnapshot = await getDoc($userDocRef)
 
+			// set the local user store from db's user doc
 			$userStore = userSnapshot.data()
 				? {
 						...$userStore,
 						id: user.uid,
 						name: userSnapshot.name,
 						email: userSnapshot.email,
-						last_project_id: userSnapshot.last_project_id,
-						last_session_id: userSnapshot.last_session_id,
+						currentProjectId: userSnapshot.currentProjectId,
+						currentSessionId: userSnapshot.currentSessionId,
 						loadedFromDb: true
 				  }
 				: {
@@ -54,8 +55,8 @@
 						id: user.uid,
 						name: '',
 						email: user.email,
-						last_project_id: '',
-						last_session_id: '',
+						currentProjectId: '',
+						currentSessionId: '',
 						loadedFromDb: true
 				  }
 

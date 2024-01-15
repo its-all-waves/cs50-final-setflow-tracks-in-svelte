@@ -4,8 +4,8 @@
 
 	import Dropzone from './dropzone.svelte'
 
-	$: tracksEntries = Object.entries($tracks)
-	$: scenesEntries = Object.entries($scenes)
+	$: tracksEntries = Object.entries($tracks).sort(([, a], [, b]) => a.number - b.number)
+	$: scenesEntries = Object.entries($scenes).sort(([, a], [, b]) => a.number - b.number)
 </script>
 
 <table data-main-table>

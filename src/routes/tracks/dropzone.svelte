@@ -20,7 +20,9 @@
 		return false
 	}
 
-	$: trackListEntries = Object.entries(scene.trackList)
+	$: trackListEntries = Object.entries(scene.trackList).sort(
+		([, a], [, b]) => a.number - b.number
+	)
 </script>
 
 <button
@@ -35,6 +37,7 @@
 		})}
 >
 	{#each trackListEntries as [trackId, chars]}
+		<!-- {@debug $tracks} -->
 		{#if $tracks[trackId].name === trackName}
 			{#each chars as charId}
 				<Character

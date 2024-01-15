@@ -181,8 +181,7 @@
 
 	// DEBUG +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	onMount(() => {
-		DEV_populate_table()
-		console.log('DEBUG')
+		// DEV_populate_table()
 	})
 </script>
 
@@ -210,7 +209,6 @@
 
 <main class="container">
 	<article>
-		<!-- does character in hand need to be a bind: ? -->
 		<Toolbar />
 		<!-- a poor-man's OR op? -->
 		{#if Object.keys($tracks).length + Object.keys($scenes).length > 0}

@@ -10,8 +10,21 @@ export const userStore = writable({
 	id: '',
 	name: '',
 	email: '',
-	last_project_id: '',
-	last_session_id: ''
+	currentProjectId: '',
+	currentSessionId: ''
+})
+
+export const projects = writable({
+	/* 
+	project_id_1: {
+		session_id_1,
+		session_id_2
+	},
+	project_id_2: {
+		session_id_3,
+		session_id_4
+	}
+	*/
 })
 
 export const userDocRef = writable(/* Firestore document reference */)

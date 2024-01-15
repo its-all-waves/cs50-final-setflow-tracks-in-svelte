@@ -108,11 +108,11 @@ tracks.subscribe(($) => ($tracks = $))
 
 /** @description Keys are dynamic and == scene name, ditto .trackList > track name */
 export const scenes = writable(
-	/** @type {{} | { [sceneId: string]: { name: string, trackList: {[trackId: string]: Set<string>}} }} */
+	/** @type {{} | { [sceneId: string]: { number: number, name: string, trackList: {[trackId: string]: Set<string>}} }} */
 	new Object()
 )
 
-/** @type {{} | { [sceneId: string]: { name: string, trackList: {[trackId: string]: Set<string>}} }} */
+/** @type {{} | { [sceneId: string]: { number: number, name: string, trackList: {[trackId: string]: Set<string>}} }} */
 let $scenes
 scenes.subscribe(($) => ($scenes = $))
 
@@ -522,6 +522,10 @@ function SMART_DELETE() {
 		for (const selected of $selectedCharacters) {
 			const { instanceId, id, sceneId, trackId } = selected
 			const { trackList } = $scenes[sceneId]
+
+			console.log('👀 👀 👀 SMART DELETE', trackList[trackId])
+			debugger
+
 			trackList[trackId].delete(id)
 		}
 		scenes.set($scenes)
