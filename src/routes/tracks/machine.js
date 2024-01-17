@@ -2,6 +2,11 @@
 
 import { nanoid } from 'nanoid'
 import { writable, get, derived } from 'svelte/store'
+import { doc, getDoc, collection, setDoc, updateDoc } from 'firebase/firestore'
+
+import { sessionDocRef } from '../firebase_stores'
+let $sessionDocRef
+sessionDocRef.subscribe(($) => ($sessionDocRef = $))
 
 // ENUMS +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -135,7 +140,10 @@ lastEventDetail.subscribe(($) => ($lastEventDetail = $))
  * @param {object} event.info
  */
 function nextState(state, msg, info) {
-	// if info?
+	// TODO: this is stupid -- make less stupid someday
+	let changedCharacters = false
+	let changedTracks = false
+	let changedScenes = false
 
 	logAction(msg)
 
@@ -194,11 +202,13 @@ function nextState(state, msg, info) {
 					if (!guard_COMMIT_CHARACTER_TO_TABLE()) break
 					COMMIT_CHARACTER_TO_TABLE()
 					resetSelections()
+					changedScenes = true
 					break
 
 				case Msg.SMART_CLEAR:
 					SMART_DELETE()
 					resetSelections()
+					changedScenes = true
 					break
 
 				// ACCESSED VIA CONTEXT MENU +++++++++++++++++++++++++++++++++++
@@ -206,37 +216,49 @@ function nextState(state, msg, info) {
 				case Msg.DELETE_CHARACTER:
 					DELETE_CHARACTER(info)
 					resetSelections()
+					changedCharacters = true
 					break
 
 				case Msg.DELETE_TRACK:
 					DELETE_TRACK(info)
 					resetSelections()
+					changedTracks = true
 					break
 
 				case Msg.DELETE_SCENE:
 					DELETE_SCENE(info)
 					resetSelections()
+					changedScenes = true
 					break
 
 				case Msg.RENAME:
 					if (!guard_RENAME(info)) break
 					RENAME(info)
+					// TEMPORARY -- THIS IS REAL STUPID
+					changedCharacters = true
+					changedTracks = true
+					changedScenes = true
 					break
 
 				case Msg.ADD_TRACKS:
 					if (!guard_ADD_TRACKS(info)) break
 					ADD_TRACKS(info)
 					send(Msg.ADD_NEW_TRACKS_TO_SCENES)
+					changedTracks = true
+					changedScenes = true
 					break
 
 				case Msg.ADD_NEW_TRACKS_TO_SCENES:
 					ADD_NEW_TRACKS_TO_SCENES()
+					// change handled in ADD_TRACKS
 					break
 
 				case Msg.ADD_SCENE:
 					if (!guard_ADD_SCENE(info)) break
 					const id = ADD_SCENE(info)
 					send(Msg.ADD_TRACKS_TO_NEW_SCENE, { id })
+					changedTracks = true
+					changedScenes = true
 					break
 
 				case Msg.ADD_TRACKS_TO_NEW_SCENE:
@@ -246,6 +268,7 @@ function nextState(state, msg, info) {
 				case Msg.ADD_CHARACTER:
 					if (!guard_ADD_CHARACTER(info)) break
 					ADD_CHARACTER(info)
+					changedCharacters = true
 					break
 
 				default:
@@ -259,6 +282,17 @@ function nextState(state, msg, info) {
 	if (invalidEvent) {
 		feedback.set(`event ${msg} is invalid for current state ${state}`)
 		return state
+	}
+
+	// UPDATE THE DB
+	if (changedCharacters) {
+		;(async () => await updateDoc($sessionDocRef, { characters: $characters }))()
+	}
+	if (changedTracks) {
+		;(async () => await updateDoc($sessionDocRef, { tracks: $tracks }))()
+	}
+	if (changedScenes) {
+		;(async () => await updateDoc($sessionDocRef, { scenes: $scenes }))()
 	}
 
 	return state // unchanged
@@ -287,7 +321,6 @@ function resetSelections() {
 
 	selectedHeader.set(null)
 	clearSelectedDropZones()
-	// debugger
 }
 
 function logAction(action) {
@@ -482,35 +515,21 @@ function guard_COMMIT_CHARACTER_TO_TABLE() {
 }
 
 function COMMIT_CHARACTER_TO_TABLE() {
+	// PRE DB
 	for (const selected of $selectedDropZones) {
 		const { sceneId, trackId } = selected
 		const { trackList } = $scenes[sceneId]
-
 		/* this prevents adding the character to the table if they're already in
 		the scene. */
 		if (trackListContainsCharacter(trackList, $characterInHand)) continue
-
 		// add character in hand to scene on track
 		trackList[trackId].add($characterInHand)
-
-		console.log('debug')
-
-		// // add character in hand to scene on track
-		// const updatedTrackList = new Set([...trackList[trackId], $characterInHand])
-
-		// // update the scenes store
-		// scenes.update(($scenes) => {
-		// 	return { ...$scenes, [sceneId]: { ...$scenes[sceneId], trackList: updatedTrackList } }
-		// })
 	}
 	scenes.set($scenes)
-	// update the scenes store
-	// scenes.set({ ...$scenes })
-	// scenes.update(($scenes) => {
-	// 	return { ...$scenes }
-	// })
 
-	console.log('debug')
+	// TODO: could this be more fine-grained?
+	// UPDATE THE DB
+	// ;(async () => await updateDoc($sessionDocRef, { scenes: $scenes }))()
 
 	feedback.set(`committed ${$characters[$characterInHand].name} to selected drop zones`)
 }
@@ -522,10 +541,6 @@ function SMART_DELETE() {
 		for (const selected of $selectedCharacters) {
 			const { instanceId, id, sceneId, trackId } = selected
 			const { trackList } = $scenes[sceneId]
-
-			console.log('👀 👀 👀 SMART DELETE', trackList[trackId])
-			debugger
-
 			trackList[trackId].delete(id)
 		}
 		scenes.set($scenes)
@@ -548,7 +563,7 @@ function SMART_DELETE() {
 		for (const sceneId in $scenes) {
 			const { trackList } = $scenes[sceneId]
 			for (const trackId in trackList) {
-				if (!trackList[trackId].has($characterInHand)) continue
+				// if (!trackList[trackId].has($characterInHand)) continue
 				// this track contains the character in hand
 				trackList[trackId].delete($characterInHand)
 			}
@@ -670,7 +685,7 @@ function ADD_NEW_TRACKS_TO_SCENES() {
 	for (const sceneId in $scenes) {
 		const { trackList } = $scenes[sceneId]
 		for (const trackId in $tracks) {
-			if (!trackList[trackId]) trackList[trackId] = new Set()
+			if (!trackList[trackId]) trackList[trackId] = []
 		}
 	}
 }
@@ -733,7 +748,7 @@ function ADD_TRACKS_TO_NEW_SCENE({ id }) {
 	// ensure newly added scene has all tracks
 	const { trackList } = $scenes[id]
 	for (const trackId in $tracks) {
-		if (!trackList[trackId]) trackList[trackId] = new Set()
+		if (!trackList[trackId]) trackList[trackId] = []
 	}
 	scenes.set($scenes)
 }

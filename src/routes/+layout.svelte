@@ -6,12 +6,13 @@
 	import { doc, getDoc, setDoc } from 'firebase/firestore'
 	import { authHandlers, userStore, userDocRef } from './firebase_stores'
 
+	import '../lib/util/extendsArray'
+
 	const nonAuthRoutes = ['/']
 
 	let pageLoaded = false
 
 	onMount(() => {
-		console.log('Mounting')
 		const unsubscribe = auth.onAuthStateChanged(async (user) => {
 			const currentPath = window.location.pathname
 
