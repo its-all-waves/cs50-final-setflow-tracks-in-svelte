@@ -315,18 +315,23 @@ function nextState(state, msg, info) {
 	// UPDATE THE DB
 	if (changedCharacters) {
 		;(async () => await updateDoc($sessionDocRef, { characters: $characters }))()
+		changedCharacters = false
 	}
 	if (changedTracks) {
 		;(async () => await updateDoc($sessionDocRef, { tracks: $tracks }))()
+		changedTracks = false
 	}
 	if (changedScenes) {
 		;(async () => await updateDoc($sessionDocRef, { scenes: $scenes }))()
+		changedScenes = false
 	}
 	if (changedTrackCount) {
 		;(async () => await updateDoc($sessionDocRef, { trackCount: $trackCount }))()
+		changedTrackCount = false
 	}
 	if (changedSceneCount) {
 		;(async () => await updateDoc($sessionDocRef, { sceneCount: $sceneCount }))()
+		changedSceneCount = false
 	}
 
 	return state // unchanged
