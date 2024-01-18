@@ -39,7 +39,7 @@ function prepTest() {
 		ctx.scenes[name] = { name, trackList: {} }
 		const { trackList } = ctx.scenes[name]
 		for (const track in ctx.tracks) {
-			trackList[track] = new Set()
+			trackList[track] = []
 		}
 	}
 }

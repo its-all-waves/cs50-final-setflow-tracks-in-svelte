@@ -22,6 +22,7 @@
 	import ModalDelete from './modalDelete.svelte'
 	import ModalRename from './modalRename.svelte'
 	import ModalClear from './modalClear.svelte'
+	import DebugInfo from './DEBUG_INFO.svelte'
 
 	// /**
 	//  * 	@type {import('./$types').PageData} */
@@ -82,17 +83,19 @@
 		}
 	}
 
-	// keep characters for the ui
-	$: charactersEntries = Object.entries($characters).sort(([_, a], [__, b]) => {
-		const aName = a.name.toLowerCase()
-		const bName = b.name.toLowerCase()
-		if (aName < bName) {
-			return -1
-		} else if (bName < aName) {
-			return 1
-		}
-		return 0
-	})
+	// keep characters sorted for the ui
+	let charactersEntries
+	$: if ($characters)
+		charactersEntries = Object.entries($characters).sort(([_, a], [__, b]) => {
+			const aName = a.name.toLowerCase()
+			const bName = b.name.toLowerCase()
+			if (aName < bName) {
+				return -1
+			} else if (bName < aName) {
+				return 1
+			}
+			return 0
+		})
 
 	// context menu ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	let showContextmenu = false
@@ -211,7 +214,7 @@
 	<article>
 		<Toolbar />
 		<!-- a poor-man's OR op? -->
-		{#if Object.keys($tracks).length + Object.keys($scenes).length > 0}
+		{#if ($tracks || $scenes) && Object.keys($tracks).length + Object.keys($scenes).length > 0}
 			<div class="table">
 				<Table />
 			</div>
@@ -219,15 +222,17 @@
 	</article>
 
 	<div class="character-pool">
-		{#each charactersEntries as [id, { name }]}
-			<Character
-				{id}
-				isInstance={false}
-				{name}
-				sceneId={undefined}
-				trackId={undefined}
-			/>
-		{/each}
+		{#if charactersEntries}
+			{#each charactersEntries as [id, { name }]}
+				<Character
+					{id}
+					isInstance={false}
+					{name}
+					sceneId={undefined}
+					trackId={undefined}
+				/>
+			{/each}
+		{/if}
 		<button
 			id="btn-commit"
 			class:hidden={$characterInHand == null}
@@ -239,7 +244,7 @@
 		</button>
 	</div>
 
-	<!-- <DebugInfo /> -->
+	<DebugInfo />
 
 	<form class="inputs">
 		<div class="track-input">

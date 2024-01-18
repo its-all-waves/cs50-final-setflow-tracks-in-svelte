@@ -40,32 +40,23 @@
 			$userDocRef = doc(db, 'users', user.uid)
 			const userSnapshot = await getDoc($userDocRef)
 
-			// set the local user store from db's user doc
-			$userStore = userSnapshot.data()
-				? {
-						...$userStore,
-						id: user.uid,
-						name: userSnapshot.name,
-						email: userSnapshot.email,
-						currentProjectId: userSnapshot.currentProjectId,
-						currentSessionId: userSnapshot.currentSessionId,
-						loadedFromDb: true
-				  }
-				: {
-						...$userStore,
-						id: user.uid,
-						name: '',
-						email: user.email,
-						currentProjectId: '',
-						currentSessionId: '',
-						loadedFromDb: true
-				  }
+			const userData = userSnapshot.data()
 
-			// TODO: does this go in the else block above? seems like it's sending the data back up to the db... which would only make sense if it didn't exist there to begin with
-			const userData = {
-				email: user.email
+			const dataForDbUserDoc = {
+				name: userData.name ?? '',
+				email: userData.email ?? '',
+				currentProjectId: userData.current_project_id ?? '',
+				currentSessionId: userData.current_session_id ?? ''
 			}
-			await setDoc($userDocRef, userData, { merge: true })
+
+			$userStore = {
+				// ...$userStore,
+				id: user.uid,
+				loadedFromDb: true,
+				...dataForDbUserDoc
+			}
+
+			await setDoc($userDocRef, dataForDbUserDoc, { merge: true })
 
 			pageLoaded = true
 		})

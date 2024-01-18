@@ -1,12 +1,86 @@
 //@ts-nocheck
 
 import { nanoid } from 'nanoid'
-import { writable, get, derived } from 'svelte/store'
-import { doc, getDoc, collection, setDoc, updateDoc } from 'firebase/firestore'
+import { writable } from 'svelte/store'
+import { updateDoc } from 'firebase/firestore'
 
 import { sessionDocRef } from '../firebase_stores'
 let $sessionDocRef
 sessionDocRef.subscribe(($) => ($sessionDocRef = $))
+
+// STORES
+
+/** @description Holds the last response from the machine to display to the user */
+export const feedback = writable('')
+
+/** @description The id of the character in the _pool_ that's clicked on to be placed onto the table */
+export const characterInHand = writable(/** @type {string?} */ null)
+
+/** @type {string?} */
+let $characterInHand
+characterInHand.subscribe(($) => ($characterInHand = $))
+
+/** @description A scene or track ID */
+export const selectedHeader = writable(/** @type {string?} */ null)
+
+/** @type {string?} */
+let $selectedHeader
+selectedHeader.subscribe(($) => ($selectedHeader = $))
+
+/** @description The characters selected from the _table_*/
+export const selectedCharacters = writable(
+	/** @type {Set<{ instanceId: string, characterId: string, sceneId: string }>} */
+	new Set()
+)
+
+/** @type {Set<{ instanceId: string, characterId: string, sceneId: string }>} */
+let $selectedCharacters
+selectedCharacters.subscribe(($) => ($selectedCharacters = $))
+
+export const selectedDropZones = writable(/** @type {Set<string>} */ new Set())
+
+/** @type {Set<string>} */
+let $selectedDropZones
+selectedDropZones.subscribe(($) => ($selectedDropZones = $))
+
+/** @description Keys are dynamic and == character name */
+export const characters = writable(
+	/** @type {{} | { [characterId: string]: { name: string } }} */
+	new Object()
+)
+
+/** @type {{} | { [characterId: string]: { name: string } }} */
+let $characters
+characters.subscribe(($) => ($characters = $))
+
+/** @description Keys are dynamic and == track name */
+export const tracks = writable(
+	/** @type {{} | { [trackId: string]: { name: string } }} */
+	// new Object()
+	{ 'i am': 'not undefined' }
+)
+
+/** @type {{} | { [trackId: string]: { name: string } }} */
+let $tracks
+tracks.subscribe(($) => ($tracks = $))
+
+/** @description Keys are dynamic and == scene name, ditto .trackList > track name */
+export const scenes = writable(
+	/** @type {{} | { [sceneId: string]: { number: number, name: string, trackList: {[trackId: string]: Set<string>}} }} */
+	new Object()
+)
+
+/** @type {{} | { [sceneId: string]: { number: number, name: string, trackList: {[trackId: string]: Set<string>}} }} */
+let $scenes
+scenes.subscribe(($) => ($scenes = $))
+
+/** @description is e.detail from oncontextmenu; gets passed into the modal */
+export const lastEventDetail = writable(
+	/** @type {object} */
+	null
+)
+let $lastEventDetail
+lastEventDetail.subscribe(($) => ($lastEventDetail = $))
 
 // ENUMS +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -57,77 +131,6 @@ function useMachine(initialState) {
 }
 
 export const { state, send } = useMachine(State.TableUnlocked)
-
-/** @description Holds the last response from the machine to display to the user */
-export const feedback = writable('')
-
-/** @description The id of the character in the _pool_ that's clicked on to be placed onto the table */
-export const characterInHand = writable(/** @type {string?} */ null)
-
-/** @type {string?} */
-let $characterInHand
-characterInHand.subscribe(($) => ($characterInHand = $))
-
-/** @description A scene or track ID */
-export const selectedHeader = writable(/** @type {string?} */ null)
-
-/** @type {string?} */
-let $selectedHeader
-selectedHeader.subscribe(($) => ($selectedHeader = $))
-
-/** @description The characters selected from the _table_*/
-export const selectedCharacters = writable(
-	/** @type {Set<{ instanceId: string, characterId: string, sceneId: string }>} */
-	new Set()
-)
-
-/** @type {Set<{ instanceId: string, characterId: string, sceneId: string }>} */
-let $selectedCharacters
-selectedCharacters.subscribe(($) => ($selectedCharacters = $))
-
-export const selectedDropZones = writable(/** @type {Set<string>} */ new Set())
-
-/** @type {Set<string>} */
-let $selectedDropZones
-selectedDropZones.subscribe(($) => ($selectedDropZones = $))
-
-/** @description Keys are dynamic and == character name */
-export const characters = writable(
-	/** @type {{} | { [characterId: string]: { name: string } }} */
-	new Object()
-)
-
-/** @type {{} | { [characterId: string]: { name: string } }} */
-let $characters
-characters.subscribe(($) => ($characters = $))
-
-/** @description Keys are dynamic and == track name */
-export const tracks = writable(
-	/** @type {{} | { [trackId: string]: { name: string } }} */
-	new Object()
-)
-
-/** @type {{} | { [trackId: string]: { name: string } }} */
-let $tracks
-tracks.subscribe(($) => ($tracks = $))
-
-/** @description Keys are dynamic and == scene name, ditto .trackList > track name */
-export const scenes = writable(
-	/** @type {{} | { [sceneId: string]: { number: number, name: string, trackList: {[trackId: string]: Set<string>}} }} */
-	new Object()
-)
-
-/** @type {{} | { [sceneId: string]: { number: number, name: string, trackList: {[trackId: string]: Set<string>}} }} */
-let $scenes
-scenes.subscribe(($) => ($scenes = $))
-
-/** @description is e.detail from oncontextmenu; gets passed into the modal */
-export const lastEventDetail = writable(
-	/** @type {object} */
-	null
-)
-let $lastEventDetail
-lastEventDetail.subscribe(($) => ($lastEventDetail = $))
 
 // MAIN FUNCTION (PRIVATE) +++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -590,7 +593,7 @@ function SMART_DELETE() {
 	}
 }
 
-// The following three DELETE_ functions are to be called via a context menu
+// The following three DELETE_ functions are called via a context menu
 function DELETE_CHARACTER({ id }) {
 	const { name } = $characters[id]
 
@@ -703,6 +706,7 @@ function ADD_TRACKS({ label, count }) {
 	}
 
 	// limit number of added tracks if total tracks would exceed max
+	console.log('👀 👀 👀 ', { $tracks })
 	const numTracks = Object.keys($tracks).length
 	if (numTracks + count > MAX_TRACK_COUNT) {
 		const oldCount = count
@@ -712,15 +716,24 @@ function ADD_TRACKS({ label, count }) {
 		)
 	}
 
-	let start = greatestValueOfTrackWith(label) ?? 0
-	const end = start + count
-	for (let i = start; i < end; i++) {
+	const end = numberOfTracks + count
+	for (let i = numberOfTracks; i < end; i++) {
 		const name = `${label} ${i + 1}`
 		const id = `trk_${nanoid(9)}`
-		numberOfTracks += 1
+		numberOfTracks++
 		$tracks[id] = { number: numberOfTracks, name }
 		feedback.set(`added "${name}" to tracks`)
 	}
+
+	// let start = greatestValueOfTrackWith(label) ?? 0
+	// const end = start + count
+	// for (let i = start; i < end; i++) {
+	// 	const name = `${label} ${i + 1}`
+	// 	const id = `trk_${nanoid(9)}`
+	// 	numberOfTracks++
+	// 	$tracks[id] = { number: numberOfTracks, name }
+	// 	feedback.set(`added "${name}" to tracks`)
+	// }
 
 	tracks.set($tracks)
 }
@@ -734,11 +747,17 @@ function guard_ADD_SCENE({ name }) {
 	return true
 }
 
+let numberOfScenes = 0
+
 /** Returns the new scene's id
  */
 function ADD_SCENE({ name }) {
+	// get the highest number in scenes
+
 	const id = `scn_${nanoid(9)}` // do keep me tho
-	$scenes[id] = { name, trackList: {} }
+	numberOfScenes++
+	$scenes[id] = { name, number: numberOfScenes, trackList: {} }
+
 	scenes.set($scenes)
 	feedback.set(`added "${name}" to scenes`)
 	return id

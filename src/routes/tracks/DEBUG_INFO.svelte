@@ -9,6 +9,8 @@
 		tracks,
 		scenes
 	} from './machine'
+
+	import { userStore } from '../firebase_stores'
 </script>
 
 <div class="info">
@@ -18,6 +20,14 @@
 	>
 		{$feedback}
 	</p> -->
+
+	<!-- DATABASE -->
+	<p>$userStore:</p>
+	<ul>
+		{#each Object.entries($userStore) as [k, v]}
+			<li>{k}: {v}</li>
+		{/each}
+	</ul>
 
 	<p>state: <span class="highlight">{$state}</span></p>
 	<p>

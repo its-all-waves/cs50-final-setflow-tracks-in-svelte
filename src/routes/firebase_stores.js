@@ -27,7 +27,11 @@ export const projects = writable({
 	*/
 })
 
-export const userDocRef = writable(/* Firestore document reference */)
+export const userDocRef = writable(/* Firestore user document reference */)
+
+export const projectDocRef = writable(/* Firestore project document reference */ {})
+
+export const sessionDocRef = writable(/* Firestore session document reference */ {})
 
 export const authHandlers = {
 	signup: async function (email, password) {
