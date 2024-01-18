@@ -7,7 +7,9 @@
 		selectedHeader,
 		characters,
 		tracks,
-		scenes
+		scenes,
+		trackCount,
+		sceneCount
 	} from './machine'
 
 	import { userStore } from '../firebase_stores'
@@ -29,6 +31,10 @@
 		{/each}
 	</ul>
 
+	<p>$trackCount: {$trackCount}</p>
+	<p>$sceneCount: {$sceneCount}</p>
+
+	<!-- LOCAL DATA -->
 	<p>state: <span class="highlight">{$state}</span></p>
 	<p>
 		character in hand: <span class="highlight">{$characters[$characterInHand]?.name ?? ''}</span
@@ -64,9 +70,9 @@
 	<ul id="scenes">
 		<span>Scenes</span>
 
-		{#each Object.values($scenes) as { name: sceneName, trackList }}
+		{#each Object.values($scenes) as { name: sceneName, number, trackList }}
 			<li>
-				{sceneName}:
+				number: {number}, name: {sceneName}:
 				{#each Object.entries(trackList) as [trackId, chars]}
 					{@const { name: trackName } = $tracks[trackId]}
 					<span>{trackName}:</span>
@@ -89,12 +95,6 @@
 			<span class="highlight">{name}</span>, &MediumSpace;
 		{/each}
 	</ul>
-	<!-- <ul>
-		<span>Scenes:</span>
-		{#each Object.keys($scenes) as scene}
-			<span>{scene}, &MediumSpace;</span>
-		{/each}
-	</ul> -->
 </div>
 
 <style>

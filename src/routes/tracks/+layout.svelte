@@ -15,7 +15,8 @@
 		updateDoc
 	} from 'firebase/firestore'
 	import { userStore, userDocRef, sessionDocRef, projectDocRef } from '../firebase_stores'
-	import { characters, tracks, scenes } from './machine'
+	import { characters, tracks, scenes, trackCount, sceneCount } from './machine'
+	import { SDK_VERSION } from 'firebase/app'
 
 	// /** @type {import('./$types').LayoutData} */
 	// export let data
@@ -23,13 +24,21 @@
 	const sessionConverter = {
 		toFirestore() {
 			// TODO: what do i do with date prop? leave out?
-			return { characters: $characters, tracks: $tracks, scenes: $scenes }
+			return {
+				characters: $characters,
+				tracks: $tracks,
+				scenes: $scenes,
+				trackCount: $trackCount,
+				sceneCount: $sceneCount
+			}
 		},
 		fromFirestore(snapShot, options) {
 			const data = snapShot.data(options)
 			$characters = data.characters ?? {}
 			$tracks = data.tracks ?? {}
 			$scenes = data.scenes ?? {}
+			$trackCount = data.trackCount ?? 0
+			$sceneCount = data.sceneCount ?? 0
 			return
 		}
 	}
@@ -44,7 +53,7 @@
 		// note: the local user data store is updated by routes/+layout.svelte
 
 		// THE INITIAL DB FETCH UPON LOGIN +++++++++++++++++++++++++++++++++++++
-		// if no session id (which implies no project id)
+
 		if (!$userStore.currentSessionId) {
 			// create new project doc
 			$projectDocRef = await addDoc(collection(db, 'projects'), {})
@@ -57,7 +66,6 @@
 			await addDoc(collection(db, 'projects', $projectDocRef.id, 'roles'), {})
 
 			// update current project / session in db
-			// $userDocRef = doc(db, 'users', $userStore.id)
 			await updateDoc($userDocRef, {
 				current_project_id: $projectDocRef.id,
 				current_session_id: $sessionDocRef.id
@@ -68,23 +76,21 @@
 			$userStore.currentSessionId = $sessionDocRef.id
 		}
 
-		// fetch the session data from db -- assume a session exists
+		// fetch the session data from db
 		const { currentProjectId, currentSessionId } = $userStore
 		$projectDocRef = doc(db, `projects/${currentProjectId}`)
 		$sessionDocRef = doc(
 			db,
 			`projects/${currentProjectId}/sessions/${currentSessionId}`
 		).withConverter(sessionConverter)
-
-		// update the local session store
 		const sessionSnapshot = await getDoc($sessionDocRef)
-
 		const sessionData = sessionSnapshot.data()
-
 		if (sessionData) {
 			$characters = sessionData.characters
 			$tracks = sessionData.tracks
 			$scenes = sessionData.scenes
+			$trackCount = sessionData.trackCount
+			$sceneCount = sessionData.sceneCount
 		}
 	})
 
@@ -167,6 +173,8 @@
 		// same for a doc in projects.doc.sessions
 		await setDoc(sessionDocRefStore, {
 			date: Date.now(),
+			trackCount: 0,
+			sceneCount: 0,
 			characters: {
 				character_id_1: {
 					name: 'Né-né'

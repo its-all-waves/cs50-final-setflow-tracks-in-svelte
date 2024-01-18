@@ -5,6 +5,10 @@ import { writable } from 'svelte/store'
 import { updateDoc } from 'firebase/firestore'
 
 import { sessionDocRef } from '../firebase_stores'
+
+// DEV
+import { get } from 'svelte/store'
+
 let $sessionDocRef
 sessionDocRef.subscribe(($) => ($sessionDocRef = $))
 
@@ -56,8 +60,7 @@ characters.subscribe(($) => ($characters = $))
 /** @description Keys are dynamic and == track name */
 export const tracks = writable(
 	/** @type {{} | { [trackId: string]: { name: string } }} */
-	// new Object()
-	{ 'i am': 'not undefined' }
+	new Object()
 )
 
 /** @type {{} | { [trackId: string]: { name: string } }} */
@@ -74,13 +77,21 @@ export const scenes = writable(
 let $scenes
 scenes.subscribe(($) => ($scenes = $))
 
+export const trackCount = writable(0)
+let $trackCount
+trackCount.subscribe(($) => ($trackCount = $))
+
+export const sceneCount = writable(0)
+let $sceneCount
+sceneCount.subscribe(($) => ($sceneCount = $))
+
 /** @description is e.detail from oncontextmenu; gets passed into the modal */
 export const lastEventDetail = writable(
 	/** @type {object} */
 	null
 )
-let $lastEventDetail
-lastEventDetail.subscribe(($) => ($lastEventDetail = $))
+// let $lastEventDetail
+// lastEventDetail.subscribe(($) => ($lastEventDetail = $))
 
 // ENUMS +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -147,8 +158,10 @@ function nextState(state, msg, info) {
 	let changedCharacters = false
 	let changedTracks = false
 	let changedScenes = false
+	let changedTrackCount = false
+	let changedSceneCount = false
 
-	logAction(msg)
+	DEV_logAction(msg)
 
 	let invalidEvent = false
 
@@ -187,12 +200,13 @@ function nextState(state, msg, info) {
 					break
 
 				case Msg.CLICK_TRACK_HEADER:
+					if (!guard_SELECT_TRACK()) break
 					if ($selectedDropZones.size > 0) clearSelectedDropZones()
 					SELECT_TRACK(info) // overwrites selected drop zones
 					break
 
 				case Msg.CLICK_SCENE_HEADER:
-					if (!guard_CLICK_SCENE_HEADER(info)) break
+					if (!guard_SELECT_SCENE(info)) break
 					if ($selectedDropZones.size > 0) clearSelectedDropZones()
 					SELECT_SCENE(info) // overwrites selected drop zones
 					break
@@ -237,10 +251,18 @@ function nextState(state, msg, info) {
 				case Msg.RENAME:
 					if (!guard_RENAME(info)) break
 					RENAME(info)
-					// TEMPORARY -- THIS IS REAL STUPID
-					changedCharacters = true
-					changedTracks = true
-					changedScenes = true
+					// TODO: TEST ME
+					switch (info.type) {
+						case 'character':
+							changedCharacters = true
+							break
+						case 'track':
+							changedTracks = true
+							break // don't need to fall thru since scene stores track id only
+						case 'scene':
+							changedScenes = true
+							break
+					}
 					break
 
 				case Msg.ADD_TRACKS:
@@ -248,7 +270,8 @@ function nextState(state, msg, info) {
 					ADD_TRACKS(info)
 					send(Msg.ADD_NEW_TRACKS_TO_SCENES)
 					changedTracks = true
-					changedScenes = true
+					changedScenes = true // since scenes keeps track of tracks
+					changedTrackCount = true
 					break
 
 				case Msg.ADD_NEW_TRACKS_TO_SCENES:
@@ -262,10 +285,12 @@ function nextState(state, msg, info) {
 					send(Msg.ADD_TRACKS_TO_NEW_SCENE, { id })
 					changedTracks = true
 					changedScenes = true
+					changedSceneCount = true
 					break
 
 				case Msg.ADD_TRACKS_TO_NEW_SCENE:
 					ADD_TRACKS_TO_NEW_SCENE(info)
+					// change handled in ADD_SCENE
 					break
 
 				case Msg.ADD_CHARACTER:
@@ -297,6 +322,12 @@ function nextState(state, msg, info) {
 	if (changedScenes) {
 		;(async () => await updateDoc($sessionDocRef, { scenes: $scenes }))()
 	}
+	if (changedTrackCount) {
+		;(async () => await updateDoc($sessionDocRef, { trackCount: $trackCount }))()
+	}
+	if (changedSceneCount) {
+		;(async () => await updateDoc($sessionDocRef, { sceneCount: $sceneCount }))()
+	}
 
 	return state // unchanged
 }
@@ -326,7 +357,7 @@ function resetSelections() {
 	clearSelectedDropZones()
 }
 
-function logAction(action) {
+function DEV_logAction(action) {
 	feedback.set(`---${action}-->`)
 }
 
@@ -438,6 +469,11 @@ function SELECT_DROP_ZONE({ sceneId, trackId }) {
 	feedback.set(`selected drop zone at scene ${scene}, ${track}`)
 }
 
+function guard_SELECT_TRACK() {
+	if (Object.keys($scenes).length === 0) return false
+	return true
+}
+
 function SELECT_TRACK({ id }) {
 	const track = $tracks[id].name
 
@@ -461,7 +497,7 @@ function SELECT_TRACK({ id }) {
 	feedback.set(`selected all drop zones on ${track}`)
 }
 
-function guard_CLICK_SCENE_HEADER({ id }) {
+function guard_SELECT_SCENE({ id }) {
 	// can't select a scene with a character in hand
 	if ($characterInHand) {
 		feedback.set(`cannot select a scene with a character in hand`)
@@ -694,15 +730,14 @@ function ADD_NEW_TRACKS_TO_SCENES() {
 }
 
 const MAX_TRACK_COUNT = 256
-let numberOfTracks = 0
 
 /** Add tracks to the global table object */
 function ADD_TRACKS({ label, count }) {
 	// add a track name without a number
 	if (!count) {
 		const id = `trk_${nanoid(9)}`
-		numberOfTracks += 1
-		$tracks[id] = { number: numberOfTracks, name: label }
+		trackCount.set($trackCount + 1)
+		$tracks[id] = { number: $trackCount, name: label }
 	}
 
 	// limit number of added tracks if total tracks would exceed max
@@ -716,24 +751,15 @@ function ADD_TRACKS({ label, count }) {
 		)
 	}
 
-	const end = numberOfTracks + count
-	for (let i = numberOfTracks; i < end; i++) {
+	let start = greatestValueOfTrackWith(label) ?? 0
+	const end = start + count
+	for (let i = start; i < end; i++) {
 		const name = `${label} ${i + 1}`
 		const id = `trk_${nanoid(9)}`
-		numberOfTracks++
-		$tracks[id] = { number: numberOfTracks, name }
+		trackCount.set($trackCount + 1)
+		$tracks[id] = { number: $trackCount, name }
 		feedback.set(`added "${name}" to tracks`)
 	}
-
-	// let start = greatestValueOfTrackWith(label) ?? 0
-	// const end = start + count
-	// for (let i = start; i < end; i++) {
-	// 	const name = `${label} ${i + 1}`
-	// 	const id = `trk_${nanoid(9)}`
-	// 	numberOfTracks++
-	// 	$tracks[id] = { number: numberOfTracks, name }
-	// 	feedback.set(`added "${name}" to tracks`)
-	// }
 
 	tracks.set($tracks)
 }
@@ -747,16 +773,15 @@ function guard_ADD_SCENE({ name }) {
 	return true
 }
 
-let numberOfScenes = 0
-
 /** Returns the new scene's id
  */
 function ADD_SCENE({ name }) {
+	// TODO: FIX THIS BAD LOGIC -- Fs UP WHEN REFRESH AND ADD MORE SCENES
 	// get the highest number in scenes
 
 	const id = `scn_${nanoid(9)}` // do keep me tho
-	numberOfScenes++
-	$scenes[id] = { name, number: numberOfScenes, trackList: {} }
+	sceneCount.set($sceneCount + 1)
+	$scenes[id] = { name, number: $sceneCount, trackList: {} }
 
 	scenes.set($scenes)
 	feedback.set(`added "${name}" to scenes`)
